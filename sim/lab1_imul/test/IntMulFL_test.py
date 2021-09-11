@@ -137,11 +137,11 @@ large_neg_neg_msgs = [
 # Test Case: sparse numbers 
 #-------------------------------------------------------------------------
 sparse_msgs = [
-  req(  34083856,  65), resp(2215451000),
-  req(  -20000,  -30), resp(600000),
-  req( -500000, -20),resp(10000000),
-  req( -12344, -42), resp(518448),
-  req( -42068, -44), resp(1850992)
+  req(  37749765,  4), resp(150999060),
+  req(2147483716, 2), resp(4294967432),
+  req(2,4), resp(2*4),
+  req(4652881168,4),resp(4652881168*4),
+  req(37749765,37749765),resp(37749765*37749765)
 ]
 
 
@@ -155,10 +155,9 @@ test_case_table = mk_test_case_table([
   [ "small_pos_neg",     small_pos_neg_msgs,   0,	       0	        ], 
   [ "small_neg_neg",     small_neg_neg_msgs,   0,        0          ],
   [ "large_pos_pos",     large_pos_pos_msgs,   0,	       0	        ],
-  [ "large_neg_pos",     large_neg_pos_msgs,   0,        0          ],
   [ "large_neg_neg",     large_neg_neg_msgs,   0,	       0	        ], 
-  [ "large_neg_neg",     large_neg_neg_msgs,   0,	       0	        ], 
-  [ "sparse",     sparse_msgs,   0,	       0	        ], 
+  [ "large_neg_pos",     large_neg_pos_msgs,   0,	       0	        ], 
+  [ "sparse",     sparse_msgs,   1,	       2	        ], 
 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to leverage the additional lists
