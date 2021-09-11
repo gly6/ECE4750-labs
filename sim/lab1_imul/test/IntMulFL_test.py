@@ -77,10 +77,73 @@ small_pos_pos_msgs = [
   req(  8,  7 ), resp(  56 ),
 ]
 
-# ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# Define additional lists of request/response messages to create
-# additional directed and random test cases.
-# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+#-------------------------------------------------------------------------
+# Test Case: small positive * negative 
+#-------------------------------------------------------------------------
+small_pos_neg_msgs = [
+  req(  2,  -2), resp( -4),
+  req(  4,  -3), resp(-12),
+  req( -1, 1),resp(-1),
+  req( 10, -13), resp(-130),
+  req( -8, 2), resp(-16)
+]
+
+#-------------------------------------------------------------------------
+# Test Case: small negative * negative 
+#-------------------------------------------------------------------------
+small_neg_neg_msgs = [
+  req(  -2,  -2), resp( 4),
+  req(  -4,  -3), resp(12),
+  req( -1, -1),resp(1),
+  req( -10, -13), resp(130),
+  req( -8, -2), resp(16)
+]
+
+
+#-------------------------------------------------------------------------
+# Test Case: large positive * positive
+#-------------------------------------------------------------------------
+large_pos_pos_msgs = [
+  req(  5000,  32), resp( 160000),
+  req(  20000,  30), resp(600000),
+  req( 500000, 20),resp(10000000),
+  req( 12344, 42), resp(518448),
+  req( 42068, 44), resp(1850992)
+]
+
+#-------------------------------------------------------------------------
+# Test Case: large negative * positive 
+#-------------------------------------------------------------------------
+large_neg_pos_msgs = [
+  req(  -5000,  32), resp( -160000),
+  req(  -20000,  30), resp(-600000),
+  req( -500000, 20),resp(-10000000),
+  req( -12344, 42), resp(-518448),
+  req( -42068, 44), resp(-1850992)
+]
+
+#-------------------------------------------------------------------------
+# Test Case: large negative * negative 
+#-------------------------------------------------------------------------
+large_neg_neg_msgs = [
+  req(  -5000,  -32), resp(160000),
+  req(  -20000,  -30), resp(600000),
+  req( -500000, -20),resp(10000000),
+  req( -12344, -42), resp(518448),
+  req( -42068, -44), resp(1850992)
+]
+
+#-------------------------------------------------------------------------
+# Test Case: sparse numbers 
+#-------------------------------------------------------------------------
+sparse_msgs = [
+  req(  34083856,  65), resp(2215451000),
+  req(  -20000,  -30), resp(600000),
+  req( -500000, -20),resp(10000000),
+  req( -12344, -42), resp(518448),
+  req( -42068, -44), resp(1850992)
+]
+
 
 #-------------------------------------------------------------------------
 # Test Case Table
@@ -89,6 +152,13 @@ small_pos_pos_msgs = [
 test_case_table = mk_test_case_table([
   (                      "msgs                 src_delay sink_delay"),
   [ "small_pos_pos",     small_pos_pos_msgs,   0,        0          ],
+  [ "small_pos_neg",     small_pos_neg_msgs,   0,	       0	        ], 
+  [ "small_neg_neg",     small_neg_neg_msgs,   0,        0          ],
+  [ "large_pos_pos",     large_pos_pos_msgs,   0,	       0	        ],
+  [ "large_neg_pos",     large_neg_pos_msgs,   0,        0          ],
+  [ "large_neg_neg",     large_neg_neg_msgs,   0,	       0	        ], 
+  [ "large_neg_neg",     large_neg_neg_msgs,   0,	       0	        ], 
+  [ "sparse",     sparse_msgs,   0,	       0	        ], 
 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to leverage the additional lists
