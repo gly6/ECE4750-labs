@@ -76,8 +76,8 @@ module lab1_imul_IntMulBaseVRTL_IntMulBaseCtrl(
 
   always_ff @(posedge clk) begin
     case (state_reg)
-      STATE_CALC: count_next = count_next + 1;
-      default: count_next = 0;
+      STATE_CALC: count_next <= count_next + 1;
+      default: count_next <= 0;
     endcase
   end
 
@@ -165,8 +165,8 @@ module lab1_imul_IntMulBaseVRTL_IntMulBaseCtrl(
 
   // Labels for Mealy transistions
 
-  logic do_swap;
-  logic do_sub;
+  logic do_add_shift;
+  logic do_shift;
 
   assign do_add_shift = b_lsb;
   assign do_shift  = !b_lsb;
