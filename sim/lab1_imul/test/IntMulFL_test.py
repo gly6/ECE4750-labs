@@ -144,7 +144,55 @@ sparse_msgs = [
   req(37749765,37749765),resp(37749765*37749765)
 ]
 
+#-------------------------------------------------------------------------
+# Test Case: dense numbers 
+#-------------------------------------------------------------------------
+dense_msgs = [
+  req(0x2F3DFE3F,  0x2F7DFE3F), resp(0x2F3DFE3F * 0x2F7DFE3F),
+  req(0x2F7DFFBF, 0x2F7FFFBF), resp(0x2F7DFFBF*0x2F7FFFBF),
+  req(0x3FFFFFFF,0x2FFFFFFF), resp(0x3FFFFFFF*0x2FFFFFFF),
+  req(0x3FFFE4FF,0xBFFFE4FF),resp(0x3FFFE4FF*0xBFFFE4FF),
+]
 
+#-------------------------------------------------------------------------
+# Test Case: ones,zero,negative one 
+#-------------------------------------------------------------------------
+ones_zeros_neg_msgs = [
+  req(1,  1), resp(1),
+  req(1, 0), resp(0),
+  req(1,-1), resp(-1),
+  req(-1,0),resp(0),
+]
+
+#-------------------------------------------------------------------------
+# Test Case: middle bits masked off
+#-------------------------------------------------------------------------
+middle_masked_off = [
+  req(0xFFFF00FF,  0xFFFE00FF), resp(0xFFFF00FF*0xFFFE00FF),
+  req(0xFFFC00FF, 0xFFFC00FF), resp(0xFFFC00FF*0xFFFC00FF),
+  req(0xFFFB00FF,0xFFFA00FF), resp(0xFFFB00FF*0xFFFA00FF),
+]
+
+#-------------------------------------------------------------------------
+# Test Case: lower order bits masked off
+#-------------------------------------------------------------------------
+low_order_off = [
+  req(0xFFFFFFFE,  0xFFFFFFFE), resp(0xFFFFFFFE*0xFFFFFFFE),
+  req(0xFFFFFFFC, 0xFFFFFFFC), resp(0xFFFFFFFC*0xFFFFFFFC),
+  req(0xFFFFFFF8,0xFFFFFFF0), resp(0xFFFFFFF8*0xFFFFFFF0),
+  req(0xFFFFFFE0,0xFFFFFFF0), resp(0xFFFFFFE0*0xFFFFFFF0),
+]
+
+
+#-------------------------------------------------------------------------
+# Test Case: random test
+#-------------------------------------------------------------------------
+random_msgs = []
+for i in xrange(50):
+  a = random.randint(0,0xffff)
+  b = random.randint(0,0xffff)
+  c = resp( a*b )
+  random_msgs.extend([req(a,b), c])
 #-------------------------------------------------------------------------
 # Test Case Table
 #-------------------------------------------------------------------------
@@ -152,13 +200,17 @@ sparse_msgs = [
 test_case_table = mk_test_case_table([
   (                      "msgs                 src_delay sink_delay"),
   [ "small_pos_pos",     small_pos_pos_msgs,   0,        0          ],
-  [ "small_pos_neg",     small_pos_neg_msgs,   0,	       0	        ], 
-  [ "small_neg_neg",     small_neg_neg_msgs,   0,        0          ],
-  [ "large_pos_pos",     large_pos_pos_msgs,   0,	       0	        ],
-  [ "large_neg_neg",     large_neg_neg_msgs,   0,	       0	        ], 
+  [ "small_pos_neg",     small_pos_neg_msgs,   9,	       10	        ], 
+  [ "small_neg_neg",     small_neg_neg_msgs,   0,        4          ],
+  [ "large_pos_pos",     large_pos_pos_msgs,   2,	       0	        ],
+  [ "large_neg_neg",     large_neg_neg_msgs,   3,	       3	        ], 
   [ "large_neg_pos",     large_neg_pos_msgs,   0,	       0	        ], 
-  [ "sparse",     sparse_msgs,   1,	       2	        ], 
-
+  [ "sparse_num",     sparse_msgs,   1,	       2	        ],
+  [ "dense_num", dense_msgs,  2,         10          ],
+  [ "ones_zeros_neg_test", ones_zeros_neg_msgs,  1,         3         ],
+  [ "middle_masked_off_test", middle_masked_off,  1,         1          ],
+  [ "middle_masked_off_test", low_order_off,  1,         0          ],
+  [ "random_test", random_msgs,  2,         10          ] 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to leverage the additional lists
   # of request/response messages defined above, but also to test
