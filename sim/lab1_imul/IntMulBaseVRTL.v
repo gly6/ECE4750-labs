@@ -4,7 +4,8 @@
 
 `ifndef LAB1_IMUL_INT_MUL_BASE_V
 `define LAB1_IMUL_INT_MUL_BASE_V
-
+`include "/home/kae87/ece4750/lab-group16/sim/lab1_imul/IntMulBaseVRTL_ControlFSM.v"
+`include "/home/kae87/ece4750/lab-group16/sim/lab1_imul/IntMulBaseVRTL_Dpath.v"
 `include "vc/trace.v"
 
 // ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -40,15 +41,15 @@ module lab1_imul_IntMulBaseVRTL
 
   // Control Signals
 
-  output logic a_mux_sel,
-  output logic b_mux_sel,
-  output logic add_mux_sel,
-  output logic result_mux_sel,
-  output logic result_en,
+  logic a_mux_sel;
+  logic b_mux_sel;
+  logic add_mux_sel;
+  logic result_mux_sel;
+  logic result_en;
 
   // Data Signals
   
-  input logic b_lsb,
+  logic b_lsb;
 
   // Control unit
 
