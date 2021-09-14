@@ -34,6 +34,35 @@ module lab1_imul_IntMulBaseVRTL
   // together.
   // '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+  //----------------------------------------------------------------------
+  // Connect Control Unit and Datapath
+  //----------------------------------------------------------------------
+
+  // Control Signals
+
+  output logic a_mux_sel,
+  output logic b_mux_sel,
+  output logic add_mux_sel,
+  output logic result_mux_sel,
+  output logic result_en,
+
+  // Data Signals
+  
+  input logic b_lsb,
+
+  // Control unit
+
+  lab1_imul_IntMulBaseVRTL_IntMulBaseCtrl ctrl
+  (
+    .*
+  );
+
+  // Datapath
+
+  lab1_imul_IntMulBaseVRTL_Dpath dpath
+  (
+    .*
+  );
  
   //----------------------------------------------------------------------
   // Line Tracing
