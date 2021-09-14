@@ -22,10 +22,10 @@ module lab1_imul_IntMulBaseVRTL_IntMulBaseCtrl(
 
   // Data Signals
   
-  input logic b_lsb,
+  input logic b_lsb
 
 );
-
+  localparam c_nbits = 32;
   //----------------------------------------------------------------------
   // State Definitions
   //----------------------------------------------------------------------
@@ -53,11 +53,11 @@ module lab1_imul_IntMulBaseVRTL_IntMulBaseCtrl(
   //----------------------------------------------------------------------
   // Counter Logic
   //----------------------------------------------------------------------
-  logic [7:0] counter;
-  logic [7:0] counter_next;
+  logic [31:0] counter;
+  logic [31:0] count_next;
   logic is_cnt_lt_32;
 
-  vc_ResetReg#(8, 0) count_reg
+  vc_ResetReg#(32, 0) count_reg
   (
     .clk    (clk),
     .reset  (reset),
@@ -67,9 +67,9 @@ module lab1_imul_IntMulBaseVRTL_IntMulBaseCtrl(
 
   // Less-than comparator
 
-  vc_LtComparator#(c_nbits) count_lt_32
+  vc_LtComparator#(32) count_lt_32
   (
-    .in0   (counter),
+    .in0   (count_next),
     .in1   (0'd32),
     .out   (is_cnt_lt_32)
   );
@@ -118,7 +118,7 @@ module lab1_imul_IntMulBaseVRTL_IntMulBaseCtrl(
   localparam b_rs = 1'd0;
   localparam b_ld = 1'd1;
   
-  localparam a_x   = 2'dx;
+  localparam a_x   = 1'dx;
   localparam a_ls = 1'd0;
   localparam a_ld = 1'd1;
 
@@ -146,7 +146,7 @@ module lab1_imul_IntMulBaseVRTL_IntMulBaseCtrl(
   (
     input logic       cs_req_rdy,
     input logic       cs_resp_val,
-    input logic [1:0] cs_a_mux_sel,
+    input logic       cs_a_mux_sel,
     input logic       cs_b_mux_sel,
     input logic       cs_add_mux_sel,
     input logic       cs_result_mux_sel,
@@ -168,15 +168,15 @@ module lab1_imul_IntMulBaseVRTL_IntMulBaseCtrl(
   logic do_add_shift;
   logic do_shift;
 
-  assign do_add_shift = b_lsb;
-  assign do_shift  = !b_lsb;
+  assign do_add_shift = b_lsb&&( counter <32);
+  assign do_shift  = !b_lsb&&(counter<32);
 
   // Set outputs using a control signal "table"
 
   always_comb begin
     
     //req rdy, resp val, a_mux_sel, b_mux_sel, add_mux_sel, result_mux_sel, result_en
-    cs( 0, 0, a_x, 0, b_x, 0 );
+    //cs( 0,     0,        a_x,       0,        b_x,         0,      0 );
     case ( state_reg )
       //                             req resp a mux  a  b mux b  
       //                             rdy val  sel    en sel   en
