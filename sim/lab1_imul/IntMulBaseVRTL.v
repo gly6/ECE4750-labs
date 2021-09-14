@@ -4,8 +4,8 @@
 
 `ifndef LAB1_IMUL_INT_MUL_BASE_V
 `define LAB1_IMUL_INT_MUL_BASE_V
-`include "/home/kae87/ece4750/lab-group16/sim/lab1_imul/IntMulBaseVRTL_ControlFSM.v"
-`include "/home/kae87/ece4750/lab-group16/sim/lab1_imul/IntMulBaseVRTL_Dpath.v"
+`include "lab1_imul/IntMulBaseVRTL_ControlFSM.v"
+`include "lab1_imul/IntMulBaseVRTL_Dpath.v"
 `include "vc/trace.v"
 
 // ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

@@ -1,25 +1,30 @@
+`include "vc/arithmetic.v"
+`include "vc/muxes.v"
+`include "vc/regs.v"
+
+
 module lab1_imul_IntMulBaseVRTL_Dpath(
   input  logic        clk,
   input  logic        reset,
   
   //Data Signal 
   input  logic        req_val,
-  output logic        req_rdy,
-  input  logic [63:0] req_msg,
+  //output logic        req_rdy,
+  //input  logic [63:0] req_msg,
 
   output logic        resp_val,
-  input  logic        resp_rdy,
-  output logic [31:0] resp_msg
+  //input  logic        resp_rdy,
+  //output logic [31:0] resp_msg,
 
   //Control Signal
-  input  logic        a_mux_sel;
-  input  logic        b_mux_sel; 
-  input  logic        result_mux_sel;
-  input  logic        add_mux_sel; 
-  input  logic        result_en;
+  input  logic        a_mux_sel,
+  input  logic        b_mux_sel, 
+  input  logic        result_mux_sel,
+  input  logic        add_mux_sel, 
+  input  logic        result_en,
 
   //Status Signal 
-  output logic        b_lsb; 
+  output logic        b_lsb 
 );
 
   // ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -88,7 +93,7 @@ logic [c_nbits-1:0] result_mux_out;
 vc_Mux2#(c_nbits) result_mux 
 (
   .in0  (add_mux_out),
-  .in1  (0'b1); 
+  .in1  (0'b1), 
   .sel  (result_mux_sel),
   .out  (result_mux_out)
 );
