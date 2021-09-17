@@ -19,14 +19,12 @@ module lab1_imul_IntMulAltVRTL_Dpath(
   //Control Signal
   input  logic        a_mux_sel,
   input  logic        b_mux_sel, 
-  input  logic        result_mux_sel,
-  input  logic        add_mux_sel, 
   input  logic        result_en,
-  input  logic        b_shift_sel, 
-  input  logic        a_shift_sel, 
+  input  logic        result_reset, 
+  input  logic        shamt, 
 
   //Status Signal 
-  output logic [1:0]  b_lsb 
+  output logic [31:0] b_out    
 );
 
   // ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -36,9 +34,16 @@ module lab1_imul_IntMulAltVRTL_Dpath(
 // a - first 32 bits, b - last 32 bits
 //top of mux is 0 
 localparam c_nbits = 32; 
+//extra stuff, can comment out if necessary 
+vc_Mux2#(c_nbits) a_in_mux (
+  .in0  (req_msg[31:0])
+  .in1  (req_msg[63:32]),
+  .sel  (gt_com),
+  .out  (req_msg_a))
+);
 
 //MAIN PART OF THE CODE 
-logic [c_nbits-1:0] req_msg_a = req_msg[63:32]; 
+logic [c_nbits-1:0] req_msg_a 
 logic [c_nbits-1:0] a_mux_out; 
 vc_Mux2#(c_nbits) a_mux 
 (
@@ -76,73 +81,29 @@ vc_ResetReg#(32, 0) b_reg
   .d      (b_mux_out)
 );
 
-logic [c_nbits-1:0] b_shift_1;
-vc_RightLogicalShifter#(c_nbits, 1) b_shift_right_1 
-(
-  .in     (b_reg_out), 
-  .shamt  (1'b1), 
-  .out    (b_shift_1)
-);
-
-logic [c_nbits-1:0] b_shift_2; 
-vc_RightLogicalShifter#(c_nbits, 2) b_shift_right_2 
-(
-  .in     (b_reg_out), 
-  .shamt  (2'd2), 
-  .out    (b_shift_2)
-);
-
 logic [c_nbits-1:0] b_shift_out;
-vc_Mux2#(c_nbits) b_shift_sel_mux 
+vc_RightLogicalShifter#(c_nbits, 1) b_shift_right 
 (
-  .in0    (b_shift_1),
-  .in1    (b_shift_2),
-  .sel    (b_shift_sel),
+  .in     (b_reg_out), 
+  .shamt  (shamt), 
   .out    (b_shift_out)
 );
 
-logic [c_nbits-1:0] a_shift_1; 
-vc_LeftLogicalShifter#(c_nbits, 1) a_shift_left_1 
+logic [c_nbits-1:0] a_shift_out; 
+vc_LeftLogicalShifter#(c_nbits, 1) a_shift_left 
 (
   .in     (a_reg_out),
-  .shamt  (1'b1), 
-  .out    (a_shift_1)
-);
-
-logic [c_nbits-1:0] a_shift_2; 
-vc_LeftLogicalShifter#(c_nbits, 2) a_shift_left_2 
-(
-  .in     (a_reg_out),
-  .shamt  (2'd2), 
-  .out    (a_shift_2)
-);
-
-logic [c_nbits-1:0] a_shift_out;
-vc_Mux2#(c_nbits) a_shift_sel_mux 
-(
-  .in0    (a_shift_1),
-  .in1    (a_shift_2),
-  .sel    (a_shift_sel),
+  .shamt  (shamt), 
   .out    (a_shift_out)
 );
-
-logic [c_nbits-1:0] result_mux_out;
-vc_Mux2#(c_nbits) result_mux 
-(
-  .in0  (add_mux_out),
-  .in1  (0), 
-  .sel  (result_mux_sel),
-  .out  (result_mux_out)
-);
-
 
 logic [c_nbits-1:0] result_reg_out; 
 vc_EnReg#(c_nbits) result_reg 
 (
     .clk    (clk),
-    .reset  (reset),
+    .reset  (reset || result_reset),
     .q      (result_reg_out),
-    .d      (result_mux_out),
+    .d      (result_adder_out),
     .en     (result_en)
 );
 
@@ -154,16 +115,7 @@ vc_SimpleAdder#(c_nbits)  result_adder
   .out    (result_adder_out)
 );
 
-logic [c_nbits-1:0] add_mux_out;
-vc_Mux2#(c_nbits) add_mux 
-(
-  .in0  (result_adder_out),
-  .in1  (result_reg_out), 
-  .sel  (add_mux_sel), 
-  .out  (add_mux_out)
-);
-
 assign resp_msg = result_reg_out; 
-assign b_lsb = b_reg_out[1:0];
+assign b_out = b_reg_out; 
 
 endmodule
