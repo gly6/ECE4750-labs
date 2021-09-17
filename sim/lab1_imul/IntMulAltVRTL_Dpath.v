@@ -26,7 +26,7 @@ module lab1_imul_IntMulAltVRTL_Dpath(
   input  logic        a_shift_sel, 
 
   //Status Signal 
-  output logic        b_lsb 
+  output logic [1:0]  b_lsb 
 );
 
   // ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -164,6 +164,6 @@ vc_Mux2#(c_nbits) add_mux
 );
 
 assign resp_msg = result_reg_out; 
-assign b_lsb = b_reg_out[0];
+assign b_lsb = b_reg_out[1:0];
 
 endmodule
