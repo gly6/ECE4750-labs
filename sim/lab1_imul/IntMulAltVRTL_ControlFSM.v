@@ -18,8 +18,6 @@ module lab1_imul_IntMulAltVRTL_IntMulAltCtrl(
   output logic b_mux_sel,
   output logic result_reset,
   output logic[4:0] shamt,
-  output logic result_en,
-
   // Data Signals
   
   input logic[31:0] b_out
@@ -88,7 +86,6 @@ module lab1_imul_IntMulAltVRTL_IntMulAltCtrl(
     input logic       cs_resp_val,
     input logic       cs_a_mux_sel,
     input logic       cs_b_mux_sel,
-    input logic       cs_result_en,
     input logic       cs_result_reset,
     input logic[4:0]  cs_shamt
   );
@@ -99,7 +96,6 @@ module lab1_imul_IntMulAltVRTL_IntMulAltCtrl(
     b_mux_sel = cs_b_mux_sel;
     result_reset = cs_result_reset;
     shamt = cs_shamt;
-    result_en = cs_result_en;
   end
   endtask
 
@@ -150,6 +146,7 @@ module lab1_imul_IntMulAltVRTL_IntMulAltCtrl(
 
       STATE_DONE:                                    cs( 0, 1, a_x, b_x, 0, 0, 0);
       default                         cs( 'x, 'x, a_x, b_x, 'x, 'x, 'x);
+
 
     endcase
 

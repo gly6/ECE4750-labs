@@ -48,16 +48,16 @@ vc_Mux2#(c_nbits) b_in_mux
 (
   .in0  (req_msg[63:32]),
   .in1  (req_msg[31:0]),
-  .sel  (get_com),
+  .sel  (gt_com),
   .out  (req_msg_b)
 );
 
-logic get_com; 
+logic gt_com; 
 vc_GtComparator#(c_nbits) comparator 
 (
   .in0  (req_msg[63:32]),
   .in1  (req_msg[31:0]), 
-  .out  (get_com)
+  .out  (gt_com)
 );
 
 //MAIN PART OF THE CODE 
@@ -123,7 +123,7 @@ vc_ResetReg#(c_nbits) result_reg
     .clk    (clk),
     .reset  (reset || result_reset),
     .q      (result_reg_out),
-    .d      (result_adder_out),
+    .d      (result_adder_out)
 );
 
 logic [c_nbits-1:0] result_adder_out;
