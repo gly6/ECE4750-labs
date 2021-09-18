@@ -1,6 +1,6 @@
  //CONTROL DESIGN START
 
-module lab1_imul_IntMulBaseVRTL_IntMulBaseCtrl(
+module lab1_imul_IntMulAltVRTL_IntMulAltCtrl(
   
   input  logic        clk,
   input  logic        reset,

@@ -4,7 +4,8 @@
 
 `ifndef LAB1_IMUL_INT_MUL_ALT_V
 `define LAB1_IMUL_INT_MUL_ALT_V
-
+`include "lab1_imul/IntMulAltVRTL_ControlFSM.v"
+`include "lab1_imul/IntMulAltVRTL_Dpath.v"
 `include "vc/trace.v"
 
 // ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

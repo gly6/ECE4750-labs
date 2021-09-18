@@ -37,7 +37,7 @@ localparam c_nbits = 32;
 logic [c_nbits-1:0] req_msg_a;
 vc_Mux2#(c_nbits) a_in_mux 
 (
-  .in0  (req_msg[31:0])
+  .in0  (req_msg[31:0]),
   .in1  (req_msg[63:32]),
   .sel  (gt_com),
   .out  (req_msg_a)
