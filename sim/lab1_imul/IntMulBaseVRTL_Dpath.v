@@ -93,7 +93,7 @@ logic [c_nbits-1:0] result_mux_out;
 vc_Mux2#(c_nbits) result_mux 
 (
   .in0  (add_mux_out),
-  .in1  (0'b1), 
+  .in1  (0), 
   .sel  (result_mux_sel),
   .out  (result_mux_out)
 );
