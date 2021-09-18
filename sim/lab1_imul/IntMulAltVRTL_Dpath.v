@@ -44,7 +44,7 @@ vc_Mux2#(c_nbits) a_in_mux
   .out  (req_msg_a)
 );
 
-logic [c_nbits-1:0] req_msg_b = req_msg[31:0];
+logic [c_nbits-1:0] req_msg_b;
 vc_Mux2#(c_nbits) b_in_mux 
 (
   .in0  (req_msg[63:32]),
@@ -62,6 +62,9 @@ vc_GtComparator#(c_nbits) comparator
 );
 
 //MAIN PART OF THE CODE 
+//uncomment for functionality if above is commented 
+//logic [c_nbits-1:0] req_msg_a = req_msg[63:32];
+//logic [c_nbits-1:0] req_msg_b = req_msg[31:0];
 logic [c_nbits-1:0] a_mux_out; 
 vc_Mux2#(c_nbits) a_mux 
 (
