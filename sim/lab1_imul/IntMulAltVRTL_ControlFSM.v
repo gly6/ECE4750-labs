@@ -40,7 +40,14 @@ module lab1_imul_IntMulAltVRTL_IntMulAltCtrl(
 
   logic [1:0] state_reg;
   logic [1:0] state_next;
-
+ always_ff @( posedge clk ) begin
+    if ( reset ) begin
+      state_reg <= STATE_IDLE;
+    end
+    else begin
+      state_reg <= state_next;
+    end
+  end
   //----------------------------------------------------------------------
   // State Transitions
   //----------------------------------------------------------------------
@@ -51,7 +58,7 @@ module lab1_imul_IntMulAltVRTL_IntMulAltCtrl(
 
   assign req_go       = req_val  && req_rdy;
   assign resp_go      = resp_val && resp_rdy;
-  assign is_calc_done = !((b_out & 32'hFFFFFFFF) > 0);
+  assign is_calc_done = ((b_out & 32'hFFFFFFFF) == 0);
 
   always_comb begin
 
@@ -119,6 +126,7 @@ module lab1_imul_IntMulAltVRTL_IntMulAltCtrl(
       //                             req resp a mux  a  b mux b  
       //                             rdy val  sel    en sel   en
       //STATE_IDLE:                                 cs( 1,  0,   a_ld,  1, b_ld, 1 );
+
       STATE_IDLE:                                      cs( 1, 0, a_ld, b_ld, add_resp, 1, 0);
       STATE_CALC: if ( (b_out[30:0] & 31'h7FFFFFFF) > 0 ) cs( 0, 0, a_ls, b_rs, add_resp, 0, 31);
              else if ( (b_out[29:0] & 30'h3FFFFFFF) > 0 ) cs( 0, 0, a_ls, b_rs, add_resp, 0, 30);
