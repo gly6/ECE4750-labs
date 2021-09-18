@@ -35,15 +35,33 @@ module lab1_imul_IntMulAltVRTL_Dpath(
 //top of mux is 0 
 localparam c_nbits = 32; 
 //extra stuff, can comment out if necessary 
-vc_Mux2#(c_nbits) a_in_mux (
+logic [c_nbits-1:0] req_msg_a;
+vc_Mux2#(c_nbits) a_in_mux 
+(
   .in0  (req_msg[31:0])
   .in1  (req_msg[63:32]),
   .sel  (gt_com),
-  .out  (req_msg_a))
+  .out  (req_msg_a)
+);
+
+logic [c_nbits-1:0] req_msg_b = req_msg[31:0];
+vc_Mux2#(c_nbits) b_in_mux 
+(
+  .in0  (req_msg[63:32]),
+  .in1  (req_msg[31:0]),
+  .sel  (get_com),
+  .out  (req_msg_b)
+);
+
+logic get_com; 
+vc_GtComparator#(c_nbits) comparator 
+(
+  .in0  (req_msg[63:32]),
+  .in1  (req_msg[31:0]), 
+  .out  (get_com)
 );
 
 //MAIN PART OF THE CODE 
-logic [c_nbits-1:0] req_msg_a 
 logic [c_nbits-1:0] a_mux_out; 
 vc_Mux2#(c_nbits) a_mux 
 (
@@ -53,7 +71,7 @@ vc_Mux2#(c_nbits) a_mux
   .out  (a_mux_out)   
 );
 
-logic [c_nbits-1:0] req_msg_b = req_msg[31:0];
+
 logic [c_nbits-1:0] b_mux_out; 
 vc_Mux2#(c_nbits) b_mux 
 (
