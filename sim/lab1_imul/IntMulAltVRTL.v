@@ -44,6 +44,7 @@ module lab1_imul_IntMulAltVRTL
   logic       b_mux_sel;
   logic       result_reset;
   logic       add_mux_sel;
+  logic       result_en;
   logic [4:0] shamt; 
 
   // Data Signals

@@ -21,6 +21,7 @@ module lab1_imul_IntMulAltVRTL_Dpath(
   input  logic        b_mux_sel, 
   input  logic        result_reset, 
   input  logic        add_mux_sel, 
+  input  logic        result_en,
   input  logic [4:0]  shamt, 
 
   //Status Signal 
@@ -119,12 +120,13 @@ vc_LeftLogicalShifter#(c_nbits, 5) a_shift_left
 );
 
 logic [c_nbits-1:0] result_reg_out; 
-vc_ResetReg#(c_nbits) result_reg 
+vc_EnResetReg#(c_nbits) result_reg 
 (
     .clk    (clk),
     .reset  (reset || result_reset),
     .q      (result_reg_out),
-    .d      (add_mux_out)
+    .d      (add_mux_out),
+    .en     (result_en)
 );
 
 logic [c_nbits-1:0] result_adder_out;
@@ -135,11 +137,11 @@ vc_SimpleAdder#(c_nbits)  result_adder
   .out    (result_adder_out)
 );
 
-logic [c_nbits-1:0] add_mux_out
+logic [c_nbits-1:0] add_mux_out;
 vc_Mux2#(c_nbits) add_mux 
 (
-  .in0    (result_reg_out),
-  .in1    (result_adder_out),
+  .in0    (result_adder_out),
+  .in1    (result_reg_out),
   .sel    (add_mux_sel),
   .out    (add_mux_out)
 );
