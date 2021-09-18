@@ -221,7 +221,7 @@ for i in xrange(50):
 random_high_mask_msgs = []
 for i in xrange(50):
   a = (random.randint(0,0xffff)) & Bits(32,0x7FFFFFFF)
-  b = (random.randint(0,0xffff)) & Bits(32,0x3FFFFFFF)
+  b = (random.randint(0,0xffff)) & Bits(32,0x1FFFFFFF)
   c = resp( a*b )
   random_high_mask_msgs.extend([req(a,b), c])
   
@@ -260,6 +260,20 @@ for i in xrange(50):
   
   c = resp( a*b )
   random_all_one_msgs.extend([req((a & 0xffff),(b & 0xffff) ), c])
+  
+#-------------------------------------------------------------------------
+# Test Case: Consecutive zeros for Alternative design 
+#-------------------------------------------------------------------------
+  
+consecutive_zeros = [
+  req(4,4), resp(16),
+  req(0,0), resp(0),
+  req(0x80000000,0x80000000), resp(0x80000000*0x80000000),
+  req(0x80000001,0x80000001), resp(0x80000001*0x80000001),
+  req(0x1,0x80008001), resp(0x80008001),
+  req(0x82008001,0x82008081), resp(0x82008001*0x82008081)
+]
+
 
 #-------------------------------------------------------------------------
 # Test Case Table
@@ -287,12 +301,8 @@ test_case_table = mk_test_case_table([
   [ "random_test_4", random_mid_mask_msgs,                 src_delay,   sink_delay          ], 
   [ "random_test_5", random_high_mask_msgs,                 src_delay,   sink_delay          ], 
   [ "random_test_6", random_mix_mask_msgs,                 src_delay,   sink_delay          ],
-  [ "random_test_7", random_all_one_msgs,                 src_delay,   sink_delay          ] 
-  # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  # Add more rows to the test case table to leverage the additional lists
-  # of request/response messages defined above, but also to test
-  # different source/sink random delays.
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+  [ "random_test_7", random_all_one_msgs,                 src_delay,   sink_delay          ],
+  [ "consecutive_zeros", consecutive_zeros,                 src_delay,   sink_delay          ] 
 
 ])
 

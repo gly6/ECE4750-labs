@@ -66,13 +66,55 @@ for i in xrange(50):
   a = random.randint(0,100)
   b = random.randint(0,100)
   random_small_msgs.extend([ req( a, b ), resp( a * b ) ])
+#----------------------------------------------------------------------
+# Data Set: random large
+#----------------------------------------------------------------------
 
-# ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# You should add more datasets for evaluation. Remember these datasets
-# are not for testing; your design should already be thoroughly tested
-# before you begin your evaluation.
-# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+random_large_msgs = []
+for i in xrange(50):
+  a = random.randint(32768,0xffff)
+  b = random.randint(32768,0xffff)
+  random_large_msgs.extend([ req( a, b ), resp( a * b ) ])
+#----------------------------------------------------------------------
+# Data Set: random lomask
+#----------------------------------------------------------------------
 
+random_lomask_msgs = []
+for i in xrange(50):
+  a = (random.randint(0,0xffff)) & Bits(32,0xFFFFFF00)
+  b = (random.randint(0,0xffff)) & Bits(32,0xFFFFFFDC)
+  c = resp( a*b )
+  random_lomask_msgs.extend([req(a,b), c])
+#----------------------------------------------------------------------
+# Data Set: random himask
+#----------------------------------------------------------------------
+
+random_himask_msgs = []
+for i in xrange(50):
+  a = (random.randint(0,0xffff)) & Bits(32,0x7FFFFFFF)
+  b = (random.randint(0,0xffff)) & Bits(32,0x3FFFFFFF)
+  c = resp( a*b )
+  random_himask_msgs.extend([req(a,b), c])
+#----------------------------------------------------------------------
+# Data Set: random lohimask
+#----------------------------------------------------------------------
+
+random_lohimask_msgs = []
+for i in xrange(50):
+  a = random.randint(0,0x1FF800)
+  b = random.randint(0,0xFF000)
+  random_lohimask_msgs.extend([ req( a, b ), resp( a * b ) ])
+#----------------------------------------------------------------------
+# Data Set: sparse
+#----------------------------------------------------------------------
+
+sparse_msgs = [
+  req(  37749765,  4), resp(150999060),
+  req(2147483716, 2), resp(4294967432),
+  req(2,4), resp(2*4),
+  req(4652881168,4),resp(4652881168*4),
+  req(37749765,37749765),resp(37749765*37749765)
+]
 #-------------------------------------------------------------------------
 # Command line processing
 #-------------------------------------------------------------------------
@@ -103,7 +145,7 @@ def parse_cmdline():
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   p.add_argument( "--input", default="small",
-    choices=["small"] )
+    choices=["small","large","lomask","himask","lohimask","sparse"] )
 
   p.add_argument( "--trace",     action="store_true" )
   p.add_argument( "--stats",     action="store_true" )
@@ -132,6 +174,16 @@ def main():
 
   if opts.input == "small":
     inputs = random_small_msgs
+  elif opts.input == "large":
+    inputs = random_large_msgs
+  elif opts.input == "lomask":
+    inputs = random_lomask_msgs
+  elif opts.input == "himask":
+    inputs = random_himask_msgs
+  elif opts.input == "lohimask":
+    inputs = random_lohimask_msgs
+  elif opts.input == "sparse":
+    inputs = sparse_msgs
 
   ninputs = len(inputs[::2])
 
