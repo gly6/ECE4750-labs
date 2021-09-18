@@ -18,7 +18,7 @@ module lab1_imul_IntMulAltVRTL_IntMulAltCtrl(
   output logic b_mux_sel,
   output logic result_reset,
   output logic[4:0] shamt,
-  output logic result_en
+  output logic result_en,
 
   // Data Signals
   
@@ -51,7 +51,7 @@ module lab1_imul_IntMulAltVRTL_IntMulAltCtrl(
 
   assign req_go       = req_val  && req_rdy;
   assign resp_go      = resp_val && resp_rdy;
-  assign is_calc_done = !(b_out && 32'xFFFFFFFF);
+  assign is_calc_done = !(b_out && 32'hFFFFFFFF);
 
   always_comb begin
 
@@ -114,42 +114,42 @@ module lab1_imul_IntMulAltVRTL_IntMulAltCtrl(
       //                             rdy val  sel    en sel   en
       //STATE_IDLE:                                 cs( 1,  0,   a_ld,  1, b_ld, 1 );
       STATE_IDLE:                                      cs( 1, 0, a_ld, b_ld, 0, 1, 0);
-      STATE_CALC: if ( !([31:0]b_out && 32'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 32);
-             else if ( !([30:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 31);
-             else if ( !([29:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 30);
-             else if ( !([28:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 29);
-             else if ( !([27:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 28);
-             else if ( !([26:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 27);
-             else if ( !([25:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 26);
-             else if ( !([24:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 25);
-             else if ( !([23:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 24);
-             else if ( !([22:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 23);
-             else if ( !([21:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 22);
-             else if ( !([20:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 21);
-             else if ( !([19:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 20);
-             else if ( !([18:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 19);
-             else if ( !([17:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 18);
-             else if ( !([16:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 17);
-             else if ( !([15:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 16);
-             else if ( !([14:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 15);
-             else if ( !([13:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 14);
-             else if ( !([12:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 13);
-             else if ( !([11:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 12);
-             else if ( !([10:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 11);
-             else if ( !([9:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 10);
-             else if ( !([8:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 9);
-             else if ( !([7:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 8);
-             else if ( !([6:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 7);
-             else if ( !([5:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 6);
-             else if ( !([4:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 5);
-             else if ( !([3:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 4);
-             else if ( !([2:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 3);
-             else if ( !([1:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 2);
-             else if ( !([0:0]b_out && 31'xFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 1);
+      STATE_CALC: if ( !(b_out[31:0] && 32'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 32);
+             else if ( !(b_out[30:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 31);
+             else if ( !(b_out[29:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 30);
+             else if ( !(b_out[28:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 29);
+             else if ( !(b_out[27:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 28);
+             else if ( !(b_out[26:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 27);
+             else if ( !(b_out[25:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 26);
+             else if ( !(b_out[24:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 25);
+             else if ( !(b_out[23:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 24);
+             else if ( !(b_out[22:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 23);
+             else if ( !(b_out[21:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 22);
+             else if ( !(b_out[20:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 21);
+             else if ( !(b_out[19:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 20);
+             else if ( !(b_out[18:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 19);
+             else if ( !(b_out[17:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 18);
+             else if ( !(b_out[16:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 17);
+             else if ( !(b_out[15:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 16);
+             else if ( !(b_out[14:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 15);
+             else if ( !(b_out[13:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 14);
+             else if ( !(b_out[12:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 13);
+             else if ( !(b_out[11:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 12);
+             else if ( !(b_out[10:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 11);
+             else if ( !(b_out[9:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 10);
+             else if ( !(b_out[8:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 9);
+             else if ( !(b_out[7:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 8);
+             else if ( !(b_out[6:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 7);
+             else if ( !(b_out[5:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 6);
+             else if ( !(b_out[4:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 5);
+             else if ( !(b_out[3:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 4);
+             else if ( !(b_out[2:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 3);
+             else if ( !(b_out[1:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 2);
+             else if ( !(b_out[0:0] && 31'hFFFFFFFF) ) cs( 0, 0, a_ls, b_rs, 1, 0, 1);
              else cs( 0, 0, a_ls, b_rs, 0, 0, 0);
 
       STATE_DONE:                                    cs( 0, 1, a_x, b_x, 0, 0, 0);
-      default                         cs( 'x, 'x, a_x, b_x, add_x, result_x, 'x);
+      default                         cs( 'x, 'x, a_x, b_x, 'x, 'x, 'x);
 
     endcase
 
