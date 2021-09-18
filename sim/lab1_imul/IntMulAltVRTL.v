@@ -33,7 +33,36 @@ module lab1_imul_IntMulAltVRTL
   // Instantiate datapath and control models here and then connect them
   // together.
   // '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+  //----------------------------------------------------------------------
+  // Connect Control Unit and Datapath
+  //----------------------------------------------------------------------
 
+  // Control Signals
+
+  logic       a_mux_sel;
+  logic       b_mux_sel;
+  logic       result_en;
+  logic       result_reset;
+  logic [4:0] shamt; 
+
+  // Data Signals
+  
+  logic [31:0] b_out;
+
+  // Control unit
+
+  lab1_imul_IntMulAltVRTL_IntMulAltCtrl ctrl
+  (
+    .*
+  );
+
+  // Datapath
+
+  lab1_imul_IntMulAltVRTL_Dpath dpath
+  (
+    .*
+  );
+ 
   //----------------------------------------------------------------------
   // Line Tracing
   //----------------------------------------------------------------------
