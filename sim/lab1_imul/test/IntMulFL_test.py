@@ -157,7 +157,7 @@ dense_msgs = [
 #-------------------------------------------------------------------------
 # Test Case: ones,zero,negative one 
 #-------------------------------------------------------------------------
-ones_zeros_neg_msgs = [
+ones_zeros_negs_msgs = [
   req(1,  1), resp(1),
   req(1, 0), resp(0),
   req(1,-1), resp(-1),
@@ -183,7 +183,6 @@ low_order_off = [
   req(0xFFFFFFE0,0xFFFFFFF0), resp(0xFFFFFFE0*0xFFFFFFF0),
 ]
 
-
 #-------------------------------------------------------------------------
 # Test Case: random test
 #-------------------------------------------------------------------------
@@ -193,24 +192,102 @@ for i in xrange(50):
   b = random.randint(0,0xffff)
   c = resp( a*b )
   random_msgs.extend([req(a,b), c])
+  
+  
+#-------------------------------------------------------------------------
+# Test Case: random test 2 : Low bits masked
+#-------------------------------------------------------------------------
+random_low_mask_msgs = []
+for i in xrange(50):
+  a = (random.randint(0,0xffff)) & Bits(32,0xFFFFFF00)
+  b = (random.randint(0,0xffff)) & Bits(32,0xFFFFFFDC)
+  c = resp( a*b )
+  random_low_mask_msgs.extend([req(a,b), c])
+  
+#-------------------------------------------------------------------------
+# Test Case: random test 3 : middle bits masked
+#-------------------------------------------------------------------------
+random_mid_mask_msgs = []
+for i in xrange(50):
+  a = (random.randint(0,0xffff)) & Bits(32,0xFFF003FF)
+  b = (random.randint(0,0xffff)) & Bits(32,0xFFE001FF)
+  c = resp( a*b )
+  random_mid_mask_msgs.extend([req(a,b), c])
+  
+  
+#-------------------------------------------------------------------------
+# Test Case: random test 4 : high bits masked
+#-------------------------------------------------------------------------
+random_high_mask_msgs = []
+for i in xrange(50):
+  a = (random.randint(0,0xffff)) & Bits(32,0x7FFFFFFF)
+  b = (random.randint(0,0xffff)) & Bits(32,0x3FFFFFFF)
+  c = resp( a*b )
+  random_high_mask_msgs.extend([req(a,b), c])
+  
+ 
+#-------------------------------------------------------------------------
+# Test Case: random test 5 : mix bits masked
+#-------------------------------------------------------------------------
+  
+random_mix_mask_msgs = []
+for i in xrange(50):
+  a = (random.randint(0,0xffff)) & Bits(32,0xCCCE707D)
+  b = (random.randint(0,0xffff)) & Bits(32,0xCCCE727D)
+  c = resp( a*b )
+  random_mix_mask_msgs.extend([req(a,b), c])
+  
+  
+#-------------------------------------------------------------------------
+# Test Case: random test 6 : pos_neg
+#-------------------------------------------------------------------------
+  
+random_pos_neg_msgs = []
+for i in xrange(50):
+  a = (random.randint(-0xffff,0))
+  b = (random.randint(0,0xffff))
+  c = resp( a*b )
+  random_pos_neg_msgs.extend([req(a,b), c])
+  
+#-------------------------------------------------------------------------
+# Test Case: random test 7 : all bits anded with 1
+#-------------------------------------------------------------------------
+  
+random_all_one_msgs = []
+for i in xrange(50):
+  a = (random.randint(0,0xffff))
+  b = (random.randint(0,0xffff))
+  
+  c = resp( a*b )
+  random_all_one_msgs.extend([req((a & 0xffff),(b & 0xffff) ), c])
+
 #-------------------------------------------------------------------------
 # Test Case Table
 #-------------------------------------------------------------------------
+for i in xrange(4):
+  src_delay = random.randint(0,20)
+  sink_delay = random.randint(0,20)
 
 test_case_table = mk_test_case_table([
-  (                      "msgs                 src_delay sink_delay"),
-  [ "small_pos_pos",     small_pos_pos_msgs,   0,        0          ],
-  [ "small_pos_neg",     small_pos_neg_msgs,   9,	       10	        ], 
-  [ "small_neg_neg",     small_neg_neg_msgs,   0,        4          ],
-  [ "large_pos_pos",     large_pos_pos_msgs,   2,	       0	        ],
-  [ "large_neg_neg",     large_neg_neg_msgs,   3,	       3	        ], 
-  [ "large_neg_pos",     large_neg_pos_msgs,   0,	       0	        ], 
-  [ "sparse_num",     sparse_msgs,   1,	       2	        ],
-  [ "dense_num", dense_msgs,  2,         10          ],
-  [ "ones_zeros_neg_test", ones_zeros_neg_msgs,  1,         3         ],
+  (                      "msgs                 src_delay     sink_delay"),
+  [ "small_pos_pos",     small_pos_pos_msgs,   src_delay,    sink_delay],
+  [ "small_pos_neg",     small_pos_neg_msgs,   src_delay,	   sink_delay], 
+  [ "small_neg_neg",     small_neg_neg_msgs,   src_delay,    sink_delay],
+  [ "large_pos_pos",     large_pos_pos_msgs,   src_delay,	   sink_delay],
+  [ "large_neg_neg",     large_neg_neg_msgs,   src_delay,	   sink_delay	        ], 
+  [ "large_neg_pos",     large_neg_pos_msgs,   src_delay,	   sink_delay	        ], 
+  [ "sparse_num",         sparse_msgs,         src_delay,	   sink_delay	        ],
+  [ "dense_num",          dense_msgs,          src_delay,    sink_delay         ],
+  [ "ones_zeros_neg_test", ones_zeros_negs_msgs,src_delay,   sink_delay         ],
   [ "middle_masked_off_test", middle_masked_off,  1,         1          ],
-  [ "middle_masked_off_test", low_order_off,  1,         0          ],
-  [ "random_test", random_msgs,  2,         10          ] 
+  [ "middle_masked_off_test", low_order_off,      1,         0          ],
+  [ "random_test", random_msgs,                 src_delay,  sink_delay          ],
+  [ "random_test_2", random_pos_neg_msgs,                 src_delay,   sink_delay          ],
+  [ "random_test_3", random_low_mask_msgs,                 src_delay,   sink_delay          ], 
+  [ "random_test_4", random_mid_mask_msgs,                 src_delay,   sink_delay          ], 
+  [ "random_test_5", random_high_mask_msgs,                 src_delay,   sink_delay          ], 
+  [ "random_test_6", random_mix_mask_msgs,                 src_delay,   sink_delay          ],
+  [ "random_test_7", random_all_one_msgs,                 src_delay,   sink_delay          ] 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to leverage the additional lists
   # of request/response messages defined above, but also to test
