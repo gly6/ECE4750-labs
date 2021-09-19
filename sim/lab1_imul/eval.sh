@@ -1,11 +1,16 @@
 #!/bin/bash
 arr=(small large lomask himask lohimask sparse)
+design=(base alt)
 > stats.txt
 for i in "${arr[@]}"
-do
-  echo "$i dataset:" >> stats.txt
-  echo "" >> stats.txt
-  ./imul-sim  --impl base --input "$i" --stats >> stats.txt
-  echo "" >> stats.txt
+  do
+  for j in "${design[@]}"
+      do
+      echo "$j design:" >> stats.txt 
+      echo "$i dataset:" >> stats.txt
+      echo "" >> stats.txt
+      ./imul-sim  --impl "$j" --input "$i" --stats >> stats.txt
+      echo "" >> stats.txt
+  done
 done
 
