@@ -1,5 +1,5 @@
 #!/bin/bash
-arr=(small large lomask himask lohimask sparse ones)
+arr=(small large lomask himask lohimask sparse ones noconsec_zero)
 design=(base alt)
 > stats.txt
 for i in "${arr[@]}"

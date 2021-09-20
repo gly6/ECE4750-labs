@@ -6,7 +6,7 @@
 #  -h --help           Display this message
 #
 #  --impl              {base,alt}
-#  --input <dataset>   {small,large,lomask,himask,lohimask,sparse,ones}
+#  --input <dataset>   {small,large,lomask,himask,lohimask,sparse,ones,noconsec_zero}
 #  --trace             Display line tracing
 #  --stats             Display statistics
 #  --translate         Translate RTL model to Verilog
@@ -117,7 +117,10 @@ sparse_msgs = [
 ]
 
 all_one = [
-  req(0xFFFFFFFF,0xFFFFFFFF), resp(0xFFFFFFFF)
+  req(0xFFFFFFFF,0xFFFFFFFF), resp(0xFFFFFFFF*0xFFFFFFFF)
+]
+noconsec_zero = [
+  req(0x55555555,0x1), resp(0x55555555)
 ]
 #-------------------------------------------------------------------------
 # Command line processing
@@ -149,7 +152,7 @@ def parse_cmdline():
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   p.add_argument( "--input", default="small",
-    choices=["small","large","lomask","himask","lohimask","sparse","ones"] )
+    choices=["small","large","lomask","himask","lohimask","sparse","ones","noconsec_zero"] )
 
   p.add_argument( "--trace",     action="store_true" )
   p.add_argument( "--stats",     action="store_true" )
@@ -190,6 +193,8 @@ def main():
     inputs = sparse_msgs
   elif opts.input == "ones":
     inputs = all_one
+  elif opts.input == "noconsec_zero":
+    inputs = noconsec_zero
 
   ninputs = len(inputs[::2])
 
