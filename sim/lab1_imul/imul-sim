@@ -6,7 +6,7 @@
 #  -h --help           Display this message
 #
 #  --impl              {base,alt}
-#  --input <dataset>   {small,large,lomask,himask,lohimask,sparse}
+#  --input <dataset>   {small,large,lomask,himask,lohimask,sparse,ones}
 #  --trace             Display line tracing
 #  --stats             Display statistics
 #  --translate         Translate RTL model to Verilog
@@ -115,6 +115,10 @@ sparse_msgs = [
   req(4652881168,4),resp(4652881168*4),
   req(37749765,37749765),resp(37749765*37749765)
 ]
+
+all_one = [
+  req(0xFFFFFFFF,0xFFFFFFFF), resp(0xFFFFFFFF)
+]
 #-------------------------------------------------------------------------
 # Command line processing
 #-------------------------------------------------------------------------
@@ -145,7 +149,7 @@ def parse_cmdline():
   # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   p.add_argument( "--input", default="small",
-    choices=["small","large","lomask","himask","lohimask","sparse"] )
+    choices=["small","large","lomask","himask","lohimask","sparse","ones"] )
 
   p.add_argument( "--trace",     action="store_true" )
   p.add_argument( "--stats",     action="store_true" )
@@ -184,6 +188,8 @@ def main():
     inputs = random_lohimask_msgs
   elif opts.input == "sparse":
     inputs = sparse_msgs
+  elif opts.input == "ones":
+    inputs = all_one
 
   ninputs = len(inputs[::2])
 

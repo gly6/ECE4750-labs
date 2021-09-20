@@ -253,28 +253,14 @@ for i in xrange(50):
 # Test Case: random test 7 : all bits anded with 1
 #-------------------------------------------------------------------------
   
-random_all_one_msgs = []
+random_and_one_msgs = []
 for i in xrange(50):
-  a = (random.randint(0,0xffff))
-  b = (random.randint(0,0xffff))
+  a = (random.randint(0,0xffffffff))
+  b = (random.randint(0,0xffffffff))
   
   c = resp( a*b )
-  random_all_one_msgs.extend([req((a & 0xffff),(b & 0xffff) ), c])
+  random_and_one_msgs.extend([req((a & 0xffffffff),(b & 0xffffffff) ), c])
   
-#-------------------------------------------------------------------------
-# Test Case: Consecutive zeros for Alternative design 
-#-------------------------------------------------------------------------
-  
-consecutive_zeros = [
-  req(4,4), resp(16),
-  req(0,0), resp(0),
-  req(0x80000000,0x80000000), resp(0x80000000*0x80000000),
-  req(0x80000001,0x80000001), resp(0x80000001*0x80000001),
-  req(0x1,0x80008001), resp(0x80008001),
-  req(0x82008001,0x82008081), resp(0x82008001*0x82008081)
-]
-
-
 #-------------------------------------------------------------------------
 # Test Case Table
 #-------------------------------------------------------------------------
@@ -293,16 +279,16 @@ test_case_table = mk_test_case_table([
   [ "sparse_num",         sparse_msgs,         src_delay,	   sink_delay	        ],
   [ "dense_num",          dense_msgs,          src_delay,    sink_delay         ],
   [ "ones_zeros_neg_test", ones_zeros_negs_msgs,src_delay,   sink_delay         ],
-  [ "middle_masked_off_test", middle_masked_off,  1,         1          ],
-  [ "middle_masked_off_test", low_order_off,      1,         0          ],
-  [ "random_test", random_msgs,                 src_delay,  sink_delay          ],
-  [ "random_test_2", random_pos_neg_msgs,                 src_delay,   sink_delay          ],
-  [ "random_test_3", random_low_mask_msgs,                 src_delay,   sink_delay          ], 
-  [ "random_test_4", random_mid_mask_msgs,                 src_delay,   sink_delay          ], 
-  [ "random_test_5", random_high_mask_msgs,                 src_delay,   sink_delay          ], 
-  [ "random_test_6", random_mix_mask_msgs,                 src_delay,   sink_delay          ],
-  [ "random_test_7", random_all_one_msgs,                 src_delay,   sink_delay          ],
-  [ "consecutive_zeros", consecutive_zeros,                 src_delay,   sink_delay          ] 
+  [ "middle_masked_off_test", middle_masked_off,  0,         0          ],
+  [ "low_masked_off_test", low_order_off,      0,         0          ],
+  [ "random_pos_pos", random_msgs,                 src_delay,  sink_delay          ],
+  [ "random_pos_neg", random_pos_neg_msgs,                 src_delay,   sink_delay          ],
+  [ "random_lomask", random_low_mask_msgs,                 src_delay,   sink_delay          ], 
+  [ "random_midmask", random_mid_mask_msgs,                 src_delay,   sink_delay          ], 
+  [ "random_himask", random_high_mask_msgs,                 src_delay,   sink_delay          ], 
+  [ "random_mixmask", random_mix_mask_msgs,                 src_delay,   sink_delay          ],
+  [ "random_AND_ones", random_and_one_msgs,                 src_delay,   sink_delay          ]
+
 
 ])
 
