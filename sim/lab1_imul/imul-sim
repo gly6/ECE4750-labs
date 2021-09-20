@@ -120,7 +120,7 @@ all_one = [
   req(0xFFFFFFFF,0xFFFFFFFF), resp(0xFFFFFFFF*0xFFFFFFFF)
 ]
 noconsec_zero = [
-  req(0x55555555,0x1), resp(0x55555555)
+  req(0x1,0x55555555), resp(0x55555555*0x1)
 ]
 #-------------------------------------------------------------------------
 # Command line processing

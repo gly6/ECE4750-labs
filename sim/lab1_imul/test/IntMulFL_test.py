@@ -184,6 +184,13 @@ low_order_off = [
 ]
 
 #-------------------------------------------------------------------------
+# Test Case: lower order bits masked off
+#-------------------------------------------------------------------------
+noconsec_zero = [
+  req(0x1,0x55555555), resp(0x55555555)
+]
+
+#-------------------------------------------------------------------------
 # Test Case: random test
 #-------------------------------------------------------------------------
 random_msgs = []
@@ -287,8 +294,8 @@ test_case_table = mk_test_case_table([
   [ "random_midmask", random_mid_mask_msgs,                 src_delay,   sink_delay          ], 
   [ "random_himask", random_high_mask_msgs,                 src_delay,   sink_delay          ], 
   [ "random_mixmask", random_mix_mask_msgs,                 src_delay,   sink_delay          ],
-  [ "random_AND_ones", random_and_one_msgs,                 src_delay,   sink_delay          ]
-
+  [ "random_AND_ones", random_and_one_msgs,                 src_delay,   sink_delay          ],
+  [ "noconsec_zero", noconsec_zero,                 src_delay,   sink_delay          ]
 
 ])
 
