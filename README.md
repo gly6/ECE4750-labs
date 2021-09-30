@@ -15,9 +15,9 @@ and pushing your changes back to GitHub, or by using the following link:
 Please update the following list of group members, including the NetIDs
 for each group member.
 
- * Student Name (NetID)
- * Student Name (NetID)
- * Student Name (NetID)
+ * Bryce Roth (ber72)
+ * Kofi Efah (kae87)
+ * Lily Yu (gly6)
 
 ### Member Roles
 
@@ -33,7 +33,7 @@ the top of the columns, and then for each lab identify which student took
 on an RTL engineer role, which student took on a verification engineer
 role, and which student was the architect.
 
- Lab   | NetID #1     | NetID #2     | NetID #3
+ Lab   | ber72     | kae87    | gly6
  ------|--------------|--------------|--------------
  Lab 1 | RTL          | Verification | RTL (architect)
  Lab 2 |              |              |
