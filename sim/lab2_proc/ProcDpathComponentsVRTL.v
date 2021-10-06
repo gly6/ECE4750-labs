@@ -23,20 +23,17 @@ module lab2_proc_ImmGenVRTL
       3'd0: // I-type
         imm = { {21{inst[31]}}, inst[30:25], inst[24:21], inst[20] };
       
-      3'd1: // R-type
-        imm = { {      
+      3'd1: // S-type
+        imm = { {21{inst[31]}}, inst[30:25], inst[11:8], inst[7]   };    
      
-
       3'd2: // B-type
         imm = { {20{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b0 };
      
-      // R-type
-     
- 
-      // SB-type
-      //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''
-      // Add more immediate types
-      //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+      3'd3: // U-type
+        imm = { inst[31], inst[30:20], inst[19:12], {12{1'b0}}        };
+
+      3'd4: // J-type 
+       imm = { {12{inst[31]}}, inst[19:12], inst[20], inst[30:25], inst[24:21], 1'b0 }; 
 
       default:
         imm = 32'bx;
@@ -76,14 +73,10 @@ module lab2_proc_AluVRTL
       4'd6    : out = in0 >> in1;				// SRL
       4'd7    : out = $signed(in0) >>> in1;			// SRA
       4'd8    : out = $signed(in0) < $signed(in1);  	        // SLT 
-      4'd9    : out = in0 < in1                                 // SLTU
-      4'd10   : out = 
+      4'd9    : out = in0 < in1;                                // SLTU
+      4'd10   : out = $signed(in0) >= $signed(in1);      //Signed greater than or equal
       4'd11   : out = in0;                                      // CP OP0
       4'd12   : out = in1;                                      // CP OP1
-
-      //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''
-      // Add more alu function
-      //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
       default : out = 32'b0;
     endcase
@@ -106,17 +99,7 @@ module lab2_proc_AluVRTL
     .out   (ops_lt)
   );
 
-  vc_GtComparator #(32) cond_gt_comp
-  (
-    .in0   (in0),
-    .in1   (in1),
-    .out   (ops_ltu)
-  );
- 
-
-  //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // Add more alu function
-  //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+  assign ltu = in0 < in1;
 
 endmodule
 
