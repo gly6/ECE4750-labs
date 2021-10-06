@@ -22,10 +22,18 @@ module lab2_proc_ImmGenVRTL
     case ( imm_type )
       3'd0: // I-type
         imm = { {21{inst[31]}}, inst[30:25], inst[24:21], inst[20] };
+      
+      3'd1: // R-type
+        imm = { {      
+     
 
       3'd2: // B-type
         imm = { {20{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b0 };
-
+     
+      // R-type
+     
+ 
+      // SB-type
       //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''
       // Add more immediate types
       //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -54,11 +62,22 @@ module lab2_proc_AluVRTL
   output logic        ops_lt,
   output logic        ops_ltu
 );
+  
 
   always_comb begin
 
     case ( fn )
       4'd0    : out = in0 + in1;                                // ADD
+      4'd1    : out = in0 - in1;                                // SUB
+      4'd2    : out = in0 & in1;                                // AND
+      4'd3    : out = in0 | in1;                                // OR
+      4'd4    : out = in0 ^ in1;                                // XOR
+      4'd5    : out = in0 << in1;				// SLL
+      4'd6    : out = in0 >> in1;				// SRL
+      4'd7    : out = $signed(in0) >>> in1;			// SRA
+      4'd8    : out = $signed(in0) < $signed(in1);  	        // SLT 
+      4'd9    : out = in0 < in1                                 // SLTU
+      4'd10   : out = 
       4'd11   : out = in0;                                      // CP OP0
       4'd12   : out = in1;                                      // CP OP1
 
@@ -79,6 +98,21 @@ module lab2_proc_AluVRTL
     .in1  (in1),
     .out  (ops_eq)
   );
+
+  vc_LtComparator #(32) cond_lt_comp
+  (
+    .in0   (in0),
+    .in1   (in1),
+    .out   (ops_lt)
+  );
+
+  vc_GtComparator #(32) cond_gt_comp
+  (
+    .in0   (in0),
+    .in1   (in1),
+    .out   (ops_ltu)
+  );
+ 
 
   //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''
   // Add more alu function
