@@ -74,7 +74,7 @@ module lab2_proc_AluVRTL
       4'd7    : out = $signed(in0) >>> in1;			// SRA
       4'd8    : out = $signed(in0) < $signed(in1);  	        // SLT 
       4'd9    : out = in0 < in1;                                // SLTU
-      4'd10   : out = $signed(in0) >= $signed(in1);      //Signed greater than or equal
+      4'd10   : out = in1 << 12;      				//LUI
       4'd11   : out = in0;                                      // CP OP0
       4'd12   : out = in1;                                      // CP OP1
 
@@ -99,7 +99,7 @@ module lab2_proc_AluVRTL
     .out   (ops_lt)
   );
 
-  assign ltu = in0 < in1;
+  assign ops_ltu = in0 < in1;
 
 endmodule
 
