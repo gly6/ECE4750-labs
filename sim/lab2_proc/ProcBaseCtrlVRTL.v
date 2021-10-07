@@ -249,6 +249,11 @@ module lab2_proc_ProcBaseCtrlVRTL
   localparam br_x     = 3'bx; // Don't care
   localparam br_na    = 3'b0; // No branch
   localparam br_bne   = 3'b1; // bne
+  localparam br_beq   = 3'b2; // beq
+  localparam br_blt   = 3'b3; // blt 
+  localparam br_bltu  = 3'b4; // bltu
+  localparam br_bge   = 3'b5; // bge
+  localparam br_bgeu  = 3'b6; // bgeu 
 
   // Operand 1 Mux Select
 
@@ -262,6 +267,15 @@ module lab2_proc_ProcBaseCtrlVRTL
   localparam alu_x    = 4'bx;
   localparam alu_add  = 4'd0;
   localparam alu_sub  = 4'd1;
+  localparam alu_and  = 4'd2; 
+  localparam alu_or   = 4'd3; 
+  localparam alu_xor  = 4'd4; 
+  localparam alu_sll  = 4'd5; 
+  localparam alu_srl  = 4'd6; 
+  localparam alu_sra  = 4'd7; 
+  localparam alu_slt  = 4'd8;
+  localparam alu_sltu = 4'd9;
+  localparam alu_lui  = 4'd10;
   localparam alu_cp0  = 4'd11;
   localparam alu_cp1  = 4'd12;
 
@@ -341,11 +355,53 @@ module lab2_proc_ProcBaseCtrlVRTL
       //                           br      imm  rs1  op2    rs2 alu      dmm wbmux rf
       //                       val type    type  en  muxsel  en fn       typ sel   wen csrr csrw
       `RV2ISA_INST_NOP     :cs( y, br_na,  imm_x, n, bm_x,   n, alu_x,   nr, wm_a, n,  n,   n    );
-      `RV2ISA_INST_ADD     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_add, nr, wm_a, y,  n,   n    );
-      `RV2ISA_INST_LW      :cs( y, br_na,  imm_i, y, bm_imm, n, alu_add, ld, wm_m, y,  n,   n    );
-      `RV2ISA_INST_BNE     :cs( y, br_bne, imm_b, y, bm_rf,  y, alu_x,   nr, wm_a, n,  n,   n    );
+      `RV2ISA_ZERO         :cs( n, br_na,  imm_x, n, bm_x,   n, alu_x,   nr, wm_a, n,  n,   n    );
+
+      //CSR 
       `RV2ISA_INST_CSRR    :cs( y, br_na,  imm_i, n, bm_csr, n, alu_cp1, nr, wm_a, y,  y,   n    );
       `RV2ISA_INST_CSRW    :cs( y, br_na,  imm_i, y, bm_rf,  n, alu_cp0, nr, wm_a, n,  n,   y    );
+
+      //Reg-Reg
+      `RV2ISA_INST_ADD     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_add, nr, wm_a, y,  n,   n    );
+      `RV2ISA_INST_SUB     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_sub, nr, wm_a, y,  n,   n    );
+      //`RV2ISA_INST_MUL     :cs( y, br_na,  imm_x, y, bm_x,   y, alu_x,   nr, wm_a, y,  n,   n    ); will not work without additional hardware
+      `RV2ISA_INST_AND     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_and, nr, wm_a, y,  n,   n    );
+      `RV2ISA_INST_OR      :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_or,  nr, wm_a, y,  n,   n    ); 
+      `RV2ISA_INST_XOR     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_xor, nr, wm_a, y,  n,   n    ); 
+      `RV2ISA_INST_SLT     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_slt, nr, wm_a, y,  n,   n    ); 
+      `RV2ISA_INST_SLTU    :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_sltu,nr, wm_a, y,  n,   n    ); 
+      `RV2ISA_INST_SLL     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_sll, nr, wm_a, y,  n,   n    ); 
+      `RV2ISA_INST_SRL     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_srl, nr, wm_a, y,  n,   n    ); 
+      `RV2ISA_INST_SRA     :cs( y, br_na,  imm_x, y, bm_rf,  y, alu_sra, nr, wm_a, y,  n,   n    );      
+
+      //Reg-Imm
+      `RV2ISA_INST_ADDI    :cs( y, br_na,  imm_i, y, bm_imm, n, alu_add, nr, wm_a, y,  n,   n    );
+      `RV2ISA_INST_ORI     :cs( y, br_na,  imm_i, y, bm_imm, n, alu_or,  nr, wm_a, y,  n,   n    ); 
+      `RV2ISA_INST_ANDI    :cs( y, br_na,  imm_i, y, bm_imm, n, alu_and, nr, wm_a, y,  n,   n    ); 
+      `RV2ISA_INST_XORI    :cs( y, br_na,  imm_i, y, bm_imm, n, alu_xor, nr, wm_a, y,  n,   n    ); 
+      `RV2ISA_INST_SLTI    :cs( y, br_na,  imm_i, y, bm_imm, n, alu_slt, nr, wm_a, y,  n,   n    );
+      `RV2ISA_INST_SLTIU   :cs( y, br_na,  imm_i, y, bm_imm, n, alu_sltu,nr, wm_a, y,  n,   n    ); 
+      //`RV2ISA_INST_SRAI    :cs( y, br_na,  imm_h, y, bm_imm, n, alu_sra, nr, wm_a, y,  n,   n    ); fix imm
+      //`RV2ISA_INST_SRLI    :cs( y, br_na,  imm_h, y, bm_imm, n, alu_srl, nr, wm_a, y,  n,   n    ); fix imm
+      //`RV2ISA_INST_SLLI    :cs( y, br_na,  imm_h, y, bm_imm, n, alu_sll, nr, wm_a, y,  n,   n    ); fix imm
+      `RV2ISA_INST_LUI     :cs( y, br_na,  imm_u, n, bm_imm, n, alu_lui, nr, wm_a, y,  n,   n    );
+      //`RV2ISA_INST_AUIPC   :cs( y, br_na,  imm_u, n, bm_imm, n, alu_auipc,nr,wm_a, y,  n,   n    ); will not work without additional hardware
+      
+      //Memory
+      `RV2ISA_INST_LW      :cs( y, br_na,  imm_i, y, bm_imm, n, alu_add, ld, wm_m, y,  n,   n    );
+      `RV2ISA_INST_SW      :cs( y, br_na,  imm_s, y, bm_imm, y, alu_add, st, wm_m, n,  n,   n    ); 
+
+      //Jump 
+      //`RV2ISA_INST_JAL     :cs( y, br_na,  imm_j, n, bm_imm, n, alu_add, nr, wm_a, y,  n,   n    ); will not work without additional hardware
+      //`RV2ISA_INST_JALR    :cs( y, br_na,  imm_i, y, bm_imm, n, alu_add, nr, wm_a, y,  n,   n    ); will not work without additional hardware
+
+      //Branch
+      `RV2ISA_INST_BNE     :cs( y, br_bne, imm_b, y, bm_rf,  y, alu_x,   nr, wm_a, n,  n,   n    );
+      //`RV2ISA_INST_BEQ     :cs( y, br_beq, imm_b, y, bm_rf,  y, alu_x,   nr, wm_a, n,  n,   n    ); implement branching stuff
+      //`RV2ISA_INST_BLT     :cs( y, br_blt, imm_b, y, bm_rf,  y, alu_x,   nr, wm_a, n,  n,   n    ); implement branching stuff
+      //`RV2ISA_INST_BLTU    :cs( y, br_bltu,imm_b, y, bm_rf,  y, alu_x,   nr, wm_a, n,  n,   n    ); implement branching stuff
+      //`RV2ISA_INST_BGE     :cs( y, br_bge, imm_b, y, bm_rf,  y, alu_x,   nr, wm_a, n,  n,   n    ); implement branching stuff
+      //`RV2ISA_INST_BGEU    :cs( y, br_bgeu,imm_b, y, bm_rf,  y, alu_x,   nr, wm_a, n,  n,   n    ); implement branching stuff
 
       //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''
       // Add more instructions to the control signal table
