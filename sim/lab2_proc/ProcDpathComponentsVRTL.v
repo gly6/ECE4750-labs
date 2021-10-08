@@ -34,7 +34,9 @@ module lab2_proc_ImmGenVRTL
 
       3'd4: // J-type 
        imm = { {12{inst[31]}}, inst[19:12], inst[20], inst[30:25], inst[24:21], 1'b0 }; 
-
+      3'd5: // I-type imm
+       imm = { {27{1'b0}}, inst[24:21], inst[20] };       
+ 
       default:
         imm = 32'bx;
 
@@ -74,9 +76,10 @@ module lab2_proc_AluVRTL
       4'd7    : out = $signed(in0) >>> in1;			// SRA
       4'd8    : out = $signed(in0) < $signed(in1);  	        // SLT 
       4'd9    : out = in0 < in1;                                // SLTU
-      4'd10   : out = in1 << 12;      				//LUI
+      4'd10   : out = in1 << 12;      				// LUI
       4'd11   : out = in0;                                      // CP OP0
       4'd12   : out = in1;                                      // CP OP1
+      4'd13   : out = in0 + (in1 << 12);                        // AUIPC
 
       default : out = 32'b0;
     endcase
@@ -96,10 +99,10 @@ module lab2_proc_AluVRTL
   (
     .in0   (in0),
     .in1   (in1),
-    .out   (ops_lt)
+    .out   (ops_ltu)
   );
 
-  assign ops_ltu = in0 < in1;
+  assign ops_lt = $signed(in0) < $signed(in1);
 
 endmodule
 

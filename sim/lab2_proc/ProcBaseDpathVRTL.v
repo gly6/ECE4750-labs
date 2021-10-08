@@ -53,7 +53,7 @@ module lab2_proc_ProcBaseDpathVRTL
   input  logic [1:0]  op2_sel_D,
   input  logic [1:0]  csrr_sel_D,
   input  logic [2:0]  imm_type_D,
-  
+  input  logic        op1_sel_D,
 
   input  logic        reg_en_X,
   input  logic [3:0]  alu_fn_X,
@@ -68,7 +68,7 @@ module lab2_proc_ProcBaseDpathVRTL
   input  logic        stats_en_wen_W,
   
   input  logic        imul_resp_rdy_X,
-  
+
 
   // status signals (dpath->ctrl)
 
@@ -189,7 +189,8 @@ module lab2_proc_ProcBaseDpathVRTL
     .wr_data  (rf_wdata_W)
   );
 
-  logic [31:0] op2_D;
+  logic [31:0] op2_D; // 2nd operand 
+  logic [31:0] op1_D; // 1st operand
 
   logic [31:0] csrr_data_D;
 
@@ -218,6 +219,14 @@ module lab2_proc_ProcBaseDpathVRTL
     .out  (op2_D)
   );
 
+  vc_Mux2 #(32) op1_sel_mux_D
+  (
+    .in0  (pc_D),
+    .in1  (rf_rdata0_D),
+    .sel  (op1_sel_D),
+    .out  (op1_D)
+  );
+
   vc_Adder #(32) pc_plus_imm_D
   (
     .in0      (pc_D),
@@ -232,14 +241,15 @@ module lab2_proc_ProcBaseDpathVRTL
   //--------------------------------------------------------------------
 
   logic [31:0] op1_X;
-  logic [31:0] op2_X;
+  logic [31:0] op2_X; 
+  logic [31:0] pc_X;
 
   vc_EnResetReg #(32, 0) op1_reg_X
   (
     .clk    (clk),
     .reset  (reset),
     .en     (reg_en_X),
-    .d      (rf_rdata0_D),
+    .d      (op1_D),
     .q      (op1_X)
   );
 
@@ -252,6 +262,15 @@ module lab2_proc_ProcBaseDpathVRTL
     .q      (op2_X)
   );
 
+  vc_EnResetReg #(32, 0) pc_reg_X
+  (
+    .clk    (clk),
+    .reset  (reset),
+    .en     (reg_en_X),
+    .d      (pc_D),
+    .q      (pc_X)
+  );
+
   vc_EnResetReg #(32, 0) br_target_reg_X
   (
     .clk    (clk),
@@ -261,8 +280,17 @@ module lab2_proc_ProcBaseDpathVRTL
     .q      (br_target_X)
   );
 
+  logic [31:0] pc_incr_result_X;
   logic [31:0] alu_result_X;
   logic [31:0] ex_result_X;
+
+
+  vc_Incrementer #(32, 4) pc_incr_X
+  (
+    .in    (pc_X),
+    .out   (pc_incr_result_X)
+  );
+
 
   lab2_proc_AluVRTL alu
   (
@@ -274,7 +302,7 @@ module lab2_proc_ProcBaseDpathVRTL
     .ops_lt   (),
     .ops_ltu  ()
   );
-
+  
   logic [31:0] imul_resp_msg;
 
   lab1_imul_IntMulAltVRTL mul
@@ -283,22 +311,20 @@ module lab2_proc_ProcBaseDpathVRTL
     .reset    (reset),
     .req_val  (imul_req_val_D),
     .req_rdy  (imul_req_rdy_D),
-    .req_msg  ({rf_rdata0_D, op2_D}),
+    .req_msg  ({op1_D, op2_D}),
     .resp_val (imul_resp_val_X),
     .resp_rdy (imul_resp_rdy_x),
     .resp_msg (imul_resp_msg)
-
   );
 
   vc_Mux3 #(32) ex_result_sel_mux_X
-    (
-      .in0  (),
+  (
+      .in0  (pc_incr_result_X),
       .in1  (alu_result_X),
       .in2  (imul_resp_msg),
       .sel  (ex_result_sel_X),
       .out  (ex_result_X)
-    );
-
+  );
 
   assign ex_result_X = alu_result_X;
 
