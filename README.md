@@ -36,7 +36,7 @@ role, and which student was the architect.
  Lab   | ber72     | kae87    | gly6
  ------|--------------|--------------|--------------
  Lab 1 | RTL          | Verification | RTL (architect)
- Lab 2 |              |              |
+ Lab 2 | Verification | RTL (architect)| RTL
  Lab 3 |              |              |
  Lab 4 |              |              |
  Lab 5 |              |              |
