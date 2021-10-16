@@ -74,8 +74,8 @@ module lab2_proc_AluVRTL
       4'd5    : out = in0 << in1;				// SLL
       4'd6    : out = in0 >> in1;				// SRL
       4'd7    : out = $signed(in0) >>> in1;			// SRA
-      4'd8    : out = $signed(in0) < $signed(in1);  	        // SLT 
-      4'd9    : out = in0 < in1;                                // SLTU
+      4'd8    : out = { {31{1'b0}}, ($signed(in0) < $signed(in1)) };  	// SLT 
+      4'd9    : out = { {31{1'b0}}, ( $unsigned(in0) < $unsigned(in1) )  };                // SLTU
       4'd10   : out = in1 << 12;      				// LUI
       4'd11   : out = in0;                                      // CP OP0
       4'd12   : out = in1;                                      // CP OP1
@@ -95,14 +95,14 @@ module lab2_proc_AluVRTL
     .out  (ops_eq)
   );
 
-  vc_LtComparator #(32) cond_lt_comp
-  (
-    .in0   (in0),
-    .in1   (in1),
-    .out   (ops_ltu)
-  );
-
-  assign ops_lt = $signed(in0) < $signed(in1);
+//  vc_LtComparator #(32) cond_lt_comp
+//  (
+//    .in0   (in0),
+//    .in1   (in1),
+//    .out   (ops_ltu)
+//  );
+  assign ops_ltu = ( $unsigned(in0) < $unsigned(in1) );
+  assign ops_lt = ( $signed(in0) < $signed(in1) );
 
 endmodule
 

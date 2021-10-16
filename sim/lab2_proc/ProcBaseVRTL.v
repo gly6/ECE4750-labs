@@ -234,7 +234,8 @@ module lab2_proc_ProcBaseVRTL
     .inst_D                 (inst_D),
     .br_cond_eq_X           (br_cond_eq_X),
 
-    .commit_inst            (commit_inst)
+    .commit_inst            (commit_inst),
+    (.*)
   );
 
   //----------------------------------------------------------------------
@@ -349,7 +350,8 @@ module lab2_proc_ProcBaseVRTL
 
     // stats_en
 
-    .stats_en                (stats_en)
+    .stats_en                (stats_en),
+    (.*)
   );
 
   //----------------------------------------------------------------------

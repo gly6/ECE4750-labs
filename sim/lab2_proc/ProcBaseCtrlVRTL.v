@@ -281,6 +281,16 @@ module lab2_proc_ProcBaseCtrlVRTL
 
   // Operand 2 Mux Select
 
+  localparam br_na    = 3'b0; // No branch
+  localparam br_bne   = 3'b1; // bne
+  localparam br_beq   = 3'b010; // beq
+  localparam br_blt   = 3'b011; // blt 
+  localparam br_bltu  = 3'b100; // bltu
+  localparam br_bge   = 3'b101; // bge
+  localparam br_bgeu  = 3'b110; // bgeu 
+
+  // Operand 1 Mux Select
+
   localparam bm_x     = 2'bx; // Don't care
   localparam bm_rf    = 2'd0; // Use data from register file
   localparam bm_imm   = 2'd1; // Use sign-extended immediate
