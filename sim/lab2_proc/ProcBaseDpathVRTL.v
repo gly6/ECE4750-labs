@@ -319,7 +319,7 @@ module lab2_proc_ProcBaseDpathVRTL
     .req_rdy  (imul_req_rdy_D),
     .req_msg  ({op1_D, op2_D}),
     .resp_val (imul_resp_val_X),
-    .resp_rdy (imul_resp_rdy_x),
+    .resp_rdy (imul_resp_rdy_X),
     .resp_msg (imul_resp_msg)
   );
 

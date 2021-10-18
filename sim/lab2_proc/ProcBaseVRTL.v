@@ -130,13 +130,19 @@ module lab2_proc_ProcBaseVRTL
   logic [4:0]  rf_waddr_W;
   logic        rf_wen_W;
   logic        stats_en_wen_W;
-
+  logic        op1_sel_D;
+  logic        imul_req_val_D;
+  logic        imul_resp_rdy_X;  
+  logic [1:0]  ex_result_sel_X;
   // status signals (dpath->ctrl)
 
   logic [31:0] inst_D;
   logic        br_cond_eq_X;
   logic        br_cond_lt_X;
   logic        br_cond_ltu_X;
+  logic        imul_req_rdy_D;
+  logic        imul_resp_val_X;
+  logic [31:0] dmemreq_msg_data;
   //----------------------------------------------------------------------
   // Pack Memory Request Messages
   //----------------------------------------------------------------------
@@ -234,8 +240,8 @@ module lab2_proc_ProcBaseVRTL
 
     .inst_D                 (inst_D),
     .br_cond_eq_X           (br_cond_eq_X),
-    //.br_cond_lt_X           (br_cond_lt_X),    
-    //.br_cond_ltu_X          (br_cond_ltu_X),
+    .br_cond_lt_X           (br_cond_lt_X),    
+    .br_cond_ltu_X          (br_cond_ltu_X),
 
     .commit_inst            (commit_inst),
     .*
@@ -331,6 +337,7 @@ module lab2_proc_ProcBaseVRTL
     .pc_sel_F                (pc_sel_F),
 
     .reg_en_D                (reg_en_D),
+    .op1_sel_D               (op1_sel_D),
     .op2_sel_D               (op2_sel_D),
     .csrr_sel_D              (csrr_sel_D),
     .imm_type_D              (imm_type_D),
@@ -345,13 +352,17 @@ module lab2_proc_ProcBaseVRTL
     .rf_waddr_W              (rf_waddr_W),
     .rf_wen_W                (rf_wen_W),
     .stats_en_wen_W          (stats_en_wen_W),
-
+    .imul_req_val_D          (imul_req_val_D),
+    .imul_resp_rdy_X         (imul_resp_rdy_X),
+    .ex_result_sel_X         (ex_result_sel_X),
     // status signals (dpath->ctrl)
 
     .inst_D                  (inst_D),
     .br_cond_eq_X            (br_cond_eq_X),
     .br_cond_lt_X            (br_cond_lt_X),
     .br_cond_ltu_X           (br_cond_ltu_X),
+    .imul_req_rdy_D          (imul_req_rdy_D),
+    .imul_resp_val_X         (imul_resp_val_X),
     // stats_en
 
     .stats_en                (stats_en),
