@@ -61,6 +61,13 @@ import inst_mul
 
 @pytest.mark.parametrize( "name,test", [
   asm_test( inst_mul.gen_basic_test     ) ,
+  asm_test( inst_mul.gen_dest_dep_test  ) ,
+  asm_test( inst_mul.gen_src0_dep_test  ) ,
+  asm_test( inst_mul.gen_src1_dep_test  ) ,
+  asm_test( inst_mul.gen_srcs_dep_test  ) ,
+  asm_test( inst_mul.gen_srcs_dest_test ) ,
+  asm_test( inst_mul.gen_value_test     ) ,
+  asm_test( inst_mul.gen_random_test    ) ,
 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to test more complicated
@@ -135,6 +142,13 @@ import inst_slt
 
 @pytest.mark.parametrize( "name,test", [
   asm_test( inst_slt.gen_basic_test     ) ,
+  asm_test( inst_slt.gen_dest_dep_test  ) ,
+  asm_test( inst_slt.gen_src0_dep_test  ) ,
+  asm_test( inst_slt.gen_src1_dep_test  ) ,
+  asm_test( inst_slt.gen_srcs_dep_test  ) ,
+  asm_test( inst_slt.gen_srcs_dest_test ) ,
+  asm_test( inst_slt.gen_value_test     ) ,
+  asm_test( inst_slt.gen_random_test    ) ,
 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to test more complicated
@@ -152,6 +166,13 @@ import inst_sltu
 
 @pytest.mark.parametrize( "name,test", [
   asm_test( inst_sltu.gen_basic_test     ) ,
+  asm_test( inst_sltu.gen_dest_dep_test  ) ,
+  asm_test( inst_sltu.gen_src0_dep_test  ) ,
+  asm_test( inst_sltu.gen_src1_dep_test  ) ,
+  asm_test( inst_sltu.gen_srcs_dep_test  ) ,
+  asm_test( inst_sltu.gen_srcs_dest_test ) ,
+  asm_test( inst_sltu.gen_value_test     ) ,
+  asm_test( inst_sltu.gen_random_test    ) ,
 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to test more complicated
@@ -169,6 +190,13 @@ import inst_sra
 
 @pytest.mark.parametrize( "name,test", [
   asm_test( inst_sra.gen_basic_test     ) ,
+  asm_test( inst_sra.gen_dest_dep_test  ) ,
+  asm_test( inst_sra.gen_src0_dep_test  ) ,
+  asm_test( inst_sra.gen_src1_dep_test  ) ,
+  asm_test( inst_sra.gen_srcs_dep_test  ) ,
+  asm_test( inst_sra.gen_srcs_dest_test ) ,
+  asm_test( inst_sra.gen_value_test     ) ,
+  asm_test( inst_sra.gen_random_test    ) ,
 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to test more complicated
@@ -186,6 +214,13 @@ import inst_srl
 
 @pytest.mark.parametrize( "name,test", [
   asm_test( inst_srl.gen_basic_test     ) ,
+  asm_test( inst_srl.gen_dest_dep_test  ) ,
+  asm_test( inst_srl.gen_src0_dep_test  ) ,
+  asm_test( inst_srl.gen_src1_dep_test  ) ,
+  asm_test( inst_srl.gen_srcs_dep_test  ) ,
+  asm_test( inst_srl.gen_srcs_dest_test ) ,
+  asm_test( inst_srl.gen_value_test     ) ,
+  asm_test( inst_srl.gen_random_test    ) ,
 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to test more complicated
