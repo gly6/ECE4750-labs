@@ -350,8 +350,8 @@ module lab2_proc_ProcBaseCtrlVRTL
   logic       proc2mngr_val_D;
   logic       mngr2proc_rdy_D;
   logic       stats_en_wen_D;
-  logic       jump_type_D; 
-  logic       ex_result_sel_D;
+  logic [1:0] jump_type_D; 
+  logic [1:0] ex_result_sel_D;
   logic       imul_val_D;
 
   task cs
@@ -370,8 +370,8 @@ module lab2_proc_ProcBaseCtrlVRTL
     input logic       cs_csrw,
 
     input logic       cs_op1_sel,
-    input logic       cs_jump_sel, 
-    input logic       cs_ex_result_sel, 
+    input logic [1:0] cs_jump_sel, 
+    input logic [1:0] cs_ex_result_sel, 
     input logic       cs_imul_val
   );
   begin
@@ -567,8 +567,8 @@ module lab2_proc_ProcBaseCtrlVRTL
     imul_req_val_D = imul_val_D;
   end 
 
-  logic pc_redirect_D; 
-  logic pc_sel_D; 
+  logic       pc_redirect_D; 
+  logic [1:0] pc_sel_D; 
 
   always_comb begin 
     //jump and link -> pc_sel = 2
@@ -598,7 +598,7 @@ module lab2_proc_ProcBaseCtrlVRTL
   logic        proc2mngr_val_X;
   logic        stats_en_wen_X;
   logic [2:0]  br_type_X;
-  logic        jump_type_X;
+  logic [1:0]  jump_type_X;
 
   // Pipeline registers
 
