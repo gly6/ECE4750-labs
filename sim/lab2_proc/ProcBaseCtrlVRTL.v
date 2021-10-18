@@ -159,14 +159,14 @@ module lab2_proc_ProcBaseCtrlVRTL
 
   // Pipeline registers
 
-  always_ff @( posedge clk ) 
+  always_ff @( posedge clk ) begin
     if ( reset ) begin
       val_F <= 1'b0;
     end 
     else if ( reg_en_F ) begin
       val_F <= 1'b1;
     end    
-  end
+  end 
 
   // forward declaration for PC sel
 
@@ -275,21 +275,11 @@ module lab2_proc_ProcBaseCtrlVRTL
   localparam jt_jalr  = 2'd2; // jump and link register 
 
   // Operand 1 Mux Select 
-  localparam bm1_x    = 2'bx; 
-  localparam bm1_pc   = 2'd0; 
-  localparam bm1_rf   = 2'd1;
+  localparam bm1_x    = 1'bx; 
+  localparam bm1_pc   = 1'd0; 
+  localparam bm1_rf   = 1'd1;
 
   // Operand 2 Mux Select
-
-  localparam br_na    = 3'b0; // No branch
-  localparam br_bne   = 3'b1; // bne
-  localparam br_beq   = 3'b010; // beq
-  localparam br_blt   = 3'b011; // blt 
-  localparam br_bltu  = 3'b100; // bltu
-  localparam br_bge   = 3'b101; // bge
-  localparam br_bgeu  = 3'b110; // bgeu 
-
-  // Operand 1 Mux Select
 
   localparam bm_x     = 2'bx; // Don't care
   localparam bm_rf    = 2'd0; // Use data from register file
@@ -329,9 +319,9 @@ module lab2_proc_ProcBaseCtrlVRTL
   localparam imm_h    = 3'd5;
 
   //Imul signals 
-  localparam req_x    = 2'bx; 
-  localparam req_n    = 2'b0; 
-  localparam req_y    = 2'b1;
+  localparam req_x    = 1'bx; 
+  localparam req_n    = 1'b0; 
+  localparam req_y    = 1'b1;
 
   // Memory Request Type
 
@@ -381,7 +371,7 @@ module lab2_proc_ProcBaseCtrlVRTL
 
     input logic       cs_op1_sel,
     input logic       cs_jump_sel, 
-    input logic       cs_ex_result_sel 
+    input logic       cs_ex_result_sel, 
     input logic       cs_imul_val
   );
   begin
@@ -577,11 +567,14 @@ module lab2_proc_ProcBaseCtrlVRTL
     imul_req_val_D = imul_val_D;
   end 
 
+  logic pc_redirect_D; 
+  logic pc_sel_D; 
+
   always_comb begin 
     //jump and link -> pc_sel = 2
   if (val_D && (jump_type_D == jt_jal)) begin
     pc_redirect_D = 1'b1; 
-    pc_sel_D = 2'b2; 
+    pc_sel_D = 2'd2; 
   end
   else begin
     pc_redirect_D = 1'b0;  
@@ -637,7 +630,7 @@ module lab2_proc_ProcBaseCtrlVRTL
       pc_redirect_X = !br_cond_eq_X;
       pc_sel_X      = 2'b1;          // use branch target
     end 
-    else if (val_X && (br_type_x == br_beq)) begin
+    else if (val_X && (br_type_X == br_beq)) begin
       pc_redirect_X = br_cond_eq_X; 
       pc_sel_X      = 2'b1; //use branch target 
     end 
@@ -652,6 +645,7 @@ module lab2_proc_ProcBaseCtrlVRTL
     else if (val_X && (br_type_X) == br_bge) begin 
       pc_redirect_X = !br_cond_lt_X;
       pc_sel_X      = 2'b1; 
+    end
     else if (val_X && (br_type_X) == br_bgeu) begin 
       pc_redirect_X = !br_cond_ltu_X; 
       pc_sel_X      = 2'b1; 
@@ -659,7 +653,7 @@ module lab2_proc_ProcBaseCtrlVRTL
     // Jump and link register -> pc_sel = 3
     else if (val_X && (jump_type_X) == jt_jalr) begin 
       pc_redirect_X = 1'b1;
-      pc_sel_X      = 2'b3; 
+      pc_sel_X      = 2'd3; 
     end 
     else begin
       pc_redirect_X = 1'b0;
