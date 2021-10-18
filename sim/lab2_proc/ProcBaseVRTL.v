@@ -135,7 +135,8 @@ module lab2_proc_ProcBaseVRTL
 
   logic [31:0] inst_D;
   logic        br_cond_eq_X;
-
+  logic        br_cond_lt_X;
+  logic        br_cond_ltu_X;
   //----------------------------------------------------------------------
   // Pack Memory Request Messages
   //----------------------------------------------------------------------
@@ -233,9 +234,11 @@ module lab2_proc_ProcBaseVRTL
 
     .inst_D                 (inst_D),
     .br_cond_eq_X           (br_cond_eq_X),
+    //.br_cond_lt_X           (br_cond_lt_X),    
+    //.br_cond_ltu_X          (br_cond_ltu_X),
 
     .commit_inst            (commit_inst),
-    (.*)
+    .*
   );
 
   //----------------------------------------------------------------------
@@ -347,11 +350,12 @@ module lab2_proc_ProcBaseVRTL
 
     .inst_D                  (inst_D),
     .br_cond_eq_X            (br_cond_eq_X),
-
+    .br_cond_lt_X            (br_cond_lt_X),
+    .br_cond_ltu_X           (br_cond_ltu_X),
     // stats_en
 
     .stats_en                (stats_en),
-    (.*)
+    .*
   );
 
   //----------------------------------------------------------------------

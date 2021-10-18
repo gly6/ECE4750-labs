@@ -337,7 +337,7 @@ module lab2_proc_ProcBaseDpathVRTL
     .clk    (clk),
     .reset  (reset),
     .en     (reg_en_X),
-    .d      (rf_data1_D),
+    .d      (rf_rdata1_D),
     .q      (dmemreq_msg_data)
   );
 
