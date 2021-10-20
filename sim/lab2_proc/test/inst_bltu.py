@@ -1,5 +1,5 @@
 #=========================================================================
-# bltu
+# bltuu
 #=========================================================================
 
 import random
@@ -53,3 +53,160 @@ def gen_basic_test():
 # ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Define additional directed and random test cases.
 # '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+#-------------------------------------------------------------------------
+# gen_src0_dep_taken_test
+#-------------------------------------------------------------------------
+
+def gen_src0_dep_taken_test():
+  return [
+    gen_br2_src0_dep_test( 5, "bltu", 1, 7, True ),
+    gen_br2_src0_dep_test( 4, "bltu", 2, 7, True ),
+    gen_br2_src0_dep_test( 3, "bltu", 3, 7, True ),
+    gen_br2_src0_dep_test( 2, "bltu", 4, 7, True ),
+    gen_br2_src0_dep_test( 1, "bltu", 5, 7, True ),
+    gen_br2_src0_dep_test( 0, "bltu", 6, 7, True ),
+  ]
+
+#-------------------------------------------------------------------------
+# gen_src0_dep_nottaken_test
+#-------------------------------------------------------------------------
+
+def gen_src0_dep_nottaken_test():
+  return [    
+    gen_br2_src0_dep_test( 5, "bltu", 1, 1, False ),
+    gen_br2_src0_dep_test( 4, "bltu", 2, 2, False ),
+    gen_br2_src0_dep_test( 3, "bltu", 3, 3, False ),
+    gen_br2_src0_dep_test( 2, "bltu", 4, 4, False ),
+    gen_br2_src0_dep_test( 1, "bltu", 5, 5, False ),
+    gen_br2_src0_dep_test( 0, "bltu", 6, 6, False ),
+    gen_br2_src0_dep_test( 5, "bltu", 2, 1, False ),
+    gen_br2_src0_dep_test( 4, "bltu", 4, 2, False ),
+    gen_br2_src0_dep_test( 3, "bltu", 6, 3, False ),
+    gen_br2_src0_dep_test( 2, "bltu", 8, 4, False ),
+    gen_br2_src0_dep_test( 1, "bltu", 10, 5, False ),
+    gen_br2_src0_dep_test( 0, "bltu", 12, 6, False ),
+  ]
+
+#-------------------------------------------------------------------------
+# gen_src1_dep_taken_test
+#-------------------------------------------------------------------------
+
+def gen_src1_dep_taken_test():
+  return [
+    gen_br2_src1_dep_test( 5, "bltu", 1, 7, True ),
+    gen_br2_src1_dep_test( 4, "bltu", 2, 7, True ),
+    gen_br2_src1_dep_test( 3, "bltu", 3, 7, True ),
+    gen_br2_src1_dep_test( 2, "bltu", 4, 7, True ),
+    gen_br2_src1_dep_test( 1, "bltu", 5, 7, True ),
+    gen_br2_src1_dep_test( 0, "bltu", 6, 7, True ),
+  ]
+
+#-------------------------------------------------------------------------
+# gen_src1_dep_nottaken_test
+#-------------------------------------------------------------------------
+
+def gen_src1_dep_nottaken_test():
+  return [
+    gen_br2_src1_dep_test( 5, "bltu", 1, 1, False ),
+    gen_br2_src1_dep_test( 4, "bltu", 2, 2, False ),
+    gen_br2_src1_dep_test( 3, "bltu", 3, 3, False ),
+    gen_br2_src1_dep_test( 2, "bltu", 4, 4, False ),
+    gen_br2_src1_dep_test( 1, "bltu", 5, 5, False ),
+    gen_br2_src1_dep_test( 0, "bltu", 6, 6, False ),
+    gen_br2_src1_dep_test( 5, "bltu", 2, 1, False ),
+    gen_br2_src1_dep_test( 4, "bltu", 4, 2, False ),
+    gen_br2_src1_dep_test( 3, "bltu", 6, 3, False ),
+    gen_br2_src1_dep_test( 2, "bltu", 8, 4, False ),
+    gen_br2_src1_dep_test( 1, "bltu", 10, 5, False ),
+    gen_br2_src1_dep_test( 0, "bltu", 12, 6, False ),
+  ]
+
+#-------------------------------------------------------------------------
+# gen_srcs_dep_taken_test
+#-------------------------------------------------------------------------
+
+def gen_srcs_dep_taken_test():
+  return [
+    gen_br2_srcs_dep_test( 5, "bltu", 1, 2, True ),
+    gen_br2_srcs_dep_test( 4, "bltu", 2, 3, True ),
+    gen_br2_srcs_dep_test( 3, "bltu", 3, 4, True ),
+    gen_br2_srcs_dep_test( 2, "bltu", 4, 5, True ),
+    gen_br2_srcs_dep_test( 1, "bltu", 5, 6, True ),
+    gen_br2_srcs_dep_test( 0, "bltu", 6, 7, True ),
+  ]
+
+#-------------------------------------------------------------------------
+# gen_srcs_dep_nottaken_test
+#-------------------------------------------------------------------------
+
+def gen_srcs_dep_nottaken_test():
+  return [
+
+
+    gen_br2_srcs_dep_test( 5, "bltu", 1, 1, False ),
+    gen_br2_srcs_dep_test( 4, "bltu", 2, 2, False ),
+    gen_br2_srcs_dep_test( 3, "bltu", 3, 3, False ),
+    gen_br2_srcs_dep_test( 2, "bltu", 4, 4, False ),
+    gen_br2_srcs_dep_test( 1, "bltu", 5, 5, False ),
+    gen_br2_srcs_dep_test( 0, "bltu", 6, 6, False ),
+    gen_br2_srcs_dep_test( 5, "bltu", 2, 1, False ),
+    gen_br2_srcs_dep_test( 4, "bltu", 4, 2, False ),
+    gen_br2_srcs_dep_test( 3, "bltu", 6, 3, False ),
+    gen_br2_srcs_dep_test( 2, "bltu", 8, 4, False ),
+    gen_br2_srcs_dep_test( 1, "bltu", 10, 5, False ),
+    gen_br2_srcs_dep_test( 0, "bltu", 12, 6, False ),
+  ]
+
+#-------------------------------------------------------------------------
+# gen_src0_eq_src1_nottaken_test
+#-------------------------------------------------------------------------
+
+def gen_src0_eq_src1_test():
+  return [
+    gen_br2_src0_eq_src1_test( "bltu", 1, False ),
+  ]
+
+#-------------------------------------------------------------------------
+# gen_value_test
+#-------------------------------------------------------------------------
+
+def gen_value_test():
+  return [
+
+    gen_br2_value_test( "bltu", -1, -1, False ),
+    gen_br2_value_test( "bltu", -1,  0, False  ),
+    gen_br2_value_test( "bltu", -1,  1, False  ),
+
+    gen_br2_value_test( "bltu",  0, -1, True  ),
+    gen_br2_value_test( "bltu",  0,  0, False ),
+    gen_br2_value_test( "bltu",  0,  1, True  ),
+
+    gen_br2_value_test( "bltu",  1, -1, True  ),
+    gen_br2_value_test( "bltu",  1,  0, False  ),
+    gen_br2_value_test( "bltu",  1,  1, False ),
+
+    gen_br2_value_test( "bltu", 0xfffffff7, 0xfffffff7, False ),
+    gen_br2_value_test( "bltu", 0x7fffffff, 0x7fffffff, False ),
+    gen_br2_value_test( "bltu", 0xfffffff7, 0x7fffffff, False ),
+    gen_br2_value_test( "bltu", 0x7fffffff, 0xfffffff7, True ),
+
+  ]
+
+#-------------------------------------------------------------------------
+# gen_random_test
+#-------------------------------------------------------------------------
+
+def gen_random_test():
+  asm_code = []
+  for i in xrange(25):
+    taken = random.choice([True, False])
+    src0  = Bits( 32, random.randint(0, 0xffffffff) )
+    if taken:
+      # Branch taken, src0 >= src1
+      src1 = Bits( 32, random.randint((src0.uint() + 1), 0xffffffff) )
+    else:
+      # Branch not taken, src0 < src1
+      src1 = Bits( 32, random.randint(0, src0.uint()) )
+    asm_code.append( gen_br2_value_test( "bltu", src0.int(), src1.int(), taken ) )
+  return asm_code
