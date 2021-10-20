@@ -564,7 +564,7 @@ module lab2_proc_ProcBaseCtrlVRTL
   assign next_val_D = val_D && !stall_D && !squash_D;
  
   always_comb begin 
-    imul_req_val_D = imul_val_D;
+    imul_req_val_D = imul_val_D && !stall_D;
   end 
 
   logic       pc_redirect_D; 
@@ -661,13 +661,12 @@ module lab2_proc_ProcBaseCtrlVRTL
     end
   end
 
-  // ostall due to dmemreq not ready.
-
-  assign ostall_X = val_X && ( dmemreq_type_X != nr ) && !dmemreq_rdy;
-
   // ostall due to imul still processing the data 
   logic ostall_imul_X; 
-  assign ostall_imul_X = !imul_resp_val_X; 
+  assign ostall_imul_X = !imul_resp_val_X && imul_resp_rdy_X; 
+
+    // ostall due to dmemreq not ready.
+  assign ostall_X = val_X && (((dmemreq_type_X != nr ) && !dmemreq_rdy) || ostall_imul_X);
 
   // osquash due to taken branch, notice we can't osquash if current
   // stage stalls, otherwise we will send osquash twice.
@@ -676,12 +675,12 @@ module lab2_proc_ProcBaseCtrlVRTL
 
   // stall and squash used in X stage
 
-  assign stall_X = val_X && ( ostall_X || ostall_M || ostall_W );
+  assign stall_X = val_X && ( ostall_X || ostall_M || ostall_W);
 
   // set dmemreq_val only if not stalling
 
   assign dmemreq_val = val_X && !stall_X && ( dmemreq_type_X != nr );
-
+  
   // Valid signal for the next stage
 
   logic  next_val_X;
