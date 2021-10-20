@@ -13,7 +13,7 @@
 
 `include "lab2_proc/TinyRV2InstVRTL.v"
 `include "lab2_proc/ProcDpathComponentsVRTL.v"
-`include "../lab1_imul/IntMulAltVRTL.v"
+`include "lab1_imul/IntMulAltVRTL.v"
 
 module lab2_proc_ProcBaseDpathVRTL
 #(
@@ -31,10 +31,12 @@ module lab2_proc_ProcBaseDpathVRTL
   input  mem_resp_4B_t imemresp_msg,
 
   // Data Memory Port
-
+  
+  output logic [31:0] dmemreq_msg_data,
   output logic [31:0] dmemreq_msg_addr,
-  input  logic [31:0] dmemresp_msg_data,
 
+  input  logic [31:0] dmemresp_msg_data,
+  
   // mngr communication ports
 
   input  logic [31:0] mngr2proc_data,
@@ -68,12 +70,14 @@ module lab2_proc_ProcBaseDpathVRTL
   input  logic        stats_en_wen_W,
   
   input  logic        imul_resp_rdy_X,
-
+  input  logic        imul_req_val_D,
 
   // status signals (dpath->ctrl)
 
   output logic [31:0] inst_D,
   output logic        br_cond_eq_X,
+  output logic        br_cond_lt_X,
+  output logic        br_cond_ltu_X,
   output logic        imul_req_rdy_D,
   output logic        imul_resp_val_X,
 
@@ -115,11 +119,12 @@ module lab2_proc_ProcBaseDpathVRTL
     .out  (pc_plus4_F)
   );
 
-  vc_Mux3 #(32) pc_sel_mux_F
+  vc_Mux4 #(32) pc_sel_mux_F
   (
     .in0  (pc_plus4_F),
     .in1  (br_target_X),
     .in2  (jal_target_D),
+    .in3  (jalr_target_X),
     .sel  (pc_sel_F),
     .out  (pc_next_F)
   );
@@ -243,6 +248,7 @@ module lab2_proc_ProcBaseDpathVRTL
   logic [31:0] op1_X;
   logic [31:0] op2_X; 
   logic [31:0] pc_X;
+  logic [31:0] jalr_target_X;  
 
   vc_EnResetReg #(32, 0) op1_reg_X
   (
@@ -299,8 +305,8 @@ module lab2_proc_ProcBaseDpathVRTL
     .fn       (alu_fn_X),
     .out      (alu_result_X),
     .ops_eq   (br_cond_eq_X),
-    .ops_lt   (),
-    .ops_ltu  ()
+    .ops_lt   (br_cond_lt_X),
+    .ops_ltu  (br_cond_ltu_X)
   );
   
   logic [31:0] imul_resp_msg;
@@ -313,7 +319,7 @@ module lab2_proc_ProcBaseDpathVRTL
     .req_rdy  (imul_req_rdy_D),
     .req_msg  ({op1_D, op2_D}),
     .resp_val (imul_resp_val_X),
-    .resp_rdy (imul_resp_rdy_x),
+    .resp_rdy (imul_resp_rdy_X),
     .resp_msg (imul_resp_msg)
   );
 
@@ -325,6 +331,17 @@ module lab2_proc_ProcBaseDpathVRTL
       .sel  (ex_result_sel_X),
       .out  (ex_result_X)
   );
+
+  vc_EnResetReg #(32, 0) dmem_write_data_reg_X
+  (
+    .clk    (clk),
+    .reset  (reset),
+    .en     (reg_en_X),
+    .d      (rf_rdata1_D),
+    .q      (dmemreq_msg_data)
+  );
+
+  assign jalr_target_X = alu_result_X;
 
   assign ex_result_X = alu_result_X;
 
