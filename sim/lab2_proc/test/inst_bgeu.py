@@ -53,3 +53,158 @@ def gen_basic_test():
 # ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Define additional directed and random test cases.
 # '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+#-------------------------------------------------------------------------
+# gen_src0_dep_taken_test
+#-------------------------------------------------------------------------
+
+def gen_src0_dep_taken_test():
+  return [
+    gen_br2_src0_dep_test( 5, "bgeu", 1, 1, True ),
+    gen_br2_src0_dep_test( 4, "bgeu", 2, 2, True ),
+    gen_br2_src0_dep_test( 3, "bgeu", 3, 3, True ),
+    gen_br2_src0_dep_test( 2, "bgeu", 4, 4, True ),
+    gen_br2_src0_dep_test( 1, "bgeu", 5, 5, True ),
+    gen_br2_src0_dep_test( 0, "bgeu", 6, 6, True ),
+    gen_br2_src0_dep_test( 5, "bgeu", 2, 1, True ),
+    gen_br2_src0_dep_test( 4, "bgeu", 4, 2, True ),
+    gen_br2_src0_dep_test( 3, "bgeu", 6, 3, True ),
+    gen_br2_src0_dep_test( 2, "bgeu", 8, 4, True ),
+    gen_br2_src0_dep_test( 1, "bgeu", 10, 5, True ),
+    gen_br2_src0_dep_test( 0, "bgeu", 12, 6, True ),
+  ]
+
+#-------------------------------------------------------------------------
+# gen_src0_dep_nottaken_test
+#-------------------------------------------------------------------------
+
+def gen_src0_dep_nottaken_test():
+  return [    
+    gen_br2_src0_dep_test( 5, "bgeu", 1, 7, False ),
+    gen_br2_src0_dep_test( 4, "bgeu", 2, 7, False ),
+    gen_br2_src0_dep_test( 3, "bgeu", 3, 7, False ),
+    gen_br2_src0_dep_test( 2, "bgeu", 4, 7, False ),
+    gen_br2_src0_dep_test( 1, "bgeu", 5, 7, False ),
+    gen_br2_src0_dep_test( 0, "bgeu", 6, 7, False ),
+  ]
+
+#-------------------------------------------------------------------------
+# gen_src1_dep_taken_test
+#-------------------------------------------------------------------------
+
+def gen_src1_dep_taken_test():
+  return [
+    gen_br2_src1_dep_test( 5, "bgeu", 1, 1, True ),
+    gen_br2_src1_dep_test( 4, "bgeu", 2, 2, True ),
+    gen_br2_src1_dep_test( 3, "bgeu", 3, 3, True ),
+    gen_br2_src1_dep_test( 2, "bgeu", 4, 4, True ),
+    gen_br2_src1_dep_test( 1, "bgeu", 5, 5, True ),
+    gen_br2_src1_dep_test( 0, "bgeu", 6, 6, True ),
+    gen_br2_src1_dep_test( 5, "bgeu", 2, 1, True ),
+    gen_br2_src1_dep_test( 4, "bgeu", 4, 2, True ),
+    gen_br2_src1_dep_test( 3, "bgeu", 6, 3, True ),
+    gen_br2_src1_dep_test( 2, "bgeu", 8, 4, True ),
+    gen_br2_src1_dep_test( 1, "bgeu", 10, 5, True ),
+    gen_br2_src1_dep_test( 0, "bgeu", 12, 6, True ),
+  ]
+
+#-------------------------------------------------------------------------
+# gen_src1_dep_nottaken_test
+#-------------------------------------------------------------------------
+
+def gen_src1_dep_nottaken_test():
+  return [
+    gen_br2_src1_dep_test( 5, "bgeu", 1, 7, False ),
+    gen_br2_src1_dep_test( 4, "bgeu", 2, 7, False ),
+    gen_br2_src1_dep_test( 3, "bgeu", 3, 7, False ),
+    gen_br2_src1_dep_test( 2, "bgeu", 4, 7, False ),
+    gen_br2_src1_dep_test( 1, "bgeu", 5, 7, False ),
+    gen_br2_src1_dep_test( 0, "bgeu", 6, 7, False ),
+  ]
+
+#-------------------------------------------------------------------------
+# gen_srcs_dep_taken_test
+#-------------------------------------------------------------------------
+
+def gen_srcs_dep_taken_test():
+  return [
+    gen_br2_srcs_dep_test( 5, "bgeu", 1, 1, True ),
+    gen_br2_srcs_dep_test( 4, "bgeu", 2, 2, True ),
+    gen_br2_srcs_dep_test( 3, "bgeu", 3, 3, True ),
+    gen_br2_srcs_dep_test( 2, "bgeu", 4, 4, True ),
+    gen_br2_srcs_dep_test( 1, "bgeu", 5, 5, True ),
+    gen_br2_srcs_dep_test( 0, "bgeu", 6, 6, True ),
+    gen_br2_srcs_dep_test( 5, "bgeu", 2, 1, True ),
+    gen_br2_srcs_dep_test( 4, "bgeu", 4, 2, True ),
+    gen_br2_srcs_dep_test( 3, "bgeu", 6, 3, True ),
+    gen_br2_srcs_dep_test( 2, "bgeu", 8, 4, True ),
+    gen_br2_srcs_dep_test( 1, "bgeu", 10, 5, True ),
+    gen_br2_srcs_dep_test( 0, "bgeu", 12, 6, True ),
+  ]
+
+#-------------------------------------------------------------------------
+# gen_srcs_dep_nottaken_test
+#-------------------------------------------------------------------------
+
+def gen_srcs_dep_nottaken_test():
+  return [
+    gen_br2_srcs_dep_test( 5, "bgeu", 1, 2, False ),
+    gen_br2_srcs_dep_test( 4, "bgeu", 2, 3, False ),
+    gen_br2_srcs_dep_test( 3, "bgeu", 3, 4, False ),
+    gen_br2_srcs_dep_test( 2, "bgeu", 4, 5, False ),
+    gen_br2_srcs_dep_test( 1, "bgeu", 5, 6, False ),
+    gen_br2_srcs_dep_test( 0, "bgeu", 6, 7, False ),
+  ]
+
+#-------------------------------------------------------------------------
+# gen_src0_eq_src1_nottaken_test
+#-------------------------------------------------------------------------
+
+def gen_src0_eq_src1_test():
+  return [
+    gen_br2_src0_eq_src1_test( "bgeu", 1, True ),
+  ]
+
+#-------------------------------------------------------------------------
+# gen_value_test
+#-------------------------------------------------------------------------
+
+def gen_value_test():
+  return [
+
+    gen_br2_value_test( "bgeu", -1, -1, True ),
+    gen_br2_value_test( "bgeu", -1,  0, True  ),
+    gen_br2_value_test( "bgeu", -1,  1, True  ),
+
+    gen_br2_value_test( "bgeu",  0, -1, False  ),
+    gen_br2_value_test( "bgeu",  0,  0, True ),
+    gen_br2_value_test( "bgeu",  0,  1, False  ),
+
+    gen_br2_value_test( "bgeu",  1, -1, False  ),
+    gen_br2_value_test( "bgeu",  1,  0, True  ),
+    gen_br2_value_test( "bgeu",  1,  1, True ),
+
+    gen_br2_value_test( "bgeu", 0xfffffff7, 0xfffffff7, True ),
+    gen_br2_value_test( "bgeu", 0x7fffffff, 0x7fffffff, True ),
+    gen_br2_value_test( "bgeu", 0xfffffff7, 0x7fffffff, True ),
+    gen_br2_value_test( "bgeu", 0x7fffffff, 0xfffffff7, False  ),
+
+  ]
+
+#-------------------------------------------------------------------------
+# gen_random_test
+#-------------------------------------------------------------------------
+
+def gen_random_test():
+  asm_code = []
+  for i in xrange(25):
+    taken = random.choice([True, False])
+    src0  = Bits( 32, random.randint(0, 0xffffffff) )
+    if taken:
+      # Branch taken, src0 >= src1
+      src1 = Bits( 32, random.randint(0, src0.uint()) )
+    else:
+      # Branch not taken, src0 < src1
+      src1 = Bits( 32, random.randint((src0.uint() + 1), 0xffffffff) )
+    asm_code.append( gen_br2_value_test( "bgeu", src0.uint(), src1.uint(), taken ) )
+  return asm_code
