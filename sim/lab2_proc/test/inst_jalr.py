@@ -55,3 +55,17 @@ def gen_basic_test():
 # ''' LAB TASK ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Define additional directed and random test cases.
 # '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+#-------------------------------------------------------------------------
+# jalr_base_dep_test
+#-------------------------------------------------------------------------
+
+def jalr_base_dep_test():
+  return [
+    gen_jalr_base_dep_test( 0, 5, 0x210 ),
+    gen_jalr_base_dep_test( 0, 4, 0x244 ),
+    gen_jalr_base_dep_test( 0, 3, 0x274 ),
+    gen_jalr_base_dep_test( 0, 2, 0x2a0 ),  
+    gen_jalr_base_dep_test( 0, 1, 0x2c8 ),
+    gen_jalr_base_dep_test( 0, 0, 0x2ec ),           
+  ]
