@@ -199,7 +199,10 @@ def test_slli( name, test, dump_vcd ):
 import inst_lui
 
 @pytest.mark.parametrize( "name,test", [
-  asm_test( inst_lui.gen_basic_test    ) ,
+  asm_test( inst_lui.gen_basic_test       ) ,
+  asm_test( inst_lui.lui_imm_dest_dep_test) ,
+  asm_test( inst_lui.lui_imm_value_test   ) , 
+  asm_test( inst_lui.gen_random_test      ) ,
 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to test more complicated
@@ -217,6 +220,9 @@ import inst_auipc
 
 @pytest.mark.parametrize( "name,test", [
   asm_test( inst_auipc.gen_basic_test    ) ,
+  asm_test( inst_auipc.auipc_imm_dest_dep_test),
+  asm_test( inst_auipc.auipc_imm_value_test   ), 
+  asm_test( inst_auipc.gen_random_test      ) ,
 
   # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # Add more rows to the test case table to test more complicated

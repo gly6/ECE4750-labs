@@ -161,30 +161,30 @@ def gen_value_test():
 # gen_random_test
 #-------------------------------------------------------------------------
 
-def gen_random_test():
+# def gen_random_test():
 
-  # Generate some random data
+#   # Generate some random data
 
-  data = []
-  for i in xrange(128):
-    data.append( random.randint(0,0xffffffff) )
+#   data = []
+#   for i in xrange(128):
+#     data.append( random.randint(0,0xffffffff) )
 
-  # Generate random accesses to this data
+#   # Generate random accesses to this data
 
-  asm_code = []
-  for i in xrange(100):
+#   asm_code = []
+#   for i in xrange(100):
 
-    a = random.randint(0,127)
-    b = random.randint(0,127)
+#     a = random.randint(0,127)
+#     b = random.randint(0,127)
 
-    base   = Bits( 32, 0x2000 + (4*b) )
-    offset = Bits( 16, (4*(a - b)) )
-    result = data[a]
+#     base   = Bits( 32, 0x2000 + (4*b) )
+#     offset = Bits( 16, (4*(a - b)) )
+#     result = data[a]
 
-    asm_code.append( gen_ld_value_test( "lw", offset.int(), base.uint(), result ) )
+#     asm_code.append( gen_ld_value_test( "sw", offset.int(), base.uint(), result ) )
 
-  # Add the data to the end of the assembly code
+#   # Add the data to the end of the assembly code
 
-  asm_code.append( gen_word_data( data ) )
-  return asm_code
+#   asm_code.append( gen_word_data( data ) )
+#   return asm_code
 
