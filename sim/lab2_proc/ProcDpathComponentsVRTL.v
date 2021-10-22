@@ -61,7 +61,12 @@ module lab2_proc_AluVRTL
   output logic        ops_lt,
   output logic        ops_ltu
 );
-  
+
+//  always_comb begin
+//    if (fn == (4'd14 || 4'd15) ) begin
+ //     out = in0 + 4;
+ //   end
+ // end
 
   always_comb begin
 
@@ -71,15 +76,17 @@ module lab2_proc_AluVRTL
       4'd2    : out = in0 & in1;                                // AND
       4'd3    : out = in0 | in1;                                // OR
       4'd4    : out = in0 ^ in1;                                // XOR
-      4'd5    : out = in0 << in1[4:0];				    // SLL
+      4'd5    : out = in0 << in1[4:0];				// SLL
       4'd6    : out = in0 >> in1[4:0];				// SRL
-      4'd7    : out = $signed(in0) >>> in1[4:0];			// SRA
+      4'd7    : out = $signed(in0) >>> in1[4:0];		// SRA
       4'd8    : out = { {31{1'b0}}, ($signed(in0) < $signed(in1)) };  	// SLT 
-      4'd9    : out = { {31{1'b0}}, ( $unsigned(in0) < $unsigned(in1) )  };                // SLTU
-      4'd10   : out = in1 << 12;      				// LUI
+      4'd9    : out = { {31{1'b0}}, ( $unsigned(in0) < $unsigned(in1) )}; // SLTU
+      4'd10   : out = in1;  				        // LUI
       4'd11   : out = in0;                                      // CP OP0
       4'd12   : out = in1;                                      // CP OP1
-      4'd13   : out = in0 + (in1 << 12);                        // AUIPC
+      4'd13   : out = in0 + (in1);                              // AUIPC
+  //    4'd14   : out = in0 + in1;                       // JAL
+    //  4'd15   : out = (in0 + in1) & 40'h0xfffffffe;        // JALR
 
       default : out = 32'b0;
     endcase
