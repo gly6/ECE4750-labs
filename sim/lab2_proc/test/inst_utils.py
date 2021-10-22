@@ -651,7 +651,7 @@ def gen_jal_dest_dep_test(num_nop_a, num_nop_b):
     # Use r3 to track the control flow pattern
     addi  x3, x0, 0     # 0x0200
     {nops_a}
-    jal   x1, label_a   # 0x0224
+    jal   x1, label_a   # 0x0200 + nops_a * 4
     addi  x3, x3, 0b01  # 0x0228
     {nops_b}
 
@@ -667,7 +667,7 @@ def gen_jal_dest_dep_test(num_nop_a, num_nop_b):
   """.format(  
     nops_a = gen_nops(num_nop_a),    
     nops_b  = gen_nops(num_nop_b),
-    link = 0x0200 + (num_nop_a * 4)
+    link = str(hex(0x0200 + (num_nop_a * 4)))
     **locals()
   )
 
@@ -696,7 +696,7 @@ def gen_jalr_dest_dep_test( num_nop_a, num_nop_b):
   """.format(  
     nops_a = gen_nops(num_nop_a),    
     nops_b  = gen_nops(num_nop_b),
-    link = 0x0208 + (num_nop_a * 4)
+    link = str(hex(0x0208 + (num_nop_a * 4)))
     **locals()
   )
 
