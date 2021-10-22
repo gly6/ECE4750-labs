@@ -370,6 +370,115 @@ def gen_imm_value_test( inst, imm, result ):
   return gen_imm_template( 0, inst, imm, result )
 
 #-------------------------------------------------------------------------
+# gen_jal_template
+#-------------------------------------------------------------------------
+gen_jal_template_id = 0
+
+def gen_jal_dest_dep_test(num_nop_a, link_addr):
+
+    # Create unique labels
+
+    global gen_jal_template_id
+    id_a = "label_{}".format( gen_jal_template_id + 1 )
+    #id_b = "label_{}".format( gen_jal_template_id + 2 )
+    #id_c = "label_{}".format( gen_jal_template_id + 3 )
+    gen_jal_template_id += 3
+
+    return """
+
+    # Use r3 to track the control flow pattern
+    addi  x3, x0, 0x000     # 0x0200
+    jal   x1, {id_a}   # 0x0200 + nops_a * 4
+    addi  x3, x3, 0b01  # 0x0228
+    {nops_a}
+
+  {id_a}:
+    addi  x3, x3, 0b010
+
+    # Check the link address
+    csrw  proc2mngr, x1 > {link}
+
+    # Only the second bit should be set if jump was taken
+    csrw  proc2mngr, x3 > 0b010
+
+  """.format(  
+    nops_a = gen_nops(num_nop_a),    
+    link = str(hex(link_addr)),
+    #nops_b  = gen_nops(num_nop_b),
+    #link = str(hex(0x0208 + (num_nop_a * 4))),
+    #link = str(hex(0x0200 + (test_number * 0x38))),
+    **locals()
+  )
+
+#-------------------------------------------------------------------------
+# gen_jal_base_dep_test
+#-------------------------------------------------------------------------
+# Test the base register bypass paths by varying how many nops are
+# inserted between writing the base register and reading this register in
+# the instruction under test.
+
+def gen_jal_base_dep_test( num_nops, link_addr ):
+  return gen_jal_dest_dep_test( num_nops, link_addr)
+
+#-------------------------------------------------------------------------
+# gen_jalr_template
+#-------------------------------------------------------------------------
+gen_jalr_template_id = 0
+
+def gen_jalr_template(num_nop_a, num_nop_b, link_addr):
+
+    # Create unique labels
+
+    global gen_jalr_template_id
+    id_a = "label_{}".format( gen_jalr_template_id + 1 )
+    #id_b = "label_{}".format( gen_jal_template_id + 2 )
+    #id_c = "label_{}".format( gen_jal_template_id + 3 )
+    gen_jalr_template_id += 3
+    return """
+
+    # Use r3 to track the control flow pattern
+    addi  x3, x0, 0           # 0x0200
+                              #
+    lui x1,      %hi[{id_a}] # 0x0204
+    addi x1, x1, %lo[{id_a}] # 0x0208
+                              #
+    {nops_a}
+                              #
+    jalr  x31, x1, 0          # 0x022c
+    addi  x3, x3, 0b01        # 0x0230
+
+    {nops_b}
+
+  {id_a}:
+    addi  x3, x3, 0b10
+
+    # Check the link address
+    csrw  proc2mngr, x31 > {link}
+
+    # Only the second bit should be set if jump was taken
+    csrw  proc2mngr, x3  > 0b10
+
+  """.format(  
+    nops_a = gen_nops(num_nop_a),    
+    nops_b = gen_nops(num_nop_b), 
+    link = str(hex(link_addr)),
+    #nops_b  = gen_nops(num_nop_b),
+    #link = str(hex(0x0208 + (num_nop_a * 4))),
+    #link = str(hex(0x0200 + (test_number * 0x38))),
+    **locals()
+  )
+
+#-------------------------------------------------------------------------
+# gen_jalr_base_dep_test
+#-------------------------------------------------------------------------
+# Test the base register bypass paths by varying how many nops are
+# inserted between writing the base register and reading this register in
+# the instruction under test.
+
+def gen_jalr_base_dep_test( num_nops_a, num_nops_b, link_addr ):
+  return gen_jalr_template( num_nops_a, num_nops_b, link_addr)
+
+#-------------------------------------------------------------------------
 # gen_br2_template
 #-------------------------------------------------------------------------
 # Template for branch instructions with two sources. We test two forward
@@ -645,31 +754,7 @@ def gen_ld_value_test( inst, offset, base, result ):
 
 # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-def gen_jal_dest_dep_test(num_nop_a, num_nop_b):
-    return """
 
-    # Use r3 to track the control flow pattern
-    addi  x3, x0, 0     # 0x0200
-    {nops_a}
-    jal   x1, label_a   # 0x0200 + nops_a * 4
-    addi  x3, x3, 0b01  # 0x0228
-    {nops_b}
-
-  label_a:
-    addi  x3, x3, 0b10
-
-    # Check the link address
-    csrw  proc2mngr, x1 > {link} 
-
-    # Only the second bit should be set if jump was taken
-    csrw  proc2mngr, x3 > 0b10
-
-  """.format(  
-    nops_a = gen_nops(num_nop_a),    
-    nops_b  = gen_nops(num_nop_b),
-    link = str(hex(0x0200 + (num_nop_a * 4)))
-    **locals()
-  )
 
 def gen_jalr_dest_dep_test( num_nop_a, num_nop_b):
     return """
@@ -696,7 +781,7 @@ def gen_jalr_dest_dep_test( num_nop_a, num_nop_b):
   """.format(  
     nops_a = gen_nops(num_nop_a),    
     nops_b  = gen_nops(num_nop_b),
-    link = str(hex(0x0208 + (num_nop_a * 4)))
+    link = str(hex(0x0208 + (num_nop_a * 4))),
     **locals()
   )
 
