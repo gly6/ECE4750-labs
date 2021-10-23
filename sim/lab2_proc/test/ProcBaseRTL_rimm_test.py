@@ -212,18 +212,17 @@ import inst_lui
 
 @pytest.mark.parametrize( "name,test", [
   asm_test( inst_lui.gen_basic_test    ) ,
+  asm_test( inst_lui.lui_imm_dest_dep_test ),
+  asm_test( inst_lui.lui_imm_value_test) ,
+  asm_test( inst_lui.gen_random_test),
 
-  # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  # Add more rows to the test case table to test more complicated
-  # scenarios.
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ])
 def test_lui( name, test, dump_vcd ):
   run_test( ProcBaseRTL, test, dump_vcd )
 
-# ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# random stall and delay
-# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+def test_lui_rand_delays( dump_vcd ):
+  run_test( ProcBaseRTL, inst_lui.gen_random_test, dump_vcd,
+            src_delay=3, sink_delay=5, mem_stall_prob=0.5, mem_latency=3 )
 #-------------------------------------------------------------------------
 # auipc
 #-------------------------------------------------------------------------
@@ -232,15 +231,14 @@ import inst_auipc
 
 @pytest.mark.parametrize( "name,test", [
   asm_test( inst_auipc.gen_basic_test    ) ,
+  asm_test ( inst_auipc.auipc_imm_dest_dep_test),
+  asm_test ( inst_auipc.auipc_imm_value_test),
+  asm_test (inst_auipc.gen_random_test),
 
-  # ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  # Add more rows to the test case table to test more complicated
-  # scenarios.
-  # ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ])
 def test_auipc( name, test, dump_vcd ):
   run_test( ProcBaseRTL, test, dump_vcd )
-
-# ''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# random stall and delay
-# ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+  
+def test_auipc_rand_delays( dump_vcd ):
+  run_test( ProcBaseRTL, inst_auipc.gen_random_test, dump_vcd,
+            src_delay=3, sink_delay=5, mem_stall_prob=0.5, mem_latency=3 )
