@@ -60,11 +60,11 @@ def lui_imm_value_test():
     gen_imm_value_test( "lui", 0x00000001, 0x00001000 ),
     gen_imm_value_test( "lui", 0x0000000f, 0x0000f000 ),
     gen_imm_value_test( "lui", 0x0000ffff, 0x0ffff000 ),
-    gen_imm_value_test( "lui", 0x0000fffff, 0xfffff000 ),  
+    gen_imm_value_test( "lui", 0x000fffff, 0xfffff000 ),  
     gen_imm_value_test( "lui", 0x000bcdef, 0xbcdef000 ),
     gen_imm_value_test( "lui", 0x00000002, 0x00002000 ),    
 
-    gen_imm_value_test( "lui", 0x0000000, 0x00000000 ),
+    gen_imm_value_test( "lui", 0x00000000, 0x00000000 ),
     gen_imm_value_test( "lui", 0x000f000f, 0xf000f000 ),
     gen_imm_value_test( "lui", 0x00045678, 0x45678000 ),
     gen_imm_value_test( "lui", 0x000babab, 0xbabab000 ),  
