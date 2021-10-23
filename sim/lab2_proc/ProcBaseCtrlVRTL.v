@@ -444,7 +444,7 @@ module lab2_proc_ProcBaseCtrlVRTL
 
       //Jump 
       `RV2ISA_INST_JAL     :cs( y, br_na,  imm_j, n, bm_imm, n, alu_add, nr, wm_a, y,  n,   n,    bm1_pc, jt_jal, ex_pc,    req_n); 
-      `RV2ISA_INST_JALR    :cs( y, br_na,  imm_i, y, bm_imm, n, alu_add, nr, wm_a, y,  n,   n,    bm1_pc, jt_jalr,ex_pc,    req_n); 
+      `RV2ISA_INST_JALR    :cs( y, br_na,  imm_i, y, bm_imm, n, alu_add, nr, wm_a, y,  n,   n,    bm1_rf, jt_jalr,ex_pc,    req_n); 
 
       //Branch
       `RV2ISA_INST_BNE     :cs( y, br_bne, imm_b, y, bm_rf,  y, alu_x,   nr, wm_a, n,  n,   n,    bm1_rf, jt_na,  ex_alu,   req_n);
