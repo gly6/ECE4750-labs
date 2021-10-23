@@ -56,6 +56,7 @@ module lab2_proc_ProcBaseCtrlVRTL
   output logic [3:0]  alu_fn_X,
   output logic        imul_resp_rdy_X, 
   output logic [1:0]  ex_result_sel_X,
+  output logic [1:0]  dmemreq_type_X, 
 
   output logic        reg_en_M,
   output logic        wb_result_sel_M,
