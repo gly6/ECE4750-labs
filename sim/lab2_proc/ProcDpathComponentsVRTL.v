@@ -79,7 +79,6 @@ module lab2_proc_AluVRTL
       4'd11   : out = in0;                                      // CP OP0
       4'd12   : out = in1;                                      // CP OP1
       4'd13   : out = in0 + (in1);                              // AUIPC
-      4'd14   : out = in0 + 4;                                  // JAL
       4'd15   : out = (in0 + in1) & 'h0xffffffe;       // JALR
 
       default : out = 32'b0;
