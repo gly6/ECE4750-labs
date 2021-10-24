@@ -1,0 +1,96 @@
+base design:
+small dataset:
+
+num_cycles         = 1756
+num_cycles_per_mul = 35.12
+
+alt design:
+small dataset:
+
+num_cycles         = 360
+num_cycles_per_mul = 7.20
+
+base design:
+large dataset:
+
+num_cycles         = 1756
+num_cycles_per_mul = 35.12
+
+alt design:
+large dataset:
+
+num_cycles         = 758
+num_cycles_per_mul = 15.16
+
+base design:
+lomask dataset:
+
+num_cycles         = 1756
+num_cycles_per_mul = 35.12
+
+alt design:
+lomask dataset:
+
+num_cycles         = 545
+num_cycles_per_mul = 10.90
+
+base design:
+himask dataset:
+
+num_cycles         = 1756
+num_cycles_per_mul = 35.12
+
+alt design:
+himask dataset:
+
+num_cycles         = 712
+num_cycles_per_mul = 14.24
+
+base design:
+lohimask dataset:
+
+num_cycles         = 1756
+num_cycles_per_mul = 35.12
+
+alt design:
+lohimask dataset:
+
+num_cycles         = 879
+num_cycles_per_mul = 17.58
+
+base design:
+sparse dataset:
+
+num_cycles         = 181
+num_cycles_per_mul = 36.20
+
+alt design:
+sparse dataset:
+
+num_cycles         = 38
+num_cycles_per_mul = 7.60
+
+base design:
+ones dataset:
+
+num_cycles         = 41
+num_cycles_per_mul = 41.00
+
+alt design:
+ones dataset:
+
+num_cycles         = 41
+num_cycles_per_mul = 41.00
+
+base design:
+noconsec_zero dataset:
+
+num_cycles         = 41
+num_cycles_per_mul = 41.00
+
+alt design:
+noconsec_zero dataset:
+
+num_cycles         = 10
+num_cycles_per_mul = 10.00
+
