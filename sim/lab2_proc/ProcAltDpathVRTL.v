@@ -368,7 +368,7 @@ module lab2_proc_ProcAltDpathVRTL
     .clk    (clk),
     .reset  (reset),
     .en     (reg_en_X),
-    .d      (rf_rdata1_D),
+    .d      (op2_byp_mux_out),
     .q      (dmemreq_msg_data)
   );
 
