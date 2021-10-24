@@ -17,6 +17,7 @@ import inst_lw
 
 @pytest.mark.parametrize( "name,test", [
   asm_test( inst_lw.gen_basic_test     ) ,
+  asm_test( inst_lw.gen_load_then_add_test     ) ,
   asm_test( inst_lw.gen_dest_dep_test  ) ,
   asm_test( inst_lw.gen_base_dep_test  ) ,
   asm_test( inst_lw.gen_srcs_dest_test ) ,
