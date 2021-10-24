@@ -2,14 +2,14 @@
 // 5-Stage Stalling Pipelined Processor Control
 //=========================================================================
 
-`ifndef LAB2_PROC_PIPELINED_PROC_BASE_CTRL_V
-`define LAB2_PROC_PIPELINED_PROC_BASE_CTRL_V
+`ifndef LAB2_PROC_PIPELINED_PROC_ALT_CTRL_V
+`define LAB2_PROC_PIPELINED_PROC_ALT_CTRL_V
 
 `include "vc/trace.v"
 
 `include "lab2_proc/TinyRV2InstVRTL.v"
 
-module lab2_proc_ProcBaseCtrlVRTL
+module lab2_proc_ProcAltCtrlVRTL
 (
   input  logic        clk,
   input  logic        reset,
@@ -553,13 +553,13 @@ module lab2_proc_ProcBaseCtrlVRTL
   assign ostall_load_use_X_rs1_D = 
     val_D && val_X && rs1_en_D && rf_wen_pending_X 
     && (rf_waddr_X == inst_rs1_D) && (rf_waddr_X != 5'd0) 
-    && (dmemreq_type_X == lw); 
+    && (dmemreq_type_X == ld); 
 
   logic ostall_load_use_X_rs2_D; 
   assign ostall_load_use_X_rs2_D = 
     val_D && val_X && rs2_en_D && rf_wen_pending_X 
     && (rf_waddr_X == inst_rs2_D) && (rf_waddr_X != 5'd0) 
-    && (dmemreq_type_X == lw);  
+    && (dmemreq_type_X == ld);  
 
   // Final ostall signal
 
@@ -578,86 +578,72 @@ module lab2_proc_ProcBaseCtrlVRTL
   assign bypass_waddr_X_rs1_D =
       val_D && rs1_en_D && val_X && rf_wen_pending_X
       && ( inst_rs1_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 )
-      && (dmemreq_type_X != lw);
+      && (dmemreq_type_X != ld);
 
   logic  bypass_waddr_X_rs2_D;
   assign bypass_waddr_X_rs2_D =
       val_D && rs2_en_D && val_X && rf_wen_pending_X
       && ( inst_rs2_D == rf_waddr_X ) && ( rf_waddr_X != 5'd0 )
-      && (dmemreq_type_X != lw);
+      && (dmemreq_type_X != ld);
 
   logic bypass_waddr_M_rs1_D; 
   assign bypass_waddr_M_rs1_D = 
       val_D && rs1_en_D && val_M && rf_wen_pending_M 
-      && (inst_rs1_D == rf_waddr_M) && ( rf_waddr_X != 5'd0 ); 
+      && (inst_rs1_D == rf_waddr_M) && ( rf_waddr_M != 5'd0 ); 
 
   logic bypass_waddr_M_rs2_D; 
   assign bypass_waddr_M_rs2_D = 
       val_D && rs2_en_D && val_M && rf_wen_pending_M 
-      && (inst_rs2_D == rf_waddr_M) && ( rf_waddr_X != 5'd0 ); 
+      && (inst_rs2_D == rf_waddr_M) && ( rf_waddr_M != 5'd0 ); 
 
   logic bypass_waddr_W_rs1_D;
   assign bypass_waddr_W_rs1_D = 
     val_D && rs1_en_D && val_W && rf_wen_pending_W 
-      && (inst_rs1_D == rf_waddr_W) && ( rf_waddr_X != 5'd0 ); 
+      && (inst_rs1_D == rf_waddr_W) && ( rf_waddr_W != 5'd0 ); 
 
   logic bypass_waddr_W_rs2_D;
   assign bypass_waddr_W_rs2_D = 
     val_D && rs2_en_D && val_W && rf_wen_pending_W 
-      && (inst_rs2_D == rf_waddr_W) && ( rf_waddr_X != 5'd0 ); 
+      && (inst_rs2_D == rf_waddr_W) && ( rf_waddr_W != 5'd0 ); 
 
-  localparam rs1_X_D = 2'd3; 
-  localparam rs1_M_D = 2'd2; 
-  localparam rs1_W_D = 2'd1;
-  localparam rs1_rf  = 2'd0; 
+  localparam rs1_X_D = 2'd2; 
+  localparam rs1_M_D = 2'd1; 
+  localparam rs1_W_D = 2'd0;
+  localparam rs1_rf  = 2'd3; 
 
-  localparam rs2_X_D = 2'd2; 
-  localparam rs2_M_D = 2'd1; 
-  localparam rs2_W_D = 2'd0;
-  localparam rs2_rf  = 2'd3; 
+  localparam rs2_X_D = 2'd3; 
+  localparam rs2_M_D = 2'd2; 
+  localparam rs2_W_D = 2'd1;
+  localparam rs2_rf  = 2'd0; 
 
+  //Bypassing for rs1
   always_comb begin 
-    if (bypass_waddr_X_rs1_D && bypass_waddr_X_rs2_D) begin
+    if (bypass_waddr_X_rs1_D) begin
       op1_byp_sel_D = rs1_X_D;
-      op2_byp_sel_D = rs1_X_D; 
-    end
-    else if (bypass_waddr_M_rs1_D && bypass_waddr_M_rs2_D) begin
-      op1_byp_sel_D = rs1_M_D;
-      op2_byp_sel_D = rs2_M_D;
-    end 
-    else if (bypass_waddr_W_rs1_D && bypass_waddr_W_rs2_D) begin 
-      op1_byp_sel_D = rs1_W_D;
-      op2_byp_sel_D = rs2_W_D;
-    end
-    else if (bypass_waddr_X_rs1_D) begin
-      op1_byp_sel_D = rs1_X_D;
-      op2_byp_sel_D = rs2_rf;
-    end 
-    else if (bypass_waddr_X_rs2_D) begin
-      op1_byp_sel_D = rs1_rf;
-      op2_byp_sel_D = rs2_X_D;
     end
     else if (bypass_waddr_M_rs1_D) begin
       op1_byp_sel_D = rs1_M_D;
-      op2_byp_sel_D = rs2_rf;
-    end
-    else if (bypass_waddr_M_rs2_D) begin
-      op1_byp_sel_D = rs1_rf;
-      op2_byp_sel_D = rs2_M_D;
     end
     else if (bypass_waddr_W_rs1_D) begin
       op1_byp_sel_D = rs1_W_D;
-      op2_byp_sel_D = rs2_rf;
     end
-    else if (bypass_waddr_W_rs2_D) begin 
+    else 
       op1_byp_sel_D = rs1_rf;
-      op2_byp_sel_D = rs2_W_D; 
-    end
-    else begin
-      op1_byp_sel_D = rs1_rf;
-      op2_byp_sel_D = rs2_rf; 
-    end
+  end 
 
+  //Bypassing for rs2 
+  always_comb begin 
+    if (bypass_waddr_X_rs2_D) begin
+      op2_byp_sel_D = rs2_X_D;
+    end
+    else if (bypass_waddr_M_rs2_D) begin
+      op2_byp_sel_D = rs2_M_D;
+    end
+    else if (bypass_waddr_W_rs2_D) begin
+      op2_byp_sel_D = rs2_W_D;
+    end
+    else 
+      op2_byp_sel_D = rs2_rf;
   end 
 
   // Valid signal for the next stage

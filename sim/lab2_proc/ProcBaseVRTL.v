@@ -110,6 +110,10 @@ module lab2_proc_ProcBaseVRTL
 
   logic        imemresp_drop;
 
+ //----------------------------------------------------------------------
+  // Signals between Ctrl and Data Paths
+  //----------------------------------------------------------------------
+
   // control signals (ctrl->dpath)
 
   logic        reg_en_F;

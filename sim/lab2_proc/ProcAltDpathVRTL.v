@@ -2,8 +2,8 @@
 // 5-Stage Stalling Pipelined Processor Datapath
 //=========================================================================
 
-`ifndef LAB2_PROC_PIPELINED_PROC_BASE_DPATH_V
-`define LAB2_PROC_PIPELINED_PROC_BASE_DPATH_V
+`ifndef LAB2_PROC_PIPELINED_PROC_ALT_DPATH_V
+`define LAB2_PROC_PIPELINED_PROC_ALT_DPATH_V
 
 `include "vc/arithmetic.v"
 `include "vc/mem-msgs.v"
@@ -15,7 +15,7 @@
 `include "lab2_proc/ProcDpathComponentsVRTL.v"
 `include "lab1_imul/IntMulAltVRTL.v"
 
-module lab2_proc_ProcBaseDpathVRTL
+module lab2_proc_ProcAltDpathVRTL
 #(
   parameter p_num_cores = 1
 )
@@ -234,14 +234,13 @@ module lab2_proc_ProcBaseDpathVRTL
   
  vc_Mux4 #(32) op2_bypsel_mux_D
   (
-    .in0  (rf_rdata0_D),
+    .in0  (rf_rdata1_D),
     .in1  (bypass_from_W),
     .in2  (bypass_from_M),
     .in3  (bypass_from_X),
     .sel  (op2_byp_sel_D),
-    .out  (op2_byp_mux_out),
-  )
-
+    .out  (op2_byp_mux_out)
+  );
 
 
   //op1 sel mux
@@ -260,8 +259,8 @@ module lab2_proc_ProcBaseDpathVRTL
     .in2  (bypass_from_X),
     .in3  (rf_rdata0_D),
     .sel  (op1_byp_sel_D),
-    .out  (op1_byp_mux_out),  
-  )
+    .out  (op1_byp_mux_out) 
+  );
 
 
   vc_Adder #(32) pc_plus_imm_D
