@@ -1,6 +1,6 @@
 
 arr=(vvadd-unopt vvadd-opt cmult bsearch mfilt)
-design=(base)
+design=(alt)
 >stats.txt
 for i in "${arr[@]}"
  do
