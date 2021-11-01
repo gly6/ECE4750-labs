@@ -458,10 +458,6 @@ module lab2_proc_ProcAltCtrlVRTL
       `RV2ISA_INST_BGE     :cs( y, br_bge, imm_b, y, bm_rf,  y, alu_x,   nr, wm_a, n,  n,   n,    bm1_rf, jt_na,  ex_alu,   req_n); 
       `RV2ISA_INST_BGEU    :cs( y, br_bgeu,imm_b, y, bm_rf,  y, alu_x,   nr, wm_a, n,  n,   n,    bm1_rf, jt_na,  ex_alu,   req_n); 
 
-      //''' LAB TASK '''''''''''''''''''''''''''''''''''''''''''''''''''''
-      // Add more instructions to the control signal table
-      //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
       default              :cs( n, br_x,  imm_x, n, bm_x,    n, alu_x,   nr, wm_x, n,  n,   n,    bm1_x,  jt_x,   ex_x,     req_x  );
 
     endcase
@@ -688,6 +684,7 @@ module lab2_proc_ProcAltCtrlVRTL
   logic        stats_en_wen_X;
   logic [2:0]  br_type_X;
   logic [1:0]  jump_type_X;
+  logic        imul_val_X;
 
   // Pipeline registers
 
@@ -708,7 +705,7 @@ module lab2_proc_ProcAltCtrlVRTL
       br_type_X       <= br_type_D;
       jump_type_X     <= jump_type_D;
       ex_result_sel_X <= ex_result_sel_D; 
-      imul_resp_rdy_X <= imul_val_D; 
+      imul_val_X <= imul_val_D; 
     end
 
   // branch logic, redirect PC in F if branch is taken
@@ -752,7 +749,9 @@ module lab2_proc_ProcAltCtrlVRTL
 
   // ostall due to imul still processing the data 
   logic ostall_imul_X; 
-  assign ostall_imul_X = !imul_resp_val_X && imul_resp_rdy_X; 
+  
+  assign imul_resp_rdy_X = !stall_X;
+  assign ostall_imul_X = !imul_resp_val_X && imul_val_X; 
 
   logic ostall_dmemreq_X; 
   assign ostall_dmemreq_X = val_X && ((dmemreq_type_X != nr ) && !dmemreq_rdy);
