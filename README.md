@@ -37,7 +37,7 @@ role, and which student was the architect.
  ------|--------------|--------------|--------------
  Lab 1 | RTL          | Verification | RTL (architect)
  Lab 2 | Verification | RTL (architect)| RTL
- Lab 3 |              |              |
+ Lab 3 | RTL (architect)| RTL          | Verification    |
  Lab 4 |              |              |
  Lab 5 |              |              |
 
