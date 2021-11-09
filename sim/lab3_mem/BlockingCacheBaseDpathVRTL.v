@@ -89,7 +89,9 @@ module lab3_mem_BlockingCacheBaseDpathVRTL
 // LAB TASK: Implement data-path
 //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+//First column of datapath
 
+//memresp and cachereq registers
 
 logic [127:0] memresp_data_reg_out; 
 vc_EnReg#(dbw, 0) memresp_data_reg
@@ -142,6 +144,10 @@ vc_EnReg#(dbw, 0) cachereq_opaque_reg
   .en     (cachereq_en)
 );
 
+//end memresp and cachereq registers
+
+//Second column of datapath
+
 //repl
 logic [127:0] repl_out;
 assign repl_out = {cachereq_data_reg_out, cachereq_data_reg_out, cachereq_data_reg_out, cachereq_data_reg_out};
@@ -156,6 +162,9 @@ vc_Mux2#(128) write_data_mux
   .out  (write_data_mux_out)
 );
 
+//Third column of datapath
+
+//Tag and data arrays
 logic [27:0] tag_array_read_data;
 vc_CombinationalBitSRAM_1rw#(28, 16) tag_array
 (
@@ -183,6 +192,8 @@ vc_CombinationalSRAM_1rw#(128,16) data_array
   .read_data      (data_array_read_data)
 );
 
+//Fourth column of datapath
+
 logic [127:0] read_data_reg_out;
 vc_EnReg#(clw, 0) cachereq_opaque_reg
 (
@@ -205,6 +216,8 @@ assign tag_array_read_data_mk_addr = {tag_array_read_data, 4'b0000};
  
 //mk_addr 2
 assign cachereq_addr_reg_out_mk_addr = {cachereq_addr_reg_out[31:4], 4'b0000};
+
+//Fifth column of datapath
 
 logic [31:0] evict_addr_reg_out;
 vc_EnReg#(32, 0) evict_addr_reg
@@ -235,6 +248,8 @@ vc_Mux5#(32) read_word_mux(
   .sel    (read_word_mux_sel),
   .out    (read_word_mux_out)
 );
+
+//Cacheresp_msg and memreq_msg
 
 //cacheresp_msg
 assign cacheresp_msg.opaque = cachereq_opaque_reg_out;
