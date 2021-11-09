@@ -57,7 +57,7 @@ module lab3_mem_BlockingCacheBaseDpathVRTL
   input logic evict_addr_reg_en,
   input logic memreq_addr_mux_sel,
   input logic hit,
-  input logic [1:0] read_word_mux_sel,
+  input logic [2:0] read_word_mux_sel,
   input logic [2:0] cacheresp_type,
   input logic [2:0] memreq_type,
   
@@ -92,12 +92,12 @@ module lab3_mem_BlockingCacheBaseDpathVRTL
 
 
 logic [127:0] memresp_data_reg_out; 
-vc_EnReg#(dbw, 0) cachereq_data_reg
+vc_EnReg#(dbw, 0) memresp_data_reg
 (
   .clk    (clk),
   .reset  (reset),
   .q      (memresp_data_reg_out),
-  .d      (memresp_msg [127:0]),
+  .d      (memresp_msg.data),
   .en     (memresp_en)
 );
 
@@ -108,7 +108,7 @@ vc_EnReg#(dbw, 0) cachereq_data_reg
   .clk    (clk),
   .reset  (reset),
   .q      (cachereq_data_reg_out),
-  .d      (cachereq_msg [dbw-1:0]),
+  .d      (cachereq_msg.data),
   .en     (cachereq_en)
 );
 
@@ -118,7 +118,7 @@ vc_EnReg#(abw, 0) cachereq_addr_reg
   .clk    (clk),
   .reset  (reset),
   .q      (cachereq_addr_reg_out),
-  .d      (cachereq_msg [65:34]),
+  .d      (cachereq_msg.addr),
   .en     (cachereq_en)
 );
 
@@ -128,7 +128,7 @@ vc_EnReg#(3, 0) cachereq_type_reg
   .clk    (clk),
   .reset  (reset),
   .q      (cachereq_type_reg_out),
-  .d      (cachereq_msg [76:74]),
+  .d      (cachereq_msg.type),
   .en     (cachereq_en)
 );
 
@@ -138,7 +138,7 @@ vc_EnReg#(dbw, 0) cachereq_opaque_reg
   .clk    (clk),
   .reset  (reset),
   .q      (cachereq_opaque_reg_out),
-  .d      (cachereq_msg [73:66]),
+  .d      (cachereq_msg.opaque),
   .en     (cachereq_en)
 );
 
@@ -192,6 +192,65 @@ vc_EnReg#(clw, 0) cachereq_opaque_reg
   .d      (data_array_read_data),
   .en     (read_data_reg_en)
 );
+
+vc_EqComparator#(28) cmp
+(
+  .in0 (cachereq_addr_reg_out[31:4]),
+  .in1 (tag_array_read_data),
+  .out (tag_match)
+);
+
+//mk_addr 1
+assign tag_array_read_data_mk_addr = {tag_array_read_data, 4'b0000};
+ 
+//mk_addr 2
+assign cachereq_addr_reg_out_mk_addr = {cachereq_addr_reg_out[31:4], 4'b0000};
+
+logic [31:0] evict_addr_reg_out;
+vc_EnReg#(32, 0) evict_addr_reg
+(
+  .clk    (clk),
+  .reset  (reset),
+  .q      (evict_addr_reg_out),
+  .d      (tag_array_read_data_mk_addr),
+  .en     (evict_addr_reg_en)
+);
+
+logic [31:0] memreq_addr_mux_out;
+vc_Mux2#(32) memreq_addr_mux 
+(
+  .in0  (evict_addr_reg_out),
+  .in1  (cachereq_addr_reg_out_mk_addr), 
+  .sel  (memreq_addr_mux_sel),
+  .out  (memreq_addr_mux_out)
+);
+
+logic [31:0] read_word_mux_out;
+vc_Mux5#(32) read_word_mux(
+  .in0    (read_data_reg_out[127:96]),
+  .in1    (read_data_reg_out[95:64]),
+  .in2    (read_data_reg_out[63:32]),
+  .in3    (read_data_reg_out[31:0]),
+  .in4    (0x00000000),
+  .sel    (read_word_mux_sel),
+  .out    (read_word_mux_out)
+);
+
+//cacheresp_msg
+assign cacheresp_msg.opaque = cachereq_opaque_reg_out;
+assign cacheresp_msg.type = cacheresp_type;
+assign cacheresp_msg.len = 2'b0;
+assign cacheresp_msg.test = hit;
+assign cacheresp_msg.data = read_word_mux_out;
+//end cacheresp_msg
+
+//memreq_msg
+assign memreq_msg.type = memreq_type;
+assign memreq_msg.len = 4'b0000;
+assign memreq_msg.addr = memreq_addr_mux_out;
+assign memreq_msg.data = read_data_reg_out;
+assign memreq_msg.opaque = 8'b00000000;
+//end memreq_msg
 
 endmodule
 
