@@ -115,6 +115,7 @@ vc_EnReg#(dbw, 0) cachereq_data_reg
 );
 
 logic [abw-1:0] cachereq_addr_reg_out; 
+assign cachereq_addr = cachereq_addr_reg_out;
 vc_EnReg#(abw, 0) cachereq_addr_reg
 (
   .clk    (clk),
@@ -124,12 +125,11 @@ vc_EnReg#(abw, 0) cachereq_addr_reg
   .en     (cachereq_en)
 );
 
-logic [2:0] cachereq_type_reg_out; 
 vc_EnReg#(3, 0) cachereq_type_reg
 (
   .clk    (clk),
   .reset  (reset),
-  .q      (cachereq_type_reg_out),
+  .q      (cachereq_type),
   .d      (cachereq_msg.type),
   .en     (cachereq_en)
 );

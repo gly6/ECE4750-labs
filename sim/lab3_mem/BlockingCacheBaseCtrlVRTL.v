@@ -125,25 +125,21 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
   // DIRTY & VALID BITS
   //----------------------------------------------------------------------
 
-  logic [3:0] read_addr_dirty;
   logic read_data_dirty;
   logic wen_dirty;
-  logic [3:0] write_addr_dirty;
 
-  logic [3:0] read_addr_val;
   logic read_data_val;
   logic wen_val;
-  logic [3:0] write_addr_val;
 
   vc_Regfile_1r1w#(1,16) dirty
   (
     .clk(clk),
     .reset(reset),
-    .read_addr(read_addr_dirty),
+    .read_addr(cachereq_addr[7:4]),
     .read_data(read_data_dirty),
     .write_en(wen_dirty),
-    .write_addr(write_addr_dirty),
-    .write_data(write_data_dirty)
+    .write_addr(cachereq_addr[7:4]),
+    .write_data(cachereq_addr[31:4])
 
   )
 
@@ -151,11 +147,11 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
   (
     .clk(clk),
     .reset(reset),
-    .read_addr(read_addr_val),
+    .read_addr(cachereq_addr[7:4]),
     .read_data(read_data_val),
     .write_en(wen_val),
-    .write_addr(write_addr_val),
-    .write_data(write_data_val)
+    .write_addr(cachereq_addr[7:4]),
+    .write_data(cachereq_addr[31:4])
   )
 
   //----------------------------------------------------------------------
