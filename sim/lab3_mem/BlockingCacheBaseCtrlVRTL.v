@@ -57,7 +57,7 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
   output logic                       memreq_addr_mux_sel,
   output logic                       cacheresp_type,
   output logic                       hit,
-  output logic                       memreq_type,
+  output logic                       memreq_type
   
 
  );
@@ -141,7 +141,7 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
     .write_addr(cachereq_addr[7:4]),
     .write_data(cachereq_addr[31:4])
 
-  )
+  );
 
   vc_Regfile_1r1w#(1,16) valid
   (
@@ -152,7 +152,7 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
     .write_en(wen_val),
     .write_addr(cachereq_addr[7:4]),
     .write_data(cachereq_addr[31:4])
-  )
+  );
 
   //----------------------------------------------------------------------
   // STATE TRANSITIONS
@@ -169,7 +169,7 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
 
     state_next = state_reg;
  
-    case (state_reg) begin
+    case (state_reg)
 
        I: begin 
          if (!idle) state_next = TC;
@@ -181,9 +181,6 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
          else if ((tag_match == 1) && ( cachereq_type == 1) && (read_data_val))  state_next = WD;
          else if ((tag_match == 0) && ( read_data_dirty == 0) || !(read_data_val)) state_next = RR;
          else if ((tag_match == 0) && ( read_data_dirty == 1)) state_next = EP; 
-         // write hit state
-         // refill request
-         // evict prepare
        end
 
        IN: begin
@@ -227,13 +224,16 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
 
       ER: begin
         if (!memreq_rdy) state_next = ER;
-        else state_next = EW
+        else state_next = EW;
       end
 
       EW: begin
         if (!memresp_val) state_next = EW;
         else state_next = RR;
       end
+
+     endcase
+    end
   //----------------------------------------------------------------------
   // OUTPUT ( CONTROL SIGNAL TABLE ) 
   //----------------------------------------------------------------------
@@ -242,8 +242,8 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
   (
    input cs_cachereq_rdy,
    input cs_cacheresp_val,
-   input cs_memreq_val  
-   input cs_memresp_rdy
+   input cs_memreq_val,
+   input cs_memresp_rdy,
    input cs_cachereq_en,
    input cs_memresp_en,
    input cs_write_data_mux_sel,
@@ -259,12 +259,12 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
    input cs_cacheresp_type,
    input cs_hit,
    input cs_memreq_type
-  )
+  );
   begin
    cachereq_rdy = cs_cachereq_rdy;
    cacheresp_val = cs_cacheresp_val;
-   memreq_val = cs_memreq_val
-   memresp_rdy = cs_memresp_rdy
+   memreq_val = cs_memreq_val;
+   memresp_rdy = cs_memresp_rdy;
    cachereq_en = cs_cachereq_en;
    memresp_en = cs_memresp_en;
    write_data_mux_sel = cs_write_data_mux_sel;
@@ -283,23 +283,23 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
   end
   endtask
 
+  assign hit = tag_match && read_data_val;
 
   always_comb begin
-   case(state_reg):
+   case(state_reg)
       //cachereq  cacheresp  memreq memresp  cachereq memresp write_data  tag_arr  tag_arr data_array  data_arr  read_data  evict_addr  read_word  cacheresp hit memreq
       //rdy       val        val    rdy      en       en      mux_sel     ren      wen     ren         wben      reg_en     reg_en      mux_sel    type          type
-    I: cs(  1,    0,         0,      0,       0,       0,       1'bx       0,       0,       0,          0,         0,       0,         1'bx      1'bx     1'bx  1'bx)
-    TC:cs(  ,    
-    IN:cs(      
-    RD:cs(
-    WD:cs( 
-    RR:cs(
-    RW:cs(
-    RU:cs(
-    EP:cs(
-    ER:cs(
-    EW:cs(
-    W:cs(
+    I: cs(  1,    0,         0,      0,       0,       0,       1'bx,       0,        0,       0,          0,          0,       0,         mux_x,      1'bx,     1'bx,  1'bx);
+    TC:cs(  0,    0,         0,      0,       1,       0,      1'bx,        1,        0,       0,          0,          0,       0,         mux_x,      1'bx,      hit,   1'bx);
+    IN:cs(  0,    1,         0,      0,       1,       0,      mux_zero,    0,        1,       0,          1,          1,       0,        mux_one,   c_write_init, hit, 1'bx);     
+    RD:cs(  0,    1,         0,      0,       1,       1,      mux_zero,    0,        0,       1,          0,          1,       0,        mux_one,     0,         hit,  0);
+    RR:cs(  0,    0,         1,      0,       0,       1,      mux_one,     0,        0,       0,          0,          0,       0,        mux_x,        0,        hit,   0);
+    RW:cs(  0,    0,         0,      1,       1,       0,      1'bx,        0,        0,       0,          0,          0,       0,        mux_x,         0,        hit,   0);
+    RU:cs(  0,    1,         0,      1,       1,       1,      mux_one,     0,        1,       0,          1,          0,       0,         mux_x,        1,        hit,   1);
+    EP:cs(  0,    0,         0,      0,       1,       0,      1'bx,        1,        0,       1,          0,          0,       1,          mux_zero,    1'bx,      hit,   1'bx);
+    ER:cs(  0,    0,         1,      0,       0,       0,      1'bx,        0,        0,       0,          0,          0,       1,         mux_zero,     1'bx,      hit, 1'bx);     
+    EW:cs(  0,    0,         0,      1,       1,       0,      1'bx,        0,        0,       0,          0,          0,       0,         mux_x,         1'bx,      hit,  1'bx);
+    W: cs(  0,    0,         0,      0,       0,       0,      mux_x,        0,        0,       0,          0,          0,       0,         mux_x,    1'bx,    hit,    1'bx); 
     endcase
   end
 
