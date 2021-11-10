@@ -126,10 +126,10 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
   //----------------------------------------------------------------------
 
   logic read_data_dirty;
-  logic wen_dirty;
+  logic wen_dirty = 0;
 
   logic read_data_val;
-  logic wen_val;
+  logic wen_val = 0;
 
   vc_Regfile_1r1w#(1,16) dirty
   (
@@ -186,23 +186,32 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
          // evict prepare
        end
 
-       IN: state_next = W;
- 
+       IN: begin
+         wen_valid = 1;
+         state_next = W;
+       end  
+
        W: begin
         if (cacheresp_rdy) state_next = I;
         else begin
           state_next = W;
           end
-       end
+        end
        
        RD: state_next = W;
 
-       WD: state_next = W;
+       WD: begin 
+         if (tag_match == 1) begin
+           wen_dirty = 1;
+           wen_valid = 1;
+         end
+         state_next = W;
+       end         
 
        RR: begin
          if (!memreq_rdy) state_next = RR;
          else state_next = RW;
-      end
+       end
 
       RW: begin
         if (!memresp_val) state_next = RW;
@@ -277,10 +286,10 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
 
   always_comb begin
    case(state_reg):
-      //cachereq cacheresp  memreq memresp  cachereq memresp write_data  tag_arr  tag_arr data_array  data_arr  read_data  evict_addr  read_word  cacheresp hit memreq
-      //en       val        val    rdy      en       en      mux_sel     ren      wen     ren         wben      reg_en     reg_en      mux_sel    type          type
-    I: cs(  0,    0,        0,      0,       0,       0,       1'bx       0,       0,       0,          0,         0,       0,         1'bx      1'bx     1'bx  1'bx)
-    TC:cs(
+      //cachereq  cacheresp  memreq memresp  cachereq memresp write_data  tag_arr  tag_arr data_array  data_arr  read_data  evict_addr  read_word  cacheresp hit memreq
+      //rdy       val        val    rdy      en       en      mux_sel     ren      wen     ren         wben      reg_en     reg_en      mux_sel    type          type
+    I: cs(  1,    0,         0,      0,       0,       0,       1'bx       0,       0,       0,          0,         0,       0,         1'bx      1'bx     1'bx  1'bx)
+    TC:cs(  ,    
     IN:cs(      
     RD:cs(
     WD:cs( 
