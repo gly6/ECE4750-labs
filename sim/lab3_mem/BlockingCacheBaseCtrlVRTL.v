@@ -40,20 +40,20 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
   input  logic                        memresp_val,
   output logic                        memresp_rdy,
 
-  input  logic                        cachereq_type,
+  input  logic     [2:0]             cachereq_type,
   output logic                       cachereq_en,
   output logic                       memresp_en,
   output logic                       write_data_mux_sel,
-  input  logic                        cachereq_addr,
+  input  logic     [31:0]             cachereq_addr,
   output logic                       tag_array_ren,
   output logic                       tag_array_wen,
   output logic                       data_array_ren,
   output logic                       data_array_wen,
   output logic                       data_array_wben,
   output logic                       read_data_reg_en,
-  input  logic                        tag_match,
+  input  logic                       tag_match,
   output logic                       evict_addr_reg_en,
-  output logic        [2:0]               read_word_mux_sel,
+  output logic        [2:0]          read_word_mux_sel,
   output logic                       memreq_addr_mux_sel,
   output logic          [2:0]             cacheresp_type,
   output logic                       hit,
@@ -254,11 +254,11 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
    input cs_data_array_wben,
    input cs_read_data_reg_en,
    input cs_evict_addr_reg_en,
-   input cs_read_word_mux_sel,
+   input [2:0] cs_read_word_mux_sel,
    input cs_memreq_addr_mux_sel,
-   input cs_cacheresp_type,
+   input [2:0] cs_cacheresp_type,
    input cs_hit,
-   input cs_memreq_type
+   input [2:0] cs_memreq_type
   );
   begin
    cachereq_rdy = cs_cachereq_rdy;
@@ -285,23 +285,24 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
 
   assign hit = tag_match && read_data_val;
 
-  always_comb begin
-   case(state_reg)
-      //cachereq  cacheresp  memreq memresp  cachereq memresp write_data  tag_arr  tag_arr data_array  data_arr  read_data  evict_addr  read_word  cacheresp hit memreq
-      //rdy       val        val    rdy      en       en      mux_sel     ren      wen     ren         wben      reg_en     reg_en      mux_sel    type          type
-    I: cs(  1,    0,         0,      0,       0,       0,       1'bx,       0,        0,       0,          0,          0,       0,         mux_x,      1'bx,     1'bx,  1'bx);
-    TC:cs(  0,    0,         0,      0,       1,       0,      1'bx,        1,        0,       0,          0,          0,       0,         mux_x,      1'bx,      hit,   1'bx);
-    IN:cs(  0,    1,         0,      0,       1,       0,      mux_zero,    0,        1,       0,          1,          1,       0,        mux_one,   3'd2, hit, 1'bx);     
-    RD:cs(  0,    1,         0,      0,       1,       1,      mux_zero,    0,        0,       1,          0,          1,       0,        mux_one,     0,         hit,  0);
-    RR:cs(  0,    0,         1,      0,       0,       1,      mux_one,     0,        0,       0,          0,          0,       0,        mux_x,        0,        hit,   0);
-    RW:cs(  0,    0,         0,      1,       1,       0,      1'bx,        0,        0,       0,          0,          0,       0,        mux_x,         0,        hit,   0);
-    RU:cs(  0,    1,         0,      1,       1,       1,      mux_one,     0,        1,       0,          1,          0,       0,         mux_x,        1,        hit,   1);
-    EP:cs(  0,    0,         0,      0,       1,       0,      1'bx,        1,        0,       1,          0,          0,       1,          mux_zero,    1'bx,      hit,   1'bx);
-    ER:cs(  0,    0,         1,      0,       0,       0,      1'bx,        0,        0,       0,          0,          0,       1,         mux_zero,     1'bx,      hit, 1'bx);     
-    EW:cs(  0,    0,         0,      1,       1,       0,      1'bx,        0,        0,       0,          0,          0,       0,         mux_x,         1'bx,      hit,  1'bx);
-    W: cs(  0,    0,         0,      0,       0,       0,      mux_x,        0,        0,       0,          0,          0,       0,         mux_x,    1'bx,    hit,    1'bx); 
-    endcase
-  end
+always_comb begin
+ case(state_reg)
+     //cachereq  cacheresp  memreq memresp  cachereq memresp write_data  tag_arr  tag_arr data_array data_arr data_arr  read_data  evict_addr  read_word  cacheresp  memreq  hit memreq
+     //rdy       val        val    rdy      en       en      mux_sel     ren      wen     ren        wen      wben      reg_en     reg_en      mux_sel    type      addr_mux     type
+  I: cs(  1,    0,         0,      0,       0,       0,      1'bx,        0,        0,       0,      0,          0,       0,       0,         3'dx,     1'dx,         1'bx,   hit, 3'bx);
+  TC:cs(  0,    0,         0,      0,       1,       0,      1'bx,        1,        0,       0,      0,          0,    	0,       0,         3'dx,      3'dx,         1'bx,   hit, 3'bx);
+  IN:cs(  0,    1,         0,      0,       1,       0,      1'b0,        0,        1,       0,      0,          1,    	1,       0,         3'd1,      3'd2,         1'bx,   hit, 3'bx);
+  WD:cs(  0,    0,         0,      0,       1,       0,      1'b0,        0,        0,       0,      1,         0,      0,       0,         3'dx,      3'd1,         1'bx,   hit, 3'd1);  
+  RD:cs(  0,    1,         0,      0,       1,       1,      1'b0,        0,        0,       1,      0,          0,    	1,       0,         3'd1,    3'd0,             1'bx,    hit, 0);
+  RR:cs(  0,    0,         1,      0,       0,       1,      1'b0,        0,        0,       0,      0,          0,    	0,       0,         3'dx,      3'd0,           1,       hit, 0);
+  RW:cs(  0,    0,         0,      1,       1,       0,      1'bx,        0,        0,       0,      0,          0,    	0,       0,         3'dx,      3'd0,           0,       hit, 0);
+  RU:cs(  0,    1,         0,      1,       1,       1,      1'b1,        0,        1,       0,      0,          1,    	0,       0,         3'dx,     3'd0,            1'bx,    hit, 1);
+  EP:cs(  0,    0,         0,      0,       1,       0,      1'bx,        1,        0,       1,      0,          0,    	0,       1,         3'dx,    3'dx,          0,       hit, 3'bx);
+  ER:cs(  0,    0,         1,      0,       0,       0,      1'bx,        0,        0,       0,      0,          0,    	0,       1,         3'd0,   3'dx,           0,       hit, 3'bx);    EW:cs(  0,    0,         0,      1,       1,       0,      1'bx,        0,        0,       0,      0,        0,    	0,       0,         3'bx,     3'dx,         1'bx,    hit, 3'bx);
+  W: cs(  0,    0,         0,      0,       0,       0,      1'bx,        0,        0,       0,      0,          0,    	0,       0,       3'bx,     3'dx,         1'bx,    hit, 3'bx); 
+  default: cs( 0, 0,       0,      0,       0,      0,       1'bx,        0,        0,       0,      0,         0,      0,       0,       3'bx,     3'dx,         1'bx,     hit, 3'bx);
+  endcase
+end
 
 
 
