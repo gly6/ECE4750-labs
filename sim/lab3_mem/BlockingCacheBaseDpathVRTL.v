@@ -52,11 +52,11 @@ module lab3_mem_BlockingCacheBaseDpathVRTL
   input logic tag_array_wen,
   input logic data_array_ren,
   input logic data_array_wen,
-  input logic data_array_wben,
+  input logic [15:0] data_array_wben,
   input logic read_data_reg_en,
   input logic evict_addr_reg_en,
   input logic memreq_addr_mux_sel,
-  input logic hit,
+  input logic [1:0] hit,
   input logic [2:0] read_word_mux_sel,
   input logic [2:0] cacheresp_type,
   input logic [2:0] memreq_type,
@@ -94,7 +94,7 @@ module lab3_mem_BlockingCacheBaseDpathVRTL
 //memresp and cachereq registers
 
 logic [127:0] memresp_data_reg_out; 
-vc_EnReg#(dbw) memresp_data_reg
+vc_EnReg#(128) memresp_data_reg
 (
   .clk    (clk),
   .reset  (reset),
@@ -135,7 +135,7 @@ vc_EnReg#(3) cachereq_type_reg
 );
 
 logic [o-1:0] cachereq_opaque_reg_out; 
-vc_EnReg#(dbw) cachereq_opaque_reg
+vc_EnReg#(8) cachereq_opaque_reg
 (
   .clk    (clk),
   .reset  (reset),
@@ -212,7 +212,8 @@ vc_EqComparator#(28) cmp
 );
 
 //mk_addr 1
-assign tag_array_read_data = {tag_array_read_data, 4'b0000};
+logic [31:0]mk_addr_tag_array_read_data;
+assign mk_addr_tag_array_read_data = {tag_array_read_data, 4'b0000};
  
 //mk_addr 2
 assign cachereq_addr_reg_out = {cachereq_addr_reg_out[31:4], 4'b0000};
@@ -225,7 +226,7 @@ vc_EnReg#(32) evict_addr_reg
   .clk    (clk),
   .reset  (reset),
   .q      (evict_addr_reg_out),
-  .d      (tag_array_read_data),
+  .d      (mk_addr_tag_array_read_data),
   .en     (evict_addr_reg_en)
 );
 
@@ -255,7 +256,7 @@ vc_Mux5#(32) read_word_mux
 //cacheresp_msg
 assign cacheresp_msg.opaque = cachereq_opaque_reg_out;
 assign cacheresp_msg.type_ = cacheresp_type;
-assign cacheresp_msg.len = 2'b0;
+assign cacheresp_msg.len = 2'b00;
 assign cacheresp_msg.test = hit;
 assign cacheresp_msg.data = read_word_mux_out;
 //end cacheresp_msg
