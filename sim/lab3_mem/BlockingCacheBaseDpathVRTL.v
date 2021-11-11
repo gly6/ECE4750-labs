@@ -94,7 +94,7 @@ module lab3_mem_BlockingCacheBaseDpathVRTL
 //memresp and cachereq registers
 
 logic [127:0] memresp_data_reg_out; 
-vc_EnReg#(dbw, 0) memresp_data_reg
+vc_EnReg#(dbw) memresp_data_reg
 (
   .clk    (clk),
   .reset  (reset),
@@ -105,7 +105,7 @@ vc_EnReg#(dbw, 0) memresp_data_reg
 
 
 logic [dbw-1:0] cachereq_data_reg_out; 
-vc_EnReg#(dbw, 0) cachereq_data_reg
+vc_EnReg#(dbw) cachereq_data_reg
 (
   .clk    (clk),
   .reset  (reset),
@@ -116,7 +116,7 @@ vc_EnReg#(dbw, 0) cachereq_data_reg
 
 logic [abw-1:0] cachereq_addr_reg_out; 
 assign cachereq_addr = cachereq_addr_reg_out;
-vc_EnReg#(abw, 0) cachereq_addr_reg
+vc_EnReg#(abw) cachereq_addr_reg
 (
   .clk    (clk),
   .reset  (reset),
@@ -125,7 +125,7 @@ vc_EnReg#(abw, 0) cachereq_addr_reg
   .en     (cachereq_en)
 );
 
-vc_EnReg#(3, 0) cachereq_type_reg
+vc_EnReg#(3) cachereq_type_reg
 (
   .clk    (clk),
   .reset  (reset),
@@ -135,7 +135,7 @@ vc_EnReg#(3, 0) cachereq_type_reg
 );
 
 logic [o-1:0] cachereq_opaque_reg_out; 
-vc_EnReg#(dbw, 0) cachereq_opaque_reg
+vc_EnReg#(dbw) cachereq_opaque_reg
 (
   .clk    (clk),
   .reset  (reset),
@@ -195,7 +195,7 @@ vc_CombinationalSRAM_1rw#(128,16) data_array
 //Fourth column of datapath
 
 logic [127:0] read_data_reg_out;
-vc_EnReg#(clw, 0) cachereq_opaque_reg_2
+vc_EnReg#(clw) cachereq_opaque_reg_2
 (
   .clk    (clk),
   .reset  (reset),
@@ -220,7 +220,7 @@ assign cachereq_addr_reg_out = {cachereq_addr_reg_out[31:4], 4'b0000};
 //Fifth column of datapath
 
 logic [31:0] evict_addr_reg_out;
-vc_EnReg#(32, 0) evict_addr_reg
+vc_EnReg#(32) evict_addr_reg
 (
   .clk    (clk),
   .reset  (reset),
