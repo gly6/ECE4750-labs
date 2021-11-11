@@ -65,7 +65,7 @@ module lab3_mem_BlockingCacheBaseDpathVRTL
   
   output logic [2:0] cachereq_type,
   output logic [31:0] cachereq_addr,
-  output logic tag_match,
+  output logic tag_match
   
 );
 
@@ -130,7 +130,7 @@ vc_EnReg#(3, 0) cachereq_type_reg
   .clk    (clk),
   .reset  (reset),
   .q      (cachereq_type),
-  .d      (cachereq_msg.type),
+  .d      (cachereq_msg.type_),
   .en     (cachereq_en)
 );
 
@@ -195,7 +195,7 @@ vc_CombinationalSRAM_1rw#(128,16) data_array
 //Fourth column of datapath
 
 logic [127:0] read_data_reg_out;
-vc_EnReg#(clw, 0) cachereq_opaque_reg
+vc_EnReg#(clw, 0) cachereq_opaque_reg_2
 (
   .clk    (clk),
   .reset  (reset),
@@ -212,10 +212,10 @@ vc_EqComparator#(28) cmp
 );
 
 //mk_addr 1
-assign tag_array_read_data_mk_addr = {tag_array_read_data, 4'b0000};
+assign tag_array_read_data = {tag_array_read_data, 4'b0000};
  
 //mk_addr 2
-assign cachereq_addr_reg_out_mk_addr = {cachereq_addr_reg_out[31:4], 4'b0000};
+assign cachereq_addr_reg_out = {cachereq_addr_reg_out[31:4], 4'b0000};
 
 //Fifth column of datapath
 
@@ -225,7 +225,7 @@ vc_EnReg#(32, 0) evict_addr_reg
   .clk    (clk),
   .reset  (reset),
   .q      (evict_addr_reg_out),
-  .d      (tag_array_read_data_mk_addr),
+  .d      (tag_array_read_data),
   .en     (evict_addr_reg_en)
 );
 
@@ -233,18 +233,19 @@ logic [31:0] memreq_addr_mux_out;
 vc_Mux2#(32) memreq_addr_mux 
 (
   .in0  (evict_addr_reg_out),
-  .in1  (cachereq_addr_reg_out_mk_addr), 
+  .in1  (cachereq_addr_reg_out), 
   .sel  (memreq_addr_mux_sel),
   .out  (memreq_addr_mux_out)
 );
 
 logic [31:0] read_word_mux_out;
-vc_Mux5#(32) read_word_mux(
+vc_Mux5#(32) read_word_mux
+(
   .in0    (read_data_reg_out[127:96]),
   .in1    (read_data_reg_out[95:64]),
   .in2    (read_data_reg_out[63:32]),
   .in3    (read_data_reg_out[31:0]),
-  .in4    (0x00000000),
+  .in4    ('h0),
   .sel    (read_word_mux_sel),
   .out    (read_word_mux_out)
 );
@@ -253,14 +254,14 @@ vc_Mux5#(32) read_word_mux(
 
 //cacheresp_msg
 assign cacheresp_msg.opaque = cachereq_opaque_reg_out;
-assign cacheresp_msg.type = cacheresp_type;
+assign cacheresp_msg.type_ = cacheresp_type;
 assign cacheresp_msg.len = 2'b0;
 assign cacheresp_msg.test = hit;
 assign cacheresp_msg.data = read_word_mux_out;
 //end cacheresp_msg
 
 //memreq_msg
-assign memreq_msg.type = memreq_type;
+assign memreq_msg.type_ = memreq_type;
 assign memreq_msg.len = 4'b0000;
 assign memreq_msg.addr = memreq_addr_mux_out;
 assign memreq_msg.data = read_data_reg_out;
