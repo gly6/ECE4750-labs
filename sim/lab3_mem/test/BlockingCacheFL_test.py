@@ -330,7 +330,6 @@ def read_miss_wr_we_dt( base_addr ):
     req( 'rd', 0x06, 0x00001004, 0, 0          ), resp('rd', 0x06, 1, 0, 0x00000002 ), # read word  0x00001000
     req( 'rd', 0x07, 0x00001008, 0, 0          ), resp('rd', 0x07, 1, 0, 0x00000003 ), # read word  0x00001000
     req( 'rd', 0x08, 0x0000100c, 0, 0          ), resp('rd', 0x08, 1, 0, 0x00000004 ), # read word  0x00001000
-#    req( 'rd', 0x09, 0x00000000, 0, 0          ), resp('rd', 0x09, 0, 0, 0xdeadbeef ), # read word  0x00000000
   ]
 
 # Data to be loaded into memory before running the test
@@ -364,8 +363,7 @@ def write_miss_wr_we_dt( base_addr ):
     req( 'rd', 0x07, 0x00001004, 0, 0          ), resp('rd', 0x07, 1, 0, 0x00000002 ), # read word  0x00001000
     req( 'rd', 0x08, 0x00001008, 0, 0          ), resp('rd', 0x08, 1, 0, 0x00000003 ), # read word  0x00001000
     req( 'rd', 0x09, 0x0000100c, 0, 0          ), resp('rd', 0x09, 1, 0, 0x00000004 ), # read word  0x00001000
-#    req( 'rd', 0x10, 0x00000000, 0, 0          ), resp('rd', 0x10, 0, 0, 0xdeadbeef ), # read word  0x00000000
-#    req( 'rd', 0x11, 0x00001000, 0, 0          ), resp('rd', 0x11, 0, 0, 0x00000010 ), # read word  0x00001000
+
   ]
 
 # Data to be loaded into memory before running the test
@@ -384,6 +382,103 @@ def write_miss_wr_we_dt_mem( base_addr ):
     0x0000100c, 0x00000004,
   ]
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# Stress test 
+#''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' 
+def stress_dt (base_addr): 
+  stress_dt_msgs = []
+  for i in range(16):
+    for j in range(4): 
+      if (j == 0):
+        hit = 0
+      else: 
+        hit = 1 
+      offset = j << 2  
+      index = i << 4 
+      addr = index | offset 
+      data = i*4+j 
+      opq = i*4+j 
+      stress_dt_msgs.extend([req('rd', i*4+j, addr, 0, 0), resp('rd', i*4+j, hit, 0, data)])
+  return stress_dt_msgs
+
+def stress_dt_mem(base_addr):
+  stress_dt_mem_msgs = []
+  for i in range(16):
+    for j in range(4): 
+      offset = j << 2  
+      index = i << 4 
+      addr = index | offset 
+      data = i*4 + j 
+      stress_dt_mem_msgs.extend([addr, data])
+  return stress_dt_mem_msgs 
+      
+    
+
+#'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# Conflict misses
+#''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' 
+def conflict_miss_dt( base_addr ):
+  return [
+    #    type  opq   addr      len  data               type  opq test len  data
+    req( 'rd', 0x00, 0x00000000, 0, 0          ), resp('rd', 0x00, 0, 0, 0xdeadbeef ), # read word  0x00000000
+    req( 'rd', 0x01, 0x00000004, 0, 0          ), resp('rd', 0x01, 1, 0, 0x00c0ffee ), # read word  0x00000004
+    req( 'rd', 0x02, 0x00000008, 0, 0          ), resp('rd', 0x02, 1, 0, 0xabcdefab ), # read word  0x00000008
+    req( 'rd', 0x03, 0x0000000c, 0, 0          ), resp('rd', 0x03, 1, 0, 0x01234567 ), # read word  0x0000000c
+    req( 'rd', 0x04, 0x00000010, 0, 0          ), resp('rd', 0x04, 0, 0, 0xdededede ), # read word  0x00000010
+    req( 'rd', 0x05, 0x00001000, 0, 0          ), resp('rd', 0x05, 0, 0, 0x00000001 ), # read word  0x00001000
+    req( 'rd', 0x06, 0x00001004, 0, 0          ), resp('rd', 0x06, 1, 0, 0x00000002 ), # read word  0x00001000
+    req( 'rd', 0x07, 0x00001008, 0, 0          ), resp('rd', 0x07, 1, 0, 0x00000003 ), # read word  0x00001000
+    req( 'rd', 0x08, 0x0000100c, 0, 0          ), resp('rd', 0x08, 1, 0, 0x00000004 ), # read word  0x00001000
+    req( 'rd', 0x09, 0x00000000, 0, 0          ), resp('rd', 0x09, 0, 0, 0xdeadbeef ), # read word  0x00000000
+  ]
+
+def conflict_miss_dt_mem( base_addr ):
+  return [
+    # addr      data (in int)
+    0x00000000, 0xdeadbeef,
+    0x00000004, 0x00c0ffee,
+    0x00000008, 0xabcdefab,
+    0x0000000c, 0x01234567, 
+    0x00000010, 0xdededede,   
+    0x00001000, 0x00000001, 
+    0x00001004, 0x00000002,
+    0x00001008, 0x00000003,
+    0x0000100c, 0x00000004,
+  ]
+  
+def conflict_miss_dt_1( base_addr ):
+  return [
+    #    type  opq   addr      len  data               type  opq test len  data
+    req( 'rd', 0x00, 0x00000000, 0, 0          ), resp('rd', 0x00, 0, 0, 0xdeadbeef ), # read word  0x00000000
+    req( 'rd', 0x01, 0x00000004, 0, 0          ), resp('rd', 0x01, 1, 0, 0x00c0ffee ), # read word  0x00000004
+    req( 'rd', 0x02, 0x00000008, 0, 0          ), resp('rd', 0x02, 1, 0, 0xabcdefab ), # read word  0x00000008
+    req( 'rd', 0x03, 0x0000000c, 0, 0          ), resp('rd', 0x03, 1, 0, 0x01234567 ), # read word  0x0000000c
+    req( 'rd', 0x04, 0x00000010, 0, 0          ), resp('rd', 0x04, 0, 0, 0xdededede ), # read word  0x00000010
+    req( 'wr', 0x05, 0x00001000, 0, 0x00000010 ), resp('wr', 0x05, 0, 0, 0          ), # write word 0x00001000
+    req( 'rd', 0x06, 0x00001000, 0, 0          ), resp('rd', 0x06, 1, 0, 0x00000010 ), # read word  0x00001000
+    req( 'rd', 0x07, 0x00001004, 0, 0          ), resp('rd', 0x07, 1, 0, 0x00000002 ), # read word  0x00001000
+    req( 'rd', 0x08, 0x00001008, 0, 0          ), resp('rd', 0x08, 1, 0, 0x00000003 ), # read word  0x00001000
+    req( 'rd', 0x09, 0x0000100c, 0, 0          ), resp('rd', 0x09, 1, 0, 0x00000004 ), # read word  0x00001000
+    req( 'rd', 0x10, 0x00000000, 0, 0          ), resp('rd', 0x10, 0, 0, 0xdeadbeef ), # read word  0x00000000
+    req( 'rd', 0x11, 0x00001000, 0, 0          ), resp('rd', 0x11, 0, 0, 0x00000010 ), # read word  0x00001000
+  ]
+
+# Data to be loaded into memory before running the test
+
+def conflict_miss_dt_mem_1( base_addr ):
+  return [
+    # addr      data (in int)
+    0x00000000, 0xdeadbeef,
+    0x00000004, 0x00c0ffee,
+    0x00000008, 0xabcdefab,
+    0x0000000c, 0x01234567, 
+    0x00000010, 0xdededede,   
+    0x00001000, 0x00000001, 
+    0x00001004, 0x00000002,
+    0x00001008, 0x00000003,
+    0x0000100c, 0x00000004,
+  ]
+
+#'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Created Assoc Test Cases 
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -401,13 +496,10 @@ def read_miss_wr_we_assoc( base_addr ):
     req( 'rd', 0x06, 0x00001004, 0, 0          ), resp('rd', 0x06, 1, 0, 0x00000002 ), # read word  0x00001000
     req( 'rd', 0x07, 0x00001008, 0, 0          ), resp('rd', 0x07, 1, 0, 0x00000003 ), # read word  0x00001000
     req( 'rd', 0x08, 0x0000100c, 0, 0          ), resp('rd', 0x08, 1, 0, 0x00000004 ), # read word  0x00001000
-#    req( 'rd', 0x09, 0x00000000, 0, 0          ), resp('rd', 0x09, 1, 0, 0xdeadbeef ), # read word  0x00000000
     req( 'rd', 0x10, 0x00002000, 0, 0          ), resp('rd', 0x10, 0, 0, 0x00000021 ), # read word  0x00001000
     req( 'rd', 0x11, 0x00002004, 0, 0          ), resp('rd', 0x11, 1, 0, 0x00000022 ), # read word  0x00001000
     req( 'rd', 0x12, 0x00002008, 0, 0          ), resp('rd', 0x12, 1, 0, 0x00000023 ), # read word  0x00001000
     req( 'rd', 0x13, 0x0000200c, 0, 0          ), resp('rd', 0x13, 1, 0, 0x00000024 ), # read word  0x00001000
-#    req( 'rd', 0x14, 0x00000000, 0, 0          ), resp('rd', 0x14, 1, 0, 0xdeadbeef ), # read word  0x00000000
-#    req( 'rd', 0x15, 0x00001000, 0, 0          ), resp('rd', 0x15, 0, 0, 0x00000001 ), # read word  0x00001000
  
   ]
 
@@ -446,20 +538,138 @@ def write_miss_wr_we_assoc( base_addr ):
     req( 'rd', 0x06, 0x00001004, 0, 0          ), resp('rd', 0x06, 1, 0, 0x00000002 ), # read word  0x00001000
     req( 'rd', 0x07, 0x00001008, 0, 0          ), resp('rd', 0x07, 1, 0, 0x00000003 ), # read word  0x00001000
     req( 'rd', 0x08, 0x0000100c, 0, 0          ), resp('rd', 0x08, 1, 0, 0x00000004 ), # read word  0x00001000
-#    req( 'rd', 0x09, 0x00000000, 0, 0          ), resp('rd', 0x09, 1, 0, 0xdeadbeef ), # read word  0x00000000
     req( 'wr', 0x09, 0x00002000, 0, 0x00000020 ), resp('rd', 0x09, 0, 0, 0          ), # read word  0x00001000
     req( 'rd', 0x10, 0x00002000, 0, 0          ), resp('rd', 0x10, 1, 0, 0x00000020 ), # read word  0x00001000
     req( 'rd', 0x11, 0x00002004, 0, 0          ), resp('rd', 0x11, 1, 0, 0x00000022 ), # read word  0x00001000
     req( 'rd', 0x12, 0x00002008, 0, 0          ), resp('rd', 0x12, 1, 0, 0x00000023 ), # read word  0x00001000
     req( 'rd', 0x13, 0x0000200c, 0, 0          ), resp('rd', 0x13, 1, 0, 0x00000024 ), # read word  0x00001000
-#    req( 'rd', 0x14, 0x00000000, 0, 0          ), resp('rd', 0x14, 1, 0, 0xdeadbeef ), # read word  0x00000000
-#    req( 'rd', 0x15, 0x00001000, 0, 0          ), resp('rd', 0x15, 0, 0, 0x00000001 ), # read word  0x00001000
  
   ]
 
 # Data to be loaded into memory before running the test
 
 def write_miss_wr_we_assoc_mem( base_addr ):
+  return [
+    # addr      data (in int)
+    0x00000000, 0xdeadbeef,
+    0x00000004, 0x00c0ffee,
+    0x00000008, 0xabcdefab,
+    0x0000000c, 0x01234567, 
+    0x00000010, 0xdededede,   
+    0x00001000, 0x00000001, 
+    0x00001004, 0x00000002,
+    0x00001008, 0x00000003,
+    0x0000100c, 0x00000004,
+    0x00002000, 0x00000021, 
+    0x00002004, 0x00000022,
+    0x00002008, 0x00000023,
+    0x0000200c, 0x00000024,
+  ]
+#'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# Stress test 
+#''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' 
+def stress_assoc (base_addr): 
+  stress_assoc_msgs = []
+  for k in range(2): 
+    for i in range(8):
+      for j in range(4): 
+        if (j == 0):
+          hit = 0
+        else: 
+          hit = 1 
+        tag = k << 7 
+        offset = j << 2  
+        index = i << 4 
+        addr = tag | index | offset 
+        data = 32*k + i*4 + j 
+        opq = 32*k + i*4 + j 
+        stress_assoc_msgs.extend([req('rd', i*4+j, addr, 0, 0), resp('rd', i*4+j, hit, 0, data)])
+  return stress_assoc_msgs
+
+def stress_assoc_mem(base_addr):
+  stress_assoc_mem_msgs = []
+  for k in range(2):
+    for i in range(8):
+      for j in range(4): 
+        tag = k << 7
+        offset = j << 2  
+        index = i << 4 
+        addr = tag| index | offset 
+        data = 32*k + i*4 + j 
+        stress_assoc_mem_msgs.extend([addr, data])
+  return stress_assoc_mem_msgs 
+      
+#'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# Conflict misses
+#''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' 
+def conflict_miss_assoc( base_addr ):
+  return [
+    #    type  opq   addr      len  data               type  opq test len  data
+    req( 'rd', 0x00, 0x00000000, 0, 0          ), resp('rd', 0x00, 0, 0, 0xdeadbeef ), # read word  0x00000000
+    req( 'rd', 0x01, 0x00000004, 0, 0          ), resp('rd', 0x01, 1, 0, 0x00c0ffee ), # read word  0x00000004
+    req( 'rd', 0x02, 0x00000008, 0, 0          ), resp('rd', 0x02, 1, 0, 0xabcdefab ), # read word  0x00000008
+    req( 'rd', 0x03, 0x0000000c, 0, 0          ), resp('rd', 0x03, 1, 0, 0x01234567 ), # read word  0x0000000c
+    req( 'rd', 0x04, 0x00000010, 0, 0          ), resp('rd', 0x04, 0, 0, 0xdededede ), # read word  0x00000010
+    req( 'rd', 0x05, 0x00001000, 0, 0          ), resp('rd', 0x05, 0, 0, 0x00000001 ), # read word  0x00001000
+    req( 'rd', 0x06, 0x00001004, 0, 0          ), resp('rd', 0x06, 1, 0, 0x00000002 ), # read word  0x00001000
+    req( 'rd', 0x07, 0x00001008, 0, 0          ), resp('rd', 0x07, 1, 0, 0x00000003 ), # read word  0x00001000
+    req( 'rd', 0x08, 0x0000100c, 0, 0          ), resp('rd', 0x08, 1, 0, 0x00000004 ), # read word  0x00001000
+    req( 'rd', 0x09, 0x00000000, 0, 0          ), resp('rd', 0x09, 1, 0, 0xdeadbeef ), # read word  0x00000000
+    req( 'rd', 0x10, 0x00002000, 0, 0          ), resp('rd', 0x10, 0, 0, 0x00000021 ), # read word  0x00001000
+    req( 'rd', 0x11, 0x00002004, 0, 0          ), resp('rd', 0x11, 1, 0, 0x00000022 ), # read word  0x00001000
+    req( 'rd', 0x12, 0x00002008, 0, 0          ), resp('rd', 0x12, 1, 0, 0x00000023 ), # read word  0x00001000
+    req( 'rd', 0x13, 0x0000200c, 0, 0          ), resp('rd', 0x13, 1, 0, 0x00000024 ), # read word  0x00001000
+    req( 'rd', 0x14, 0x00000000, 0, 0          ), resp('rd', 0x14, 1, 0, 0xdeadbeef ), # read word  0x00000000
+    req( 'rd', 0x15, 0x00001000, 0, 0          ), resp('rd', 0x15, 0, 0, 0x00000001 ), # read word  0x00001000
+ 
+  ]
+
+# Data to be loaded into memory before running the test
+
+def conflict_miss_assoc_mem( base_addr ):
+  return [
+    # addr      data (in int)
+    0x00000000, 0xdeadbeef,
+    0x00000004, 0x00c0ffee,
+    0x00000008, 0xabcdefab,
+    0x0000000c, 0x01234567, 
+    0x00000010, 0xdededede,   
+    0x00001000, 0x00000001, 
+    0x00001004, 0x00000002,
+    0x00001008, 0x00000003,
+    0x0000100c, 0x00000004,
+    0x00002000, 0x00000021, 
+    0x00002004, 0x00000022,
+    0x00002008, 0x00000023,
+    0x0000200c, 0x00000024,
+  ]
+def conflict_miss_assoc_1( base_addr ):
+  return [
+    #    type  opq   addr      len  data               type  opq test len  data
+    req( 'rd', 0x00, 0x00000000, 0, 0          ), resp('rd', 0x00, 0, 0, 0xdeadbeef ), # read word  0x00000000
+    req( 'rd', 0x01, 0x00000004, 0, 0          ), resp('rd', 0x01, 1, 0, 0x00c0ffee ), # read word  0x00000004
+    req( 'rd', 0x02, 0x00000008, 0, 0          ), resp('rd', 0x02, 1, 0, 0xabcdefab ), # read word  0x00000008
+    req( 'rd', 0x03, 0x0000000c, 0, 0          ), resp('rd', 0x03, 1, 0, 0x01234567 ), # read word  0x0000000c
+    req( 'rd', 0x04, 0x00000010, 0, 0          ), resp('rd', 0x04, 0, 0, 0xdededede ), # read word  0x00000010
+    req( 'wr', 0x05, 0x00001000, 0, 0x00000010 ), resp('wr', 0x05, 0, 0, 0          ), # read word  0x00001000
+    req( 'rd', 0x05, 0x00001000, 0, 0          ), resp('rd', 0x05, 1, 0, 0x00000010 ), # read word  0x00001000
+    req( 'rd', 0x06, 0x00001004, 0, 0          ), resp('rd', 0x06, 1, 0, 0x00000002 ), # read word  0x00001000
+    req( 'rd', 0x07, 0x00001008, 0, 0          ), resp('rd', 0x07, 1, 0, 0x00000003 ), # read word  0x00001000
+    req( 'rd', 0x08, 0x0000100c, 0, 0          ), resp('rd', 0x08, 1, 0, 0x00000004 ), # read word  0x00001000
+    req( 'rd', 0x09, 0x00000000, 0, 0          ), resp('rd', 0x09, 1, 0, 0xdeadbeef ), # read word  0x00000000
+    req( 'wr', 0x09, 0x00002000, 0, 0x00000020 ), resp('rd', 0x09, 0, 0, 0          ), # read word  0x00001000
+    req( 'rd', 0x10, 0x00002000, 0, 0          ), resp('rd', 0x10, 1, 0, 0x00000020 ), # read word  0x00001000
+    req( 'rd', 0x11, 0x00002004, 0, 0          ), resp('rd', 0x11, 1, 0, 0x00000022 ), # read word  0x00001000
+    req( 'rd', 0x12, 0x00002008, 0, 0          ), resp('rd', 0x12, 1, 0, 0x00000023 ), # read word  0x00001000
+    req( 'rd', 0x13, 0x0000200c, 0, 0          ), resp('rd', 0x13, 1, 0, 0x00000024 ), # read word  0x00001000
+    req( 'rd', 0x14, 0x00000000, 0, 0          ), resp('rd', 0x14, 1, 0, 0xdeadbeef ), # read word  0x00000000
+    req( 'rd', 0x15, 0x00001000, 0, 0          ), resp('rd', 0x15, 0, 0, 0x00000010 ), # read word  0x00001000
+ 
+  ]
+
+# Data to be loaded into memory before running the test
+
+def conflict_miss_assoc_mem_1( base_addr ):
   return [
     # addr      data (in int)
     0x00000000, 0xdeadbeef,
@@ -546,6 +756,9 @@ test_case_table_set_assoc = mk_test_case_table([
   [ "write_miss_wr_woe",     write_miss_wr_woe,     write_miss_wr_woe_mem,0,    0.0,  0,  0,  0    ],
   [ "read_miss_wr_we_assoc", read_miss_wr_we_assoc, read_miss_wr_we_assoc_mem,0,0.0,  0,  0,  0    ],
   [ "write_miss_wr_we_assoc",write_miss_wr_we_assoc,write_miss_wr_we_assoc_mem,0,0.0,  0,  0,  0    ],
+  [ "conflict_miss_assoc",   conflict_miss_assoc,   conflict_miss_assoc_mem,     0,    0.0, 0,  0,  0    ], 
+  [ "conflict_miss_assoc_1", conflict_miss_assoc_1, conflict_miss_assoc_mem_1,0,    0.0, 0,  0,  0    ], 
+  [ "stress_assoc",          stress_assoc,          stress_assoc_mem,     0,     0.0,  0,  0,  0],
 
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # LAB TASK: Add test cases to this table
@@ -584,8 +797,11 @@ test_case_table_dir_mapped = mk_test_case_table([
   [ "write_hit_dirty",       write_hit_dirty,       write_hit_dirty_mem,            0,    0.0,  0,  0,  0    ],
   [ "read_miss_wr_woe",      read_miss_wr_woe,      read_miss_wr_woe_mem,           0,    0.0,  0,  0,  0    ],
   [ "write_miss_wr_woe",     write_miss_wr_woe,     write_miss_wr_woe_mem,          0,    0.0,  0,  0,  0    ],
-  [ "read_miss_wr_we_dt",       read_miss_wr_we_dt,       read_miss_wr_we_dt_mem,            0,    0.0,  0,  0,  0    ],
-  [ "write_miss_wr_we_dt",      write_miss_wr_we_dt,      write_miss_wr_we_dt_mem,           0,    0.0,  0,  0,  0    ],
+  [ "read_miss_wr_we_dt",    read_miss_wr_we_dt,    read_miss_wr_we_dt_mem,         0,    0.0,  0,  0,  0    ],
+  [ "write_miss_wr_we_dt",   write_miss_wr_we_dt,   write_miss_wr_we_dt_mem,        0,    0.0,  0,  0,  0    ],
+  [ "conflict_miss_dt",      conflict_miss_dt,      conflict_miss_dt_mem,           0,    0.0, 0,  0,  0    ], 
+  [ "conflict_miss_dt_1",    conflict_miss_dt_1,    conflict_miss_dt_mem_1,         0,    0.0, 0,  0,  0    ], 
+  [ "stress_dt",             stress_dt,             stress_dt_mem,                  0,    0.0, 0,  0,  0    ],
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # LAB TASK: Add test cases to this table
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
