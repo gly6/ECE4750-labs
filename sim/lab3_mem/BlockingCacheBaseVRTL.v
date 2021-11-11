@@ -73,7 +73,7 @@ module lab3_mem_BlockingCacheBaseVRTL
    logic cachereq_en;
    logic memresp_en;
    logic write_data_mux_sel;
-   logic cachereq_addr;
+   logic [31:0] cachereq_addr;
    logic tag_array_ren;
    logic tag_array_wen;
    logic data_array_ren;
@@ -82,11 +82,11 @@ module lab3_mem_BlockingCacheBaseVRTL
    logic read_data_reg_en;
    logic tag_match;
    logic evict_addr_reg_en;
-   logic read_word_mux_sel;
+   logic [2:0] read_word_mux_sel;
    logic memreq_addr_mux_sel;
-   logic cacheresp_type;
+   logic [2:0] cacheresp_type;
    logic hit;
-   logic memreq_type;
+   logic [2:0] memreq_type;
   
 
 

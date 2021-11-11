@@ -53,11 +53,11 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
   output logic                       read_data_reg_en,
   input  logic                        tag_match,
   output logic                       evict_addr_reg_en,
-  output logic                       read_word_mux_sel,
+  output logic        [2:0]               read_word_mux_sel,
   output logic                       memreq_addr_mux_sel,
-  output logic                       cacheresp_type,
+  output logic          [2:0]             cacheresp_type,
   output logic                       hit,
-  output logic                       memreq_type
+  output logic           [2:0]            memreq_type
   
 
  );
@@ -184,7 +184,7 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
        end
 
        IN: begin
-         wen_valid = 1;
+         wen_val = 1;
          state_next = W;
        end  
 
@@ -200,7 +200,7 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
        WD: begin 
          if (tag_match == 1) begin
            wen_dirty = 1;
-           wen_valid = 1;
+           wen_val = 1;
          end
          state_next = W;
        end         
@@ -291,7 +291,7 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
       //rdy       val        val    rdy      en       en      mux_sel     ren      wen     ren         wben      reg_en     reg_en      mux_sel    type          type
     I: cs(  1,    0,         0,      0,       0,       0,       1'bx,       0,        0,       0,          0,          0,       0,         mux_x,      1'bx,     1'bx,  1'bx);
     TC:cs(  0,    0,         0,      0,       1,       0,      1'bx,        1,        0,       0,          0,          0,       0,         mux_x,      1'bx,      hit,   1'bx);
-    IN:cs(  0,    1,         0,      0,       1,       0,      mux_zero,    0,        1,       0,          1,          1,       0,        mux_one,   c_write_init, hit, 1'bx);     
+    IN:cs(  0,    1,         0,      0,       1,       0,      mux_zero,    0,        1,       0,          1,          1,       0,        mux_one,   3'd2, hit, 1'bx);     
     RD:cs(  0,    1,         0,      0,       1,       1,      mux_zero,    0,        0,       1,          0,          1,       0,        mux_one,     0,         hit,  0);
     RR:cs(  0,    0,         1,      0,       0,       1,      mux_one,     0,        0,       0,          0,          0,       0,        mux_x,        0,        hit,   0);
     RW:cs(  0,    0,         0,      1,       1,       0,      1'bx,        0,        0,       0,          0,          0,       0,        mux_x,         0,        hit,   0);
