@@ -8,6 +8,7 @@ import pytest
 import random
 import struct
 import math
+import os 
 
 random.seed(0xa4e28cc2)
 
@@ -686,6 +687,47 @@ def conflict_miss_assoc_mem_1( base_addr ):
     0x00002008, 0x00000023,
     0x0000200c, 0x00000024,
   ]
+
+def flipbit (lru):
+  if (lru == 0):
+      return 1
+  else: 
+      return 0
+
+def lru_replacement(base_addr): 
+  lru_replacement_msgs = []
+  cache = [-1,-1]
+  lru = 0
+  for i in range(50): 
+    tag = random.randint(0,3) 
+    hit = 0
+    if (cache[flipbit(lru)] == tag): 
+        hit = 1 
+    if (cache[lru] == tag):
+        hit = 1 
+        lru = flipbit(lru)
+    if (hit == 0): 
+        cache[lru] = tag 
+        lru = flipbit(lru) 
+    data = tag + 1
+    addr = tag << 7
+    lru_replacement_msgs.extend([req('rd', i, addr, 0, 0), resp('rd', i, hit, 0, data)])
+  if os.path.exists("lru_replacement.txt"):
+    os.remove("lru_replacement.txt")
+  with open('lru_replacement.txt', 'w') as f:
+    f.write(str(lru_replacement_msgs))
+  return lru_replacement_msgs   
+
+def lru_replacement_mem(base_addr):
+  return [
+    # addr      data (in int)
+    0x00000000, 0x00000001,
+    0x00000080, 0x00000002,
+    0x00000100, 0x00000003,
+    0x00000180, 0x00000004,
+  ]
+  
+
 #----------------------------------------------------------------------
 # Banked cache test
 #----------------------------------------------------------------------
@@ -759,6 +801,7 @@ test_case_table_set_assoc = mk_test_case_table([
   [ "conflict_miss_assoc",   conflict_miss_assoc,   conflict_miss_assoc_mem,     0,    0.0, 0,  0,  0    ], 
   [ "conflict_miss_assoc_1", conflict_miss_assoc_1, conflict_miss_assoc_mem_1,0,    0.0, 0,  0,  0    ], 
   [ "stress_assoc",          stress_assoc,          stress_assoc_mem,     0,     0.0,  0,  0,  0],
+  [ "lru_replacement",       lru_replacement,       lru_replacement_mem,  0,     0.0,  0,  0,  0],
 
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # LAB TASK: Add test cases to this table
