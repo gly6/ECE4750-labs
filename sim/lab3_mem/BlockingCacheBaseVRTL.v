@@ -205,19 +205,16 @@ module lab3_mem_BlockingCacheBaseVRTL
   `VC_TRACE_BEGIN
   begin
 
-    // case ( ctrl.state_reg )
+     case ( ctrl.state_reg )
 
-    //   ctrl.STATE_IDLE:                   vc_trace.append_str( trace_str, "(I )" );
-    //   ctrl.STATE_TAG_CHECK:              vc_trace.append_str( trace_str, "(TC)" );
-    //   ctrl.STATE_INIT_DATA_ACCESS:       vc_trace.append_str( trace_str, "(IN)" );
-    //   ctrl.STATE_WAIT:                   vc_trace.append_str( trace_str, "(W )" );
-    //   default:                           vc_trace.append_str( trace_str, "(? )" );
+       ctrl.I:                   vc_trace.append_str( trace_str, "(I )" );
+       ctrl.TC:              vc_trace.append_str( trace_str, "(TC)" );
+       ctrl.IN:       vc_trace.append_str( trace_str, "(IN)" );
+       ctrl.W:                   vc_trace.append_str( trace_str, "(W )" );
+       default:                           vc_trace.append_str( trace_str, "(? )" );
 
-    // endcase
+     endcase
 
-    //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    // LAB TASK: Add line tracing
-    //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
   end
   `VC_TRACE_END

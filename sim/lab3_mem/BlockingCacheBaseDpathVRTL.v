@@ -216,7 +216,8 @@ logic [(abw - 1):0]mk_addr_tag_array_read_data;
 assign mk_addr_tag_array_read_data = {tag_array_read_data, 4'b0000};
  
 //mk_addr 2
-assign cachereq_addr_reg_out = {cachereq_addr_reg_out[31:4], 4'b0000};
+logic [31:0] mk_addr_cachereq_addr_reg_out;
+assign mk_addr_cachereq_addr_reg_out = {mk_addr_cachereq_addr_reg_out[31:4], 4'b0000};
 
 //Fifth column of datapath
 
