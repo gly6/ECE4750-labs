@@ -174,7 +174,7 @@ vc_CombinationalBitSRAM_1rw#(tgw, nbl) tag_array
   .read_addr    (cachereq_addr_reg_out[(idw + ofw - 1 + p_idx_shamt):(ofw + p_idx_shamt)]),
   .write_en     (tag_array_wen),
   .write_addr   (cachereq_addr_reg_out[(idw + ofw - 1 + p_idx_shamt):(ofw + p_idx_shamt)]),
-  .write_data   (cachereq_addr_reg_out[(abw - 1):(ofw + p_idx_shamt)]),
+  .write_data   (cachereq_addr_reg_out[31:4]),
   .read_data    (tag_array_read_data)
 );
 
@@ -206,7 +206,7 @@ vc_EnReg#(clw) read_data_reg
 
 vc_EqComparator#(tgw) cmp
 (
-  .in0 (cachereq_addr_reg_out[(abw - 1):(ofw + p_idx_shamt)]),
+  .in0 (cachereq_addr_reg_out[31:4]),
   .in1 (tag_array_read_data),
   .out (tag_match)
 );
@@ -243,11 +243,16 @@ vc_Mux2#(abw) memreq_addr_mux
 logic [(clw/4 -1):0] read_word_mux_out;
 vc_Mux5#(clw/4) read_word_mux
 (
-  .in0    (read_data_reg_out[clw - 1:clw/4 * 3]),
-  .in1    (read_data_reg_out[(clw/4 * 3 - 1):clw/4 * 2]),
+  //.in0    (read_data_reg_out[clw - 1:clw/4 * 3]),
+  //.in1    (read_data_reg_out[(clw/4 * 3 - 1):clw/4 * 2]),
+  //.in2    (read_data_reg_out[(clw/4 * 2 - 1):clw/4]),
+  //.in3    (read_data_reg_out[(clw/4 - 1):0]),
+  //.in4    ('h0),
+  .in0    (0), 
+  .in1    (read_data_reg_out[(clw/4 - 1):0]),
   .in2    (read_data_reg_out[(clw/4 * 2 - 1):clw/4]),
-  .in3    (read_data_reg_out[(clw/4 - 1):0]),
-  .in4    ('h0),
+  .in3    (read_data_reg_out[(clw/4 * 3 - 1):clw/4 * 2]),
+  .in4    (read_data_reg_out[clw - 1:clw/4 * 3]),
   .sel    (read_word_mux_sel),
   .out    (read_word_mux_out)
 );

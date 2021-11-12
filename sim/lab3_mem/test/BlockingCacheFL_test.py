@@ -251,8 +251,8 @@ def write_hit_dirty (base_addr):
   return [
     #    type  opq   addr      len  data               type  opq test len  data
     req( 'in', 0x00, 0x00000000, 0, 0xdeadbeef ), resp('in', 0x00, 0, 0, 0        ),
-    req( 'wr', 0x00, 0x00000004, 0, 0x00c0ffee ), resp('in', 0x00, 0, 0, 0        ),
-    req( 'wr', 0x00, 0x00000008, 0, 0xabcdefab ), resp('in', 0x00, 0, 0, 0        ),
+    req( 'wr', 0x00, 0x00000004, 0, 0x00c0ffee ), resp('wr', 0x00, 1, 0, 0        ),
+    req( 'wr', 0x00, 0x00000008, 0, 0xabcdefab ), resp('wr', 0x00, 1, 0, 0        ),
     req( 'rd', 0x01, 0x00000000, 0, 0          ), resp('rd', 0x01, 1, 0, 0xdeadbeef ), # read word  0x00000000
     req( 'rd', 0x02, 0x00000004, 0, 0          ), resp('rd', 0x02, 1, 0, 0x00c0ffee ), # read word  0x00000004
     req( 'rd', 0x03, 0x00000008, 0, 0          ), resp('rd', 0x03, 1, 0, 0xabcdefab ), # read word  0x00000008

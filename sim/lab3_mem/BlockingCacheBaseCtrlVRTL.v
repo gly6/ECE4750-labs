@@ -226,12 +226,12 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
 
        TC: begin 
          if (cachereq_type == 3'b010) state_next = IN;
-         else if ((tag_match == 1) && ( cachereq_type == 0) && (read_data_val))  state_next = RD;
-         else if ((tag_match == 1) && ( cachereq_type == 1) && (read_data_val))  state_next = WD;
+         else if ((tag_match) && ( cachereq_type == 0) && (read_data_val))  state_next = RD;
+         else if ((tag_match) && ( cachereq_type == 1) && (read_data_val))  state_next = WD;
          //else if ((tag_match == 0) && ( read_data_dirty == 0) || !(read_data_val)) state_next = RR;
          //else if ((tag_match == 0) && ( read_data_dirty == 1)) state_next = EP;
-         else if ((!(read_data_val))  && (read_data_dirty == 0)) state_next = RR; 
-         else if (!(read_data_val) && (read_data_dirty == 1)) state_next = EP; 
+         else if ((!(read_data_val) || !(tag_match))  && (read_data_dirty == 0)) state_next = RR; 
+         else if ((!(read_data_val) || !(tag_match)) && (read_data_dirty == 1)) state_next = EP; 
        end
 
        IN: begin
@@ -359,7 +359,7 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
   read_mux_sel read_mux_sel 
   (
     .in(cachereq_addr[ofw-1:2]),
-    .cashereq_type(cachereq_type), 
+    .cashereq_type(cacheresp_type), 
     .en(read_word_mux_sel_en),
     .out(read_word_mux_sel)
   );
