@@ -52,11 +52,11 @@ module lab3_mem_BlockingCacheBaseDpathVRTL
   input logic tag_array_wen,
   input logic data_array_ren,
   input logic data_array_wen,
-  input logic data_array_wben,
+  input logic [15:0] data_array_wben,
   input logic read_data_reg_en,
   input logic evict_addr_reg_en,
   input logic memreq_addr_mux_sel,
-  input logic hit,
+  input logic [1:0] hit,
   input logic [2:0] read_word_mux_sel,
   input logic [2:0] cacheresp_type,
   input logic [2:0] memreq_type,
@@ -93,8 +93,8 @@ module lab3_mem_BlockingCacheBaseDpathVRTL
 
 //memresp and cachereq registers
 
-logic [127:0] memresp_data_reg_out; 
-vc_EnReg#(dbw) memresp_data_reg
+logic [clw-1:0] memresp_data_reg_out; 
+vc_EnReg#(clw) memresp_data_reg
 (
   .clk    (clk),
   .reset  (reset),
@@ -135,7 +135,7 @@ vc_EnReg#(3) cachereq_type_reg
 );
 
 logic [o-1:0] cachereq_opaque_reg_out; 
-vc_EnReg#(dbw) cachereq_opaque_reg
+vc_EnReg#(o) cachereq_opaque_reg
 (
   .clk    (clk),
   .reset  (reset),
@@ -149,12 +149,12 @@ vc_EnReg#(dbw) cachereq_opaque_reg
 //Second column of datapath
 
 //repl
-logic [127:0] repl_out;
+logic [(dbw*4)-1:0] repl_out;
 assign repl_out = {cachereq_data_reg_out, cachereq_data_reg_out, cachereq_data_reg_out, cachereq_data_reg_out};
 //end repl
 
-logic [127:0] write_data_mux_out;
-vc_Mux2#(128) write_data_mux 
+logic [clw-1:0] write_data_mux_out;
+vc_Mux2#(clw) write_data_mux 
 (
   .in0  (repl_out),
   .in1  (memresp_data_reg_out), 
@@ -165,28 +165,28 @@ vc_Mux2#(128) write_data_mux
 //Third column of datapath
 
 //Tag and data arrays
-logic [27:0] tag_array_read_data;
-vc_CombinationalBitSRAM_1rw#(28, 16) tag_array
+logic [(tgw-1):0] tag_array_read_data;
+vc_CombinationalBitSRAM_1rw#(tgw, nbl) tag_array
 (
   .clk          (clk),
   .reset        (reset),
   .read_en      (tag_array_ren),
-  .read_addr    (cachereq_addr_reg_out[7:4]),
+  .read_addr    (cachereq_addr_reg_out[(idw + ofw - 1 + p_idx_shamt):(ofw + p_idx_shamt)]),
   .write_en     (tag_array_wen),
-  .write_addr   (cachereq_addr_reg_out[7:4]),
-  .write_data   (cachereq_addr_reg_out[31:4]),
+  .write_addr   (cachereq_addr_reg_out[(idw + ofw - 1 + p_idx_shamt):(ofw + p_idx_shamt)]),
+  .write_data   (cachereq_addr_reg_out[(abw - 1):(ofw + p_idx_shamt)]),
   .read_data    (tag_array_read_data)
 );
 
-logic [127:0] data_array_read_data;
-vc_CombinationalSRAM_1rw#(128,16) data_array
+logic [clw - 1:0] data_array_read_data;
+vc_CombinationalSRAM_1rw#(clw , nbl) data_array
 (
   .clk            (clk),
   .reset          (reset),
   .read_en        (data_array_ren),
-  .read_addr      (cachereq_addr_reg_out[7:4]),
+  .read_addr      (cachereq_addr_reg_out[(idw + ofw - 1 + p_idx_shamt):(ofw + p_idx_shamt)]),
   .write_en       (data_array_wen),
-  .write_addr     (cachereq_addr_reg_out[7:4]),
+  .write_addr     (cachereq_addr_reg_out[(idw + ofw - 1 + p_idx_shamt):(ofw + p_idx_shamt)]),
   .write_data     (write_data_mux_out),
   .write_byte_en  (data_array_wben),
   .read_data      (data_array_read_data)
@@ -194,8 +194,8 @@ vc_CombinationalSRAM_1rw#(128,16) data_array
 
 //Fourth column of datapath
 
-logic [127:0] read_data_reg_out;
-vc_EnReg#(clw) cachereq_opaque_reg_2
+logic [clw - 1:0] read_data_reg_out;
+vc_EnReg#(clw) read_data_reg
 (
   .clk    (clk),
   .reset  (reset),
@@ -204,33 +204,34 @@ vc_EnReg#(clw) cachereq_opaque_reg_2
   .en     (read_data_reg_en)
 );
 
-vc_EqComparator#(28) cmp
+vc_EqComparator#(tgw) cmp
 (
-  .in0 (cachereq_addr_reg_out[31:4]),
+  .in0 (cachereq_addr_reg_out[(abw - 1):(ofw + p_idx_shamt)]),
   .in1 (tag_array_read_data),
   .out (tag_match)
 );
 
 //mk_addr 1
-assign tag_array_read_data = {tag_array_read_data, 4'b0000};
+logic [(abw - 1):0]mk_addr_tag_array_read_data;
+assign mk_addr_tag_array_read_data = {tag_array_read_data, 4'b0000};
  
 //mk_addr 2
 assign cachereq_addr_reg_out = {cachereq_addr_reg_out[31:4], 4'b0000};
 
 //Fifth column of datapath
 
-logic [31:0] evict_addr_reg_out;
-vc_EnReg#(32) evict_addr_reg
+logic [(abw - 1):0] evict_addr_reg_out;
+vc_EnReg#(abw) evict_addr_reg
 (
   .clk    (clk),
   .reset  (reset),
   .q      (evict_addr_reg_out),
-  .d      (tag_array_read_data),
+  .d      (mk_addr_tag_array_read_data),
   .en     (evict_addr_reg_en)
 );
 
-logic [31:0] memreq_addr_mux_out;
-vc_Mux2#(32) memreq_addr_mux 
+logic [abw-1:0] memreq_addr_mux_out;
+vc_Mux2#(abw) memreq_addr_mux 
 (
   .in0  (evict_addr_reg_out),
   .in1  (cachereq_addr_reg_out), 
@@ -238,13 +239,13 @@ vc_Mux2#(32) memreq_addr_mux
   .out  (memreq_addr_mux_out)
 );
 
-logic [31:0] read_word_mux_out;
-vc_Mux5#(32) read_word_mux
+logic [(clw/4 -1):0] read_word_mux_out;
+vc_Mux5#(clw/4) read_word_mux
 (
-  .in0    (read_data_reg_out[127:96]),
-  .in1    (read_data_reg_out[95:64]),
-  .in2    (read_data_reg_out[63:32]),
-  .in3    (read_data_reg_out[31:0]),
+  .in0    (read_data_reg_out[clw - 1:clw/4 * 3]),
+  .in1    (read_data_reg_out[(clw/4 * 3 - 1):clw/4 * 2]),
+  .in2    (read_data_reg_out[(clw/4 * 2 - 1):clw/4]),
+  .in3    (read_data_reg_out[(clw/4 - 1):0]),
   .in4    ('h0),
   .sel    (read_word_mux_sel),
   .out    (read_word_mux_out)
@@ -255,7 +256,7 @@ vc_Mux5#(32) read_word_mux
 //cacheresp_msg
 assign cacheresp_msg.opaque = cachereq_opaque_reg_out;
 assign cacheresp_msg.type_ = cacheresp_type;
-assign cacheresp_msg.len = 2'b0;
+assign cacheresp_msg.len = 2'b00;
 assign cacheresp_msg.test = hit;
 assign cacheresp_msg.data = read_word_mux_out;
 //end cacheresp_msg
