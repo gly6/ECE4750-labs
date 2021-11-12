@@ -9,6 +9,7 @@ import random
 import struct
 import math
 import os 
+from datetime import datetime
 
 random.seed(0xa4e28cc2)
 
@@ -695,6 +696,12 @@ def flipbit (lru):
       return 0
 
 def lru_replacement(base_addr): 
+  now = datetime.now()
+  current_time = now.strftime("%H:%M:%S")
+  if os.path.exists("lru_replacement.txt"):
+    os.remove("lru_replacement.txt")
+  with open("lru_replacement.txt", "w") as f:
+    f.write("Data for LRU at " + current_time + "\n")
   lru_replacement_msgs = []
   cache = [-1,-1]
   lru = 0
@@ -711,11 +718,9 @@ def lru_replacement(base_addr):
         lru = flipbit(lru) 
     data = tag + 1
     addr = tag << 7
-    lru_replacement_msgs.extend([req('rd', i, addr, 0, 0), resp('rd', i, hit, 0, data)])
-  if os.path.exists("lru_replacement.txt"):
-    os.remove("lru_replacement.txt")
-  with open('lru_replacement.txt', 'w') as f:
-    f.write(str(lru_replacement_msgs))
+    with open("lru_replacement.txt", "a") as f:
+      f.write("addr " + '{:04x}'.format(addr) + " data " + str(data) + " hit " + str(hit) + "\n")
+    lru_replacement_msgs.extend([req('rd', i, addr, 0, 0), resp('rd', i, hit, 0, data)]) 
   return lru_replacement_msgs   
 
 def lru_replacement_mem(base_addr):
