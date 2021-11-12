@@ -69,7 +69,7 @@ module lab3_mem_BlockingCacheBaseVRTL
   //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   // LAB TASK: Define wires
   //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-   logic cachereq_type;
+   logic [2:0] cachereq_type;
    logic cachereq_en;
    logic memresp_en;
    logic write_data_mux_sel;
@@ -78,14 +78,14 @@ module lab3_mem_BlockingCacheBaseVRTL
    logic tag_array_wen;
    logic data_array_ren;
    logic data_array_wen;
-   logic data_array_wben;
+   logic [15:0] data_array_wben;
    logic read_data_reg_en;
    logic tag_match;
    logic evict_addr_reg_en;
    logic [2:0] read_word_mux_sel;
    logic memreq_addr_mux_sel;
    logic [2:0] cacheresp_type;
-   logic hit;
+   logic [1:0] hit;
    logic [2:0] memreq_type;
   
 
