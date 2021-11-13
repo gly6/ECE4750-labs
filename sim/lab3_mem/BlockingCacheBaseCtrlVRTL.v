@@ -225,13 +225,6 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
        end
 
        TC: begin 
-<<<<<<< HEAD
-         if (cachereq_type == 2) state_next = IN;
-         else if ((tag_match == 1) && ( cachereq_type == 0) && (read_data_val))  state_next = RD;
-         else if ((tag_match == 1) && ( cachereq_type == 1) && (read_data_val))  state_next = WD;
-         else if ((tag_match == 0) && ( read_data_dirty == 0) || !(read_data_val)) state_next = RR;
-         else if ((tag_match == 0) && ( read_data_dirty == 1)) state_next = EP; 
-=======
          if (cachereq_type == 3'b010) state_next = IN;
          else if ((tag_match) && ( cachereq_type == 0) && (read_data_val))  state_next = RD;
          else if ((tag_match) && ( cachereq_type == 1) && (read_data_val))  state_next = WD;
@@ -239,7 +232,6 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
          //else if ((tag_match == 0) && ( read_data_dirty == 1)) state_next = EP;
          else if ((!(read_data_val) || !(tag_match))  && (read_data_dirty == 0)) state_next = RR; 
          else if ((!(read_data_val) || !(tag_match)) && (read_data_dirty == 1)) state_next = EP; 
->>>>>>> 088755c8e67a90bd2bbe49e943c5058299017264
        end
 
        IN: begin
@@ -376,24 +368,6 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
 
 always_comb begin
  case(state_reg)
-<<<<<<< HEAD
-     //cachereq  cacheresp  memreq memresp  cachereq memresp write_data  tag_arr  tag_arr data_array data_arr data_arr  read_data  evict_addr  read_word  memreq  cacheresp  hit memreq   dirty  valid   wen_   wen_
-    //rdy       val        val    rdy      en       en      mux_sel     ren      wen     ren        wen      wben      reg_en     reg_en      mux_sel  addr_mux  type           type      in      in      val  dirty
-  I: cs(1,    0,         0,      0,       1,       0,      1'bx,        0,        0,       0,      0,          0,       0,       0,         3'dx,     1'dx,         3'bx,   hit, 3'bx,    1'bx,  1'bx,    0,  0  );
-  TC:cs(0,    0,         0,      0,       0,       0,      1'bx,        1,        0,       0,      0,          0,    	0,       0,         3'dx,      1'dx,         3'bx,   hit, 3'bx,     1'bx,  1'bx,    0,  0  );
-  IN:cs(0,    1,         0,      0,       0,       0,      1'b0,        0,        1,       0,      0,          1,    	1,       0,         3'd1,      1'dx,         3'd2,   hit, 3'bx,     1'bx,  1'bx,    0,  0  );
-  WD:cs(0,    0,         0,      0,       1,       0,      1'b0,        0,        0,       0,      1,         0,      0,       0,         3'dx,      1'd1,         3'bx,   hit, 3'd1,     1,     1,       1,  1  );  
-  RD:cs(0,    1,         0,      0,       1,       1,      1'b0,        0,        0,       1,      0,          0,    	1,       0,         3'd1,    1'd0,             3'bx, hit, 3'd0,     1'bx,  1'bx,    0,  0  );
-  RR:cs(0,    0,         1,      0,       0,       1,      1'b0,        0,        0,       0,      0,          0,    	0,       0,         3'dx,      1,           3'd0,    hit, 3'd0,     1'bx,  1'bx,    0,  0  );
-  RW:cs(0,    0,         0,      1,       1,       0,      1'bx,        0,        0,       0,      0,          0,    	0,       0,         3'dx,      0,           3'd0,    hit, 3'd0,     1'bx,  1'bx,    0,  0  );
-  RU:cs(0,    1,         0,      1,       1,       1,      1'b1,        0,        1,       0,      0,          1,    	0,       0,         3'dx,     1'd0,            3'bx, hit, 3'd1,     0,     1,       1,  0  );
-  EP:cs(0,    0,         0,      0,       1,       0,      1'bx,        1,        0,       1,      0,          0,    	0,       1,         3'dx,    0,          3'dx,       hit, 3'bx,     1'bx,  1'bx,    0,  0  );
-  ER:cs(0,    0,         1,      0,       0,       0,      1'bx,        0,        0,       0,      0,          0,    	0,       1,         3'd0,   0,           3'dx,       hit, 3'bx,     1'bx,  1'bx,    0,  0  );    
-  EW:cs(0,    0,         0,      1,       1,       0,      1'bx,        0,        0,       0,      0,        0,    	0,       0,         3'bx,     1'bx,         3'dx,      hit, 3'bx,     1'bx,  1'bx,    0,  0  );
-  W: cs(0,    0,         0,      0,       0,       0,      1'bx,        0,        0,       0,      0,          0,    	0,       0,       3'bx,     1'dx,         3'dx,      hit, 3'bx,     1'bx,  1'bx,    0,  0  ); 
-  default: cs( 0, 0,       0,      0,       0,      0,       1'bx,        0,        0,       0,      0,         0,      0,       0,       3'bx,     1'dx,         3'dx,    hit, 3'bx,     1'bx,  1'bx,    0,  0 );
-  endcase
-=======
      //cachereq  cacheresp  memreq memresp  cachereq memresp write_data  tag_arr  tag_arr data_array data_arr data_arr    read_data  evict_addr  read_word    memreq    cacheresp hit_en  memreq  dirty   valid   wen_  wen_
      //rdy       val        val    rdy      en       en      mux_sel     ren      wen     ren        wen      wben        reg_en     reg_en      mux_sel_en   addr_mux  type_en           type    in      in      val   dirty
   I: cs(1,       0,         0,     0,       1,       0,      1'bx,       0,       0,      0,         0,       0,          0,         0,          0,           1'dx,     0,        0,      3'bx,   1'bx,   1'bx,   0,    0  );
@@ -410,7 +384,6 @@ always_comb begin
   W: cs(0,       1,         0,     0,       0,       0,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          1,           1'dx,     0,        0,      3'bx,   1'bx,   1'bx,   0,    0  ); 
   default: cs( 0,0,         0,     0,       0,       0,      1'bx,       0,       0,      0,         0,       0,          0,         0,          0,           1'dx,     0,        0,      3'bx,   1'bx,   1'bx,   0,    0  );
   endcase   
->>>>>>> 088755c8e67a90bd2bbe49e943c5058299017264
 end
 
 
