@@ -87,7 +87,7 @@ module lab3_mem_BlockingCacheBaseVRTL
    logic [2:0] cacheresp_type;
    logic [1:0] hit;
    logic [2:0] memreq_type;
-  
+   
 
 
 
@@ -124,6 +124,33 @@ module lab3_mem_BlockingCacheBaseVRTL
    .memresp_val       (memresp_val),
    .memresp_rdy       (memresp_rdy),
 
+  //Control Signals
+   .cachereq_en       (cachereq_en), 
+   .cachereq_type     (cachereq_type),
+   .cachereq_addr     (cachereq_addr),
+
+   .memresp_en        (memresp_en), 
+   .write_data_mux_sel (write_data_mux_sel),
+
+   .tag_array_ren     (tag_array_ren),
+   .tag_array_wen     (tag_array_wen),
+   .tag_match         (tag_match),
+
+   .data_array_ren    (data_array_ren),
+   .data_array_wen    (data_array_wen),
+   .data_array_wben   (data_array_wben),
+
+   .evict_addr_reg_en (evict_addr_reg_en),
+   .memreq_addr_mux_sel (memreq_addr_mux_sel),
+   .cacheresp_type    (cacheresp_type),
+   .hit               (hit),
+
+   .read_data_reg_en  (read_data_reg_en),
+   .read_word_mux_sel (read_word_mux_sel),
+   .memreq_type       (memreq_type),
+
+
+
    .*
 
   );
@@ -157,8 +184,31 @@ module lab3_mem_BlockingCacheBaseVRTL
 
    .memresp_msg       (memresp_msg),
 
+  //Control Signals
+   .cachereq_en       (cachereq_en), 
+   .cachereq_type     (cachereq_type),
+   .cachereq_addr     (cachereq_addr),
 
-   .*,
+   .memresp_en        (memresp_en), 
+   .write_data_mux_sel (write_data_mux_sel),
+
+   .tag_array_ren     (tag_array_ren),
+   .tag_array_wen     (tag_array_wen),
+   .tag_match         (tag_match),
+
+   .data_array_ren    (data_array_ren),
+   .data_array_wen    (data_array_wen),
+   .data_array_wben   (data_array_wben),
+
+   .evict_addr_reg_en (evict_addr_reg_en),
+   .memreq_addr_mux_sel (memreq_addr_mux_sel),
+   .cacheresp_type    (cacheresp_type),
+   .hit               (hit),
+
+   .read_data_reg_en  (read_data_reg_en),
+   .read_word_mux_sel (read_word_mux_sel),
+   .memreq_type       (memreq_type),
+   .*
 
   );
 
@@ -207,10 +257,18 @@ module lab3_mem_BlockingCacheBaseVRTL
 
      case ( ctrl.state_reg )
 
-       ctrl.I:                   vc_trace.append_str( trace_str, "(I )" );
-       ctrl.TC:              vc_trace.append_str( trace_str, "(TC)" );
-       ctrl.IN:       vc_trace.append_str( trace_str, "(IN)" );
-       ctrl.W:                   vc_trace.append_str( trace_str, "(W )" );
+       ctrl.I:                vc_trace.append_str( trace_str, "(I )" );
+       ctrl.TC:               vc_trace.append_str( trace_str, "(TC)" );
+       ctrl.IN:               vc_trace.append_str( trace_str, "(IN)" );
+       ctrl.RD:               vc_trace.append_str( trace_str, "(RD)" );
+       ctrl.WD:               vc_trace.append_str( trace_str, "(WD)" );
+       ctrl.EP:               vc_trace.append_str( trace_str, "(EP)" );
+       ctrl.ER:               vc_trace.append_str( trace_str, "(ER)" );
+       ctrl.EW:               vc_trace.append_str( trace_str, "(EW)" );
+       ctrl.RR:               vc_trace.append_str( trace_str, "(RR)" );
+       ctrl.RW:               vc_trace.append_str( trace_str, "(RW)" );
+       ctrl.RU:               vc_trace.append_str( trace_str, "(RU)" );
+       ctrl.W:                vc_trace.append_str( trace_str, "(W )" );
        default:                           vc_trace.append_str( trace_str, "(? )" );
 
      endcase
