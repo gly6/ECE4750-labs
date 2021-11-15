@@ -228,8 +228,6 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
          if (cachereq_type == 3'b010) state_next = IN;
          else if ((tag_match) && ( cachereq_type == 0) && (read_data_val))  state_next = RD;
          else if ((tag_match) && ( cachereq_type == 1) && (read_data_val))  state_next = WD;
-         //else if ((tag_match == 0) && ( read_data_dirty == 0) || !(read_data_val)) state_next = RR;
-         //else if ((tag_match == 0) && ( read_data_dirty == 1)) state_next = EP;
          else if ((!(read_data_val) || !(tag_match))  && (read_data_dirty == 0)) state_next = RR; 
          else if ((!(read_data_val) || !(tag_match)) && (read_data_dirty == 1)) state_next = EP; 
        end
@@ -377,7 +375,7 @@ always_comb begin
   RD:cs(0,       0,         0,     0,       0,       0,      1'b0,       0,       0,      1,         0,       0,    	    1,         0,          0,           1'd0,     0,        0,      3'd0,   1'bx,   1'bx,   0,    0  );
   RR:cs(0,       0,         1,     0,       0,       0,      1'b0,       0,       0,      0,         0,       0,    	    0,         0,          0,           1,        0,        0,      3'd0,   1'bx,   1'bx,   0,    0  );
   RW:cs(0,       0,         0,     1,       0,       1,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           0,        0,        0,      3'd0,   1'bx,   1'bx,   0,    0  );
-  RU:cs(0,       0,         0,     0,       0,       0,      1'b1,       0,       1,      0,         1,       write_all,  0,         0,          0,           1'd0,     0,        0,      3'd1,   0,      1,      1,    0  );
+  RU:cs(0,       0,         0,     0,       0,       0,      1'b1,       0,       1,      0,         1,       write_all,  0,         0,          0,           1'd0,     0,        0,      3'd1,   0,      1,      1,    1  );
   EP:cs(0,       0,         0,     0,       0,       0,      1'bx,       1,       0,      1,         0,       0,    	    1,         1,          0,           0,        0,        0,      3'bx,   1'bx,   1'bx,   0,    0  );
   ER:cs(0,       0,         1,     0,       0,       0,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           0,        0,        0,      3'd1,   1'bx,   1'bx,   0,    0  );    
   EW:cs(0,       0,         0,     1,       0,       0,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           1'bx,     0,        0,      3'bx,   1'bx,   1'bx,   0,    0  );
