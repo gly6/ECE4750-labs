@@ -47,6 +47,8 @@ module lab3_mem_BlockingCacheAltDpathVRTL
   input logic tag_array_wen_0,
   input logic tag_array_ren_1,
   input logic tag_array_wen_1,
+  input logic tag_array_ren,
+  input logic tag_array_wen,
   input logic data_array_ren,
   input logic data_array_wen,
   input logic [15:0] data_array_wben,
