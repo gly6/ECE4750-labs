@@ -331,7 +331,7 @@ def read_miss_wr_we_dt( base_addr ):
     req( 'rd', 0x05, 0x00001000, 0, 0          ), resp('rd', 0x05, 0, 0, 0x00000001 ), # read word  0x00001000
     req( 'rd', 0x06, 0x00001004, 0, 0          ), resp('rd', 0x06, 1, 0, 0x00000002 ), # read word  0x00001000
     req( 'rd', 0x07, 0x00001008, 0, 0          ), resp('rd', 0x07, 1, 0, 0x00000003 ), # read word  0x00001000
-    req( 'rd', 0x08, 0x0000100c, 0, 0          ), resp('rd', 0x08, 1, 0, 0x00000004 ), # read word  0x00001000
+    req( 'rd', 0x08, 0x0000100c, 0, 0          ), resp('rd', 0x08, 1, 0, 0x00000004 ), # read word  0x00001000 
   ]
 
 # Data to be loaded into memory before running the test
@@ -480,6 +480,63 @@ def conflict_miss_dt_mem_1( base_addr ):
     0x0000100c, 0x00000004,
   ]
 
+#'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# Capacity test 
+#'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+def capacity_dt (base_addr): 
+  capacity_dt_msgs = []
+  for i in range(16):
+    for j in range(4): 
+      if (j == 0):
+        hit = 0
+      else: 
+        hit = 1 
+      offset = j << 2  
+      index = i << 4 
+      addr = index | offset 
+      data = i*4+j 
+      opq = i*4+j 
+      capacity_dt_msgs.extend([req('rd', i*4+j, addr, 0, 0), resp('rd', i*4+j, hit, 0, data)])
+  capacity_dt_msgs.extend([req('rd', 64, 0x00001000, 0, 0), resp('rd', 64, 0, 0, 100)])
+  return capacity_dt_msgs
+
+def capacity_dt_mem(base_addr):
+  capacity_dt_mem_msgs = []
+  for i in range(16):
+    for j in range(4): 
+      offset = j << 2  
+      index = i << 4 
+      addr = index | offset 
+      data = i*4 + j 
+      capacity_dt_mem_msgs.extend([addr, data])
+  capacity_dt_mem_msgs.extend([0x00001000, 100])
+  return capacity_dt_mem_msgs 
+
+#'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+# Random test 
+#'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+def cacheline_int (addr, dict): 
+  offset = hex(addr)[3:2] 
+  
+def random_randata_dt (base_addr):
+  random_randata_dt_msgs = []
+  refmem = {} 
+  refcache = [[-1,-1],[-1,-1],[-1,-1],[-1,-1],
+              [-1,-1],[-1,-1],[-1,-1],[-1,-1],
+              [-1,-1],[-1,-1],[-1,-1],[-1,-1],
+              [-1,-1],[-1,-1],[-1,-1],[-1,-1]]
+  now = datetime.now()
+  current_time = now.strftime("%H:%M:%S")
+  if os.path.exists("random_randata.txt"):
+    os.remove("random_randata.txt")
+  with open("random_randdata.txt", "w") as f:
+    f.write("Data for simple address patterns, single request type, random data " + current_time + "\n")             
+  for i in range(50): 
+    addr = i << 2 
+    if (addr not in refmem):
+      cacheline_int (addr, refmem)
+
+  return random_randata_dt_msgs 
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Created Assoc Test Cases 
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -850,6 +907,7 @@ test_case_table_dir_mapped = mk_test_case_table([
   [ "conflict_miss_dt",      conflict_miss_dt,      conflict_miss_dt_mem,           0,    0.0, 0,  0,  0    ], 
   [ "conflict_miss_dt_1",    conflict_miss_dt_1,    conflict_miss_dt_mem_1,         0,    0.0, 0,  0,  0    ], 
   [ "stress_dt",             stress_dt,             stress_dt_mem,                  0,    0.0, 0,  0,  0    ],
+  [ "capacity_dt",           capacity_dt,           capacity_dt_mem,                0,    0.0, 0,  0,  0,   ],
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # LAB TASK: Add test cases to this table
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
