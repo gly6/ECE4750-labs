@@ -1,5 +1,5 @@
 //=========================================================================
-// Alternative Blocking Cache
+// Baseline Blocking Cache
 //=========================================================================
 
 `ifndef LAB3_MEM_BLOCKING_CACHE_ALT_V
@@ -26,7 +26,7 @@
 
 module lab3_mem_BlockingCacheAltVRTL
 #(
-  parameter p_num_banks  = 0              // Total number of cache banks
+  parameter p_num_banks    = 0               // Total number of cache banks
 )
 (
   input  logic           clk,
@@ -67,8 +67,33 @@ module lab3_mem_BlockingCacheAltVRTL
   localparam c_idx_shamt = $clog2( p_num_banks );
 
   //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // LAB TASK: Define temporary wires
+  // LAB TASK: Define wires
   //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+   logic [2:0] cachereq_type;
+   logic cachereq_en;
+   logic memresp_en;
+   logic write_data_mux_sel;
+   logic [31:0] cachereq_addr;
+   logic tag_array_ren_0;
+   logic tag_array_ren_1;
+   logic tag_array_wen_0;
+   logic tag_array_wen_1;
+   logic data_array_ren;
+   logic data_array_wen;
+   logic [15:0] data_array_wben;
+   logic read_data_reg_en;
+   logic tag_match_0;
+   logic tag_match_1;
+   logic evict_addr_reg_en_0;
+   logic evict_addr_reg_en_1;
+   logic [2:0] read_word_mux_sel;
+   logic memreq_addr_mux_sel;
+   logic [2:0] cacheresp_type;
+   logic [1:0] hit;
+   logic [2:0] memreq_type;
+   
+
+
 
   //----------------------------------------------------------------------
   // Control
@@ -103,9 +128,41 @@ module lab3_mem_BlockingCacheAltVRTL
    .memresp_val       (memresp_val),
    .memresp_rdy       (memresp_rdy),
 
-   //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-   // LAB TASK: Connect additional signals
-   //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+  //Control Signals
+   .cachereq_en       (cachereq_en), 
+   .cachereq_type     (cachereq_type),
+   .cachereq_addr     (cachereq_addr),
+
+   .memresp_en        (memresp_en), 
+   .write_data_mux_sel (write_data_mux_sel),
+
+   .tag_array_ren_0     (tag_array_ren_0),
+   .tag_array_ren_1     (tag_array_ren_1),
+   
+   .tag_array_wen_0     (tag_array_wen_0),
+   .tag_array_wen_1     (tag_array_wen_1),
+   .tag_match_0         (tag_match_0),
+   .tag_match_1         (tag_match_1),
+
+
+   .data_array_ren    (data_array_ren),
+   .data_array_wen    (data_array_wen),
+   .data_array_wben   (data_array_wben),
+
+   .evict_addr_reg_en_0 (evict_addr_reg_en_0),
+   .evict_addr_reg_en_1 (evict_addr_reg_en_1),
+
+   .memreq_addr_mux_sel (memreq_addr_mux_sel),
+   .cacheresp_type    (cacheresp_type),
+   .hit               (hit),
+
+   .read_data_reg_en  (read_data_reg_en),
+   .read_word_mux_sel (read_word_mux_sel),
+   .memreq_type       (memreq_type),
+
+
+
+   .*
 
   );
 
@@ -113,7 +170,7 @@ module lab3_mem_BlockingCacheAltVRTL
   // Datapath
   //----------------------------------------------------------------------
 
-  lab3_mem_BlockingCacheAltDpathVRTL
+   lab3_mem_BlockingCacheAltDpathVRTL
   #(
     .p_idx_shamt            (c_idx_shamt)
   )
@@ -138,9 +195,36 @@ module lab3_mem_BlockingCacheAltVRTL
 
    .memresp_msg       (memresp_msg),
 
-   //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-   // LAB TASK: Connect additional ports
-   //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+  //Control Signals
+   .cachereq_en       (cachereq_en), 
+   .cachereq_type     (cachereq_type),
+   .cachereq_addr     (cachereq_addr),
+
+   .memresp_en        (memresp_en), 
+   .write_data_mux_sel (write_data_mux_sel),
+
+   .tag_array_ren_0     (tag_array_ren_0),
+   .tag_array_wen_0     (tag_array_wen_0),
+   .tag_array_ren_1     (tag_array_ren_1),
+   .tag_array_wen_1     (tag_array_wen_1),
+   .tag_match_0         (tag_match_0),
+   .tag_match_1         (tag_match_1),
+
+   .data_array_ren    (data_array_ren),
+   .data_array_wen    (data_array_wen),
+   .data_array_wben   (data_array_wben),
+
+   .evict_addr_reg_en_0 (evict_addr_reg_en_0),
+   .evict_addr_reg_en_1 (evict_addr_reg_en_1),
+   
+   .memreq_addr_mux_sel (memreq_addr_mux_sel),
+   .cacheresp_type    (cacheresp_type),
+   .hit               (hit),
+
+   .read_data_reg_en  (read_data_reg_en),
+   .read_word_mux_sel (read_word_mux_sel),
+   .memreq_type       (memreq_type),
+   .*
 
   );
 
@@ -187,9 +271,24 @@ module lab3_mem_BlockingCacheAltVRTL
   `VC_TRACE_BEGIN
   begin
 
-    //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    // LAB TASK: Add line tracing
-    //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+     case ( ctrl.state_reg )
+
+       ctrl.I:                vc_trace.append_str( trace_str, "(I )" );
+       ctrl.TC:               vc_trace.append_str( trace_str, "(TC)" );
+       ctrl.IN:               vc_trace.append_str( trace_str, "(IN)" );
+       ctrl.RD:               vc_trace.append_str( trace_str, "(RD)" );
+       ctrl.WD:               vc_trace.append_str( trace_str, "(WD)" );
+       ctrl.EP:               vc_trace.append_str( trace_str, "(EP)" );
+       ctrl.ER:               vc_trace.append_str( trace_str, "(ER)" );
+       ctrl.EW:               vc_trace.append_str( trace_str, "(EW)" );
+       ctrl.RR:               vc_trace.append_str( trace_str, "(RR)" );
+       ctrl.RW:               vc_trace.append_str( trace_str, "(RW)" );
+       ctrl.RU:               vc_trace.append_str( trace_str, "(RU)" );
+       ctrl.W:                vc_trace.append_str( trace_str, "(W )" );
+       default:                           vc_trace.append_str( trace_str, "(? )" );
+
+     endcase
+
 
   end
   `VC_TRACE_END
