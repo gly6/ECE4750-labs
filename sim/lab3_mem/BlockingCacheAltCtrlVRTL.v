@@ -45,7 +45,7 @@ endmodule
 //CONTROL UNIT 
 //------------------------------------------------------------------------------------------------------
 
-module lab3_mem_BlockingCacheBaseCtrlVRTL
+module lab3_mem_BlockingCacheAltCtrlVRTL
 #(
   parameter p_idx_shamt    = 0
 )
@@ -255,8 +255,7 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
 
 
 
-
-  logic [1:0] hit_in = {1'b0, (tag_match_0 || tag_match_1) && read_data_val};
+  logic [1:0] hit_in = {1'b0, (tag_match_0 || tag_match_1) && (read_data_val_0 || read_data_val_1)};
   vc_EnReg#(2) hit_reg 
   (
     .clk    (clk),
@@ -297,12 +296,13 @@ module lab3_mem_BlockingCacheBaseCtrlVRTL
 
        TC: begin 
          if (cachereq_type == 3'b010) state_next = IN;
-         else if ((tag_match) && ( cachereq_type == 0) && (read_data_val_0 || read_data_val_1))  state_next = RD;
-         else if ((tag_match) && ( cachereq_type == 1) && (read_data_val_0 || read_data_val_1))  state_next = WD;
-         //else if ((tag_match == 0) && ( read_data_dirty == 0) || !(read_data_val)) state_next = RR;
-         //else if ((tag_match == 0) && ( read_data_dirty == 1)) state_next = EP;
-         else if ((!(read_data_val_0 || read_data_val_1) || !(tag_match_0 || tag_match_1))  && (read_data_dirty == 0)) state_next = RR; 
-         else if ((!(read_data_val_0 || read_data_val_1) || !(tag_match_0 || tag_match_1)) && (read_data_dirty == 1)) state_next = EP; 
+         //else if ((tag_match_0||tag_match_1) && ( cachereq_type == 0) && (read_data_val_0 || read_data_val_1))  state_next = RD;
+         //else if ((tag_match_0||tag_match_1) && ( cachereq_type == 1) && (read_data_val_0 || read_data_val_1))  state_next = WD;
+         //else if ((!(read_data_val_0 || read_data_val_1) || !(tag_match_0 || tag_match_1))  && (read_data_dirty == 0)) state_next = RR; 
+         //else if ((!(read_data_val_0 || read_data_val_1) || !(tag_match_0 || tag_match_1)) && (read_data_dirty == 1)) state_next = EP; 
+         else if (((tag_match_0 && read_data_val_0) || (tag_match_1 && read_data_val_1)) && (cachereq_type = 0)) state_next = RD; 
+         else if (((tag_match_0 && read_data_val_0) || (tag_match_1 && read_data_val_1)) && (cachereq_type = 1)) state_next = WD;
+         else if 
        end
 
        IN: begin
