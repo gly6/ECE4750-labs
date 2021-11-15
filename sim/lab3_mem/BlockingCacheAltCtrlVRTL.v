@@ -8,9 +8,10 @@
 `include "vc/mem-msgs.v"
 `include "vc/assert.v"
 `include "vc/regfiles.v"
-//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-// LAB TASK: Include necessary files
-//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+`include "vc/arithmetic.v"
+`include "vc/muxes.v"
+`include "vc/regs.v"
+`include "vc/srams.v"
 
 module wben_module (
   input logic   [1:0]   in,
@@ -91,11 +92,17 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
   output logic                        evict_addr_reg_en_0,
   output logic                        evict_addr_reg_en_1,
   output logic  [2:0]                 read_word_mux_sel,
-  output logic                        memreq_addr_mux_sel,
+  output logic  [1:0]                 memreq_addr_mux_sel,
   output logic  [2:0]                 cacheresp_type,
   output logic  [1:0]                 hit,
-  output logic  [2:0]                 memreq_type
-  
+  output logic  [2:0]                 memreq_type,
+  output logic                        tag_array_ren,
+  output logic                        tag_array_wen,
+  output logic                        wen_val,
+  output logic                        evict_addr_reg_en,
+  output logic                        valid_in,
+  output logic                        dirty_in,
+  output logic                        wen_dirty
 
  );
 
@@ -170,7 +177,7 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
   logic wen_dirty_0 = 0;
 
   logic read_data_val_0;
-  logic wen_val_0 = 0;
+  logic wen_val_0;
 
 // Valid,dirty wires for set1
   logic valid_in_1;
@@ -302,11 +309,12 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
          //else if ((!(read_data_val_0 || read_data_val_1) || !(tag_match_0 || tag_match_1)) && (read_data_dirty == 1)) state_next = EP; 
          else if (((tag_match_0 && read_data_val_0) || (tag_match_1 && read_data_val_1)) && (cachereq_type = 0)) state_next = RD; 
          else if (((tag_match_0 && read_data_val_0) || (tag_match_1 && read_data_val_1)) && (cachereq_type = 1)) state_next = WD;
-         else if 
+         else if ((read_data_val_0 && read_data_dirty_0 && !lru) || (read_data_val_1 && read_data_dirty_1 && lru)) state_next = EP; 
+         else state_next = RR;
        end
 
        IN: begin
-         wen_val = 1;
+         wen_val_0 = 1;
          lru_in = 1; //As this initializes an invalid cache we will always load the data in way 0
          state_next = W;
        end  
@@ -388,18 +396,15 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
    input cs_cachereq_en,
    input cs_memresp_en,
    input cs_write_data_mux_sel,
-   input cs_tag_array_ren_0,
-   input cs_tag_array_ren_1,
-   input cs_tag_array_wen_0,
-   input cs_tag_array_wen_1,
+   input cs_tag_array_ren,
+   input cs_tag_array_wen,
    input cs_data_array_ren,
    input cs_data_array_wen,
    input [15:0] cs_data_array_wben,
    input cs_read_data_reg_en,
-   input cs_evict_addr_reg_en_0,
-   input cs_evict_addr_reg_en_1,
+   input cs_evict_addr_reg_en,
    input cs_read_word_mux_sel_en,
-   input cs_memreq_addr_mux_sel,
+   input [1:0] cs_memreq_addr_mux_sel,
    input cs_cache_type_en,
    input cs_hit_en,
    input [2:0] cs_memreq_type,
@@ -417,16 +422,13 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
    cachereq_en = cs_cachereq_en;
    memresp_en = cs_memresp_en;
    write_data_mux_sel = cs_write_data_mux_sel;
-   tag_array_ren_0 = cs_tag_array_ren_0;
-   tag_array_ren_1 = cs_tag_array_ren_1;
-   tag_array_wen_0 = cs_tag_array_wen_1;
-   tag_array_wen_1 = cs_tag_array_wen_1;
+   tag_array_ren = cs_tag_array_ren;
+   tag_array_wen = cs_tag_array_wen;
    data_array_ren = cs_data_array_ren;
    data_array_wen = cs_data_array_wen;
    data_array_wben = cs_data_array_wben;
    read_data_reg_en = cs_read_data_reg_en;
-   evict_addr_reg_en_0 = cs_evict_addr_reg_en_0;
-   evict_addr_reg_en_1 = cs_evict_addr_reg_en_1;
+   evict_addr_reg_en = cs_evict_addr_reg_en;
    read_word_mux_sel_en = cs_read_word_mux_sel_en;
    memreq_addr_mux_sel = cs_memreq_addr_mux_sel;
    cache_type_en = cs_cache_type_en;
@@ -455,25 +457,33 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
     .out(read_word_mux_sel)
   );
 
+assign wen_dirty_0 = wen_dirty && tag_match_0;
+assign wen_dirty_1 = wen_dirty && tag_match_1;
+assign tag_array_wen_0 = tag_array_wen && !read_data_lru;
+assign tag_array_wen_1 = tag_array_wen && read_data_lru;
+assign wen_val_0 = wen_val && tag_match_0;
+assign wen_val_1 = wen_val && tag_match_1;
+assign evict_addr_reg_en_0 = evict_addr_reg_en && tag_match_0;
+assign evict_addr_reg_en_1 = evict_addr_reg_en && tag_match_1;
 
 
 always_comb begin
  case(state_reg)
-     //cachereq  cacheresp  memreq memresp  cachereq memresp write_data  tag_arr  tag_arr data_array data_arr data_arr    read_data  evict_addr  read_word    memreq    cacheresp hit_en  memreq  dirty   valid   wen_  wen_
-     //rdy       val        val    rdy      en       en      mux_sel     ren      wen     ren        wen      wben        reg_en     reg_en      mux_sel_en   addr_mux  type_en           type    in      in      val   dirty
-  I: cs(1,       0,         0,     0,       1,       0,      1'bx,       0,       0,      0,         0,       0,          0,         0,          0,           1'dx,     0,        0,      3'bx,   1'bx,   1'bx,   0,    0  );
-  TC:cs(0,       0,         0,     0,       0,       0,      1'bx,       1,       0,      0,         0,       0,    	    0,         0,          0,           1'dx,     1,        1,      3'bx,   1'bx,   1'bx,   0,    0  );
-  IN:cs(0,       0,         0,     0,       0,       0,      1'b0,       0,       1,      0,         1,       wben,    	  1,         0,          0,           1'dx,     0,        0,      3'bx,   1'bx,   1,      1,    0  );
-  WD:cs(0,       0,         0,     0,       0,       0,      1'b0,       0,       0,      0,         1,       wben,       0,         0,          0,           1'd1,     0,        0,      3'd1,   1,      1,      1,    1  );  
-  RD:cs(0,       0,         0,     0,       0,       0,      1'b0,       0,       0,      1,         0,       0,    	    1,         0,          0,           1'd0,     0,        0,      3'd0,   1'bx,   1'bx,   0,    0  );
-  RR:cs(0,       0,         1,     0,       0,       0,      1'b0,       0,       0,      0,         0,       0,    	    0,         0,          0,           1,        0,        0,      3'd0,   1'bx,   1'bx,   0,    0  );
-  RW:cs(0,       0,         0,     1,       0,       1,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           0,        0,        0,      3'd0,   1'bx,   1'bx,   0,    0  );
-  RU:cs(0,       0,         0,     0,       0,       0,      1'b1,       0,       1,      0,         1,       write_all,  0,         0,          0,           1'd0,     0,        0,      3'd1,   0,      1,      1,    0  );
-  EP:cs(0,       0,         0,     0,       0,       0,      1'bx,       1,       0,      1,         0,       0,    	    1,         1,          0,           0,        0,        0,      3'bx,   1'bx,   1'bx,   0,    0  );
-  ER:cs(0,       0,         1,     0,       0,       0,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           0,        0,        0,      3'bx,   1'bx,   1'bx,   0,    0  );    
-  EW:cs(0,       0,         0,     1,       0,       0,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           1'bx,     0,        1,      3'bx,   1'bx,   1'bx,   0,    0  );
-  W: cs(0,       1,         0,     0,       0,       0,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          1,           1'dx,     0,        1,      3'bx,   1'bx,   1'bx,   0,    0  ); 
-  default: cs( 0,0,         0,     0,       0,       0,      1'bx,       0,       0,      0,         0,       0,          0,         0,          0,           1'dx,     0,        0,      3'bx,   1'bx,   1'bx,   0,    0  );
+     //cachereq  cacheresp  memreq memresp  cachereq memresp write_data  tag_arr  tag_arr data_array data_arr data_arr    read_data  evict_addr  read_word    memreq    cacheresp hit_en  memreq  dirty   valid   wen_  wen_  lru_
+     //rdy       val        val    rdy      en       en      mux_sel     ren      wen     ren        wen      wben        reg_en     reg_en      mux_sel_en   addr_mux  type_en           type    in      in      val   dirty en
+  I: cs(1,       0,         0,     0,       1,       0,      1'bx,       0,       0,      0,         0,       0,          0,         0,          0,           2'dx,     0,        0,      3'bx,   1'bx,   1'bx,   0,    0,     0    );
+  TC:cs(0,       0,         0,     0,       0,       0,      1'bx,       1,       0,      0,         0,       0,    	    0,         0,          0,           2'dx,     1,        1,      3'bx,   1'bx,   1'bx,   0,    0,     0    );
+  IN:cs(0,       0,         0,     0,       0,       0,      1'b0,       0,       1,      0,         1,       wben,    	  1,         0,          0,           2'dx,     0,        0,      3'bx,   1'bx,   1,      1,    0,     1    );
+  WD:cs(0,       0,         0,     0,       0,       0,      1'b0,       0,       0,      0,         1,       wben,       0,         0,          0,           2'd1,     0,        0,      3'd1,   1,      1,      1,    1,     1    );  
+  RD:cs(0,       0,         0,     0,       0,       0,      1'b0,       0,       0,      1,         0,       0,    	    1,         0,          0,           2'd0,     0,        0,      3'd0,   1'bx,   1'bx,   0,    0,     1    );
+  RR:cs(0,       0,         1,     0,       0,       0,      1'b0,       0,       0,      0,         0,       0,    	    0,         0,          0,           2,        0,        0,      3'd0,   1'bx,   1'bx,   0,    0,     0    );
+  RW:cs(0,       0,         0,     1,       0,       1,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           0,        0,        0,      3'd0,   1'bx,   1'bx,   0,    0,     0    );
+  RU:cs(0,       0,         0,     0,       0,       0,      1'b1,       0,       1,      0,         1,       write_all,  0,         0,          0,           2'd0,     0,        0,      3'd1,   0,      1,      1,    0,     0    );
+  EP:cs(0,       0,         0,     0,       0,       0,      1'bx,       1,       0,      1,         0,       0,    	    1,         1,          0,           0,        0,        0,      3'bx,   1'bx,   1'bx,   0,    0,     0    );
+  ER:cs(0,       0,         1,     0,       0,       0,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           0,        0,        0,      3'bx,   1'bx,   1'bx,   0,    0,     0    );    
+  EW:cs(0,       0,         0,     1,       0,       0,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           2'bx,     0,        1,      3'bx,   1'bx,   1'bx,   0,    0,     0    );
+  W: cs(0,       1,         0,     0,       0,       0,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          1,           2'dx,     0,        1,      3'bx,   1'bx,   1'bx,   0,    0,     0    ); 
+  default: cs( 0,0,         0,     0,       0,       0,      1'bx,       0,       0,      0,         0,       0,          0,         0,          0,           2'dx,     0,        0,      3'bx,   1'bx,   1'bx,   0,    0,     0    );
   endcase   
 end
 

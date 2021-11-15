@@ -87,11 +87,17 @@ module lab3_mem_BlockingCacheAltVRTL
    logic evict_addr_reg_en_0;
    logic evict_addr_reg_en_1;
    logic [2:0] read_word_mux_sel;
-   logic memreq_addr_mux_sel;
+   logic [1:0] memreq_addr_mux_sel;
    logic [2:0] cacheresp_type;
    logic [1:0] hit;
    logic [2:0] memreq_type;
-   
+   logic tag_array_wen;
+   logic tag_array_ren;
+   logic wen_val;
+   logic evict_addr_reg_en;
+   logic  valid_in;
+   logic  dirty_in;
+   logic  wen_dirty;
 
 
 
