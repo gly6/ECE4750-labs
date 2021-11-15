@@ -63,7 +63,8 @@ module lab3_mem_BlockingCacheAltDpathVRTL
   
   output logic [2:0] cachereq_type,
   output logic [31:0] cachereq_addr,
-  output logic tag_match
+  output logic tag_match_0,
+  output logic tag_match_1
   
 
 );
@@ -232,7 +233,8 @@ vc_EqComparator#(tgw) cmp_1
   .out (cmp_1_out)
 );
 
-assign tag_match = cmp_0_out | cmp_1_out;
+assign tag_match_0 = cmp_0_out;
+assign tag_match_1 = cmp_1_out;
 
 //mk_addr_tag_array_0
 logic [(abw - 1):0]mk_addr_tag_array_read_data_0;
@@ -272,7 +274,7 @@ logic [abw-1:0] memreq_addr_mux_out;
 vc_Mux3#(abw) memreq_addr_mux 
 (
   .in0  (evict_addr_reg_out_0),
-  .in1  (evict_addr_reg_out_1)
+  .in1  (evict_addr_reg_out_1),
   .in2  (cachereq_addr_reg_out), 
   .sel  (memreq_addr_mux_sel),
   .out  (memreq_addr_mux_out)
