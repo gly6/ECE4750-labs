@@ -674,7 +674,7 @@ def random_rantypedata_dt (base_addr):
   num_inst = 0 
   now = datetime.now()
   current_time = now.strftime("%H:%M:%S")
-  name = "random_rantypedata.txt"
+  name = "random_rantypedata_dt.txt"
   if os.path.exists(name):
     os.remove(name)
   with open(name, "w") as f:
@@ -714,7 +714,7 @@ def random_ranaddrtypedata_dt (base_addr):
   num_inst = 0 
   now = datetime.now()
   current_time = now.strftime("%H:%M:%S")
-  name = "random_ranaddrtypedata.txt"
+  name = "random_ranaddrtypedata_dt.txt"
   addr_array = [] 
   if os.path.exists(name):
     os.remove(name)
@@ -732,6 +732,48 @@ def random_ranaddrtypedata_dt (base_addr):
     addr = addr_array[i]
     num_inst = read_request_dt (addr, refcache, refmem, reftag, num_inst, random_ranaddrtypedata_dt_msgs, name)
   return random_ranaddrtypedata_dt_msgs
+
+def random_ranaddrtypedata_dt_1 (base_addr):
+  random_ranaddrtypedata_dt_1_msgs = []
+  refmem = {} 
+  reftag = set()  
+  refcache = [[-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1]]
+  num_inst = 0 
+  now = datetime.now()
+  current_time = now.strftime("%H:%M:%S")
+  name = "random_ranaddrtypedata_dt_1.txt"
+  addr_array = [] 
+  if os.path.exists(name):
+    os.remove(name)
+  with open(name, "w") as f:
+    f.write("Data for random address patterns, random request type, random data " + current_time + "\n")  
+  for i in range(100):
+    req_type = random.randint(0, 1)
+    addr = random.randint(0, 0x000007F) << 2
+    addr_array.append(addr)
+    if (req_type == 0):
+      num_inst = write_request_dt (addr, refcache, refmem, reftag, num_inst, random_ranaddrtypedata_dt_1_msgs, name)
+    else: 
+      num_inst = read_request_dt (addr, refcache, refmem, reftag, num_inst, random_ranaddrtypedata_dt_1_msgs, name)
+  for i in range(100):
+    addr = addr_array[i]
+    num_inst = read_request_dt (addr, refcache, refmem, reftag, num_inst, random_ranaddrtypedata_dt_1_msgs, name)
+  return random_ranaddrtypedata_dt_1_msgs
  
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Created Assoc Test Cases 
@@ -984,7 +1026,286 @@ def lru_replacement_mem(base_addr):
     0x00000100, 0x00000003,
     0x00000180, 0x00000004,
   ]
-  
+
+def cacheline_int_assoc (tag, index, cache, tag_mem, msgs, num, lru, name): 
+  tag_mem.add(tag)
+  offset = ['0', '4', '8', 'c']
+  for i in range (4): 
+    if (i == 0): 
+      hit = 0 
+    else:
+      hit = 1
+    addr_hex = tag + offset[i]
+    data = random.randint(0, 0xFFFFFFFF)
+    cache[lru][index][i+1] = data 
+    addr = int(addr_hex, 16) 
+    with open(name, "a") as f:
+      f.write("wr " + "addr " + addr_hex + " data " + str(data) + " hit " + str(hit) + " index " + str(index) + " lru " + str(lru) + "\n")  
+    msgs.extend([req('wr', num, addr, 0, data), resp('wr', num, hit, 0, 0)])
+    num += 1
+    if (num > 255): num = 0
+  return num     
+
+def cacheline_refill_assoc (tag, index, cache, mem, lru):
+  offset = ['0', '4', '8', 'c']
+  for i in range(4):
+    addr_hex = tag + offset[i]
+    if (addr_hex not in mem):
+      data = 0
+    else: 
+      data = mem[addr_hex]
+    cache[lru][index][i+1] = data 
+    
+def cacheline_evict_assoc (index, cache, mem, lru):
+  offset = ['0', '4', '8', 'c']
+  tag_hex = '{:07x}'.format(cache[lru][index][0])
+  for i in range(4):
+    addr_hex = tag_hex + offset[i] 
+    mem[addr_hex] = cache[lru][index][i+1]
+
+def read_request_assoc (addr, refcache, refmem, reftag, num_inst, msgs, lru_array, name): 
+  offset_dic = {'0':1, '4':2, '8':3, 'c':4} 
+  addr_hex = '{:08x}'.format(addr)
+  offset_hex = addr_hex[-1]
+  tag_hex = addr_hex[:len(addr_hex)-1]
+  addr_bin = '{:032b}'.format(addr)
+  index_bin = addr_bin[25:28]
+  tag = int(tag_hex,16)
+  index = int(index_bin, 2)
+  offset = int(offset_hex, 16)
+  hit = 1
+  lru = lru_array[index]
+  if ((refcache[0][index][0] != tag) and (refcache[1][index][0] != tag)):
+    if (refcache[lru][index][0] != -1):
+      cacheline_evict_assoc(index, refcache, refmem, lru)
+    if (tag_hex not in reftag):
+      num_inst = cacheline_int_assoc (tag_hex, index, refcache, reftag, msgs, num_inst, lru, name)
+    else: 
+      cacheline_refill_assoc(tag_hex, index, refcache, refmem, lru)
+      hit = 0
+    refcache[lru][index][0] = tag
+    lru_array[index] = flipbit(lru)
+  else: 
+    if (refcache[lru][index][0] == tag):
+      lru_array[index] = flipbit(lru)
+  if (refcache[0][index][0] == tag):
+    data = refcache[0][index][offset_dic[offset_hex]]
+  else:
+    data = refcache[1][index][offset_dic[offset_hex]]
+  with open(name, "a") as f:
+    f.write("rd " + "addr " + addr_hex + " data " + str(data) + " hit " + str(hit) + " index " + str(index) + " lru " + str(lru) + "\n")
+  msgs.extend([req('rd', num_inst, addr, 0, 0),resp('rd', num_inst, hit, 0, data)])
+  num_inst += 1
+  if (num_inst > 255): num_inst = 0
+  return num_inst
+
+def write_request_assoc (addr, refcache, refmem, reftag, num_inst, msgs, lru_array, name):
+  offset_dic = {'0':1, '4':2, '8':3, 'c':4} 
+  addr_hex = '{:08x}'.format(addr)
+  offset_hex = addr_hex[-1]
+  tag_hex = addr_hex[:len(addr_hex)-1]
+  addr_bin = '{:032b}'.format(addr)
+  index_bin = addr_bin[25:28]
+  tag = int(tag_hex,16)
+  index = int(index_bin, 2)
+  offset = int(offset_hex, 16)
+  hit = 1
+  lru = lru_array[index]
+  data = random.randint(0, 0xFFFFFFFF)
+  if ((refcache[0][index][0] != tag) and (refcache[1][index][0] != tag)):
+    if (refcache[lru][index][0] != -1):
+      cacheline_evict_assoc(index, refcache, refmem, lru)
+    if (tag_hex not in reftag):
+      num_inst = cacheline_int_assoc (tag_hex, index, refcache, reftag, msgs, num_inst, lru, name)
+    else: 
+      cacheline_refill_assoc(tag_hex, index, refcache, refmem, lru)
+      hit = 0
+    refcache[lru][index][0] = tag
+    lru_array[index] = flipbit(lru)
+  else: 
+    if (refcache[lru][index][0] == tag):
+      lru_array[index] = flipbit(lru)
+  if (refcache[0][index][0] == tag):
+      refcache[0][index][offset_dic[offset_hex]] = data
+  else:
+      refcache[1][index][offset_dic[offset_hex]] = data
+  with open(name, "a") as f:
+    f.write("wr " + "addr " + addr_hex + " data " + str(data) + " hit " + str(hit) + " index " + str(index) + " lru " + str(lru) + "\n")
+  msgs.extend([req('wr', num_inst, addr, 0, data),resp('wr', num_inst, hit, 0, 0)])
+  num_inst += 1
+  if (num_inst > 255): num_inst = 0
+  return num_inst
+
+def random_randata_assoc (base_addr):
+  random_randata_assoc_msgs = []
+  refmem = {} 
+  reftag = set()  
+  refcache_0 = [[-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1]]
+  refcache_1 =[[-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1]]
+  lru_array = [0, 0, 0, 0, 0, 0, 0, 0]
+  refcache = [refcache_0, refcache_1]
+  num_inst = 0 
+  now = datetime.now()
+  current_time = now.strftime("%H:%M:%S")
+  name = "random_randata_assoc.txt"
+  addr_array = [] 
+  if os.path.exists(name):
+    os.remove(name)
+  with open(name, "w") as f:
+    f.write("Data for simple address patterns, simple request type, random data " + current_time + "\n") 
+  for i in range(75):
+    addr = i << 2
+    num_inst = read_request_assoc (addr, refcache, refmem, reftag, num_inst, random_randata_assoc_msgs, lru_array, name)
+  for i in range(75):
+    addr = i << 2 
+    num_inst = read_request_assoc (addr, refcache, refmem, reftag, num_inst, random_randata_assoc_msgs, lru_array, name)
+  return random_randata_assoc_msgs
+
+def random_rantypedata_assoc (base_addr):
+  random_rantypedata_assoc_msgs = []
+  refmem = {} 
+  reftag = set()  
+  refcache_0 = [[-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1]]
+  refcache_1 =[[-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1]]
+  lru_array = [0, 0, 0, 0, 0, 0, 0, 0]
+  refcache = [refcache_0, refcache_1]
+  num_inst = 0 
+  now = datetime.now()
+  current_time = now.strftime("%H:%M:%S")
+  name = "random_rantypedata_assoc.txt"
+  addr_array = [] 
+  if os.path.exists(name):
+    os.remove(name)
+  with open(name, "w") as f:
+    f.write("Data for simple address patterns, random request type, random data " + current_time + "\n") 
+  for i in range(75):
+    addr = i << 2
+    req_type = random.randint(0, 1)
+    if (req_type == 0):
+        num_inst = read_request_assoc (addr, refcache, refmem, reftag, num_inst, random_rantypedata_assoc_msgs, lru_array, name)
+    else:
+        num_inst = write_request_assoc (addr, refcache, refmem, reftag, num_inst, random_rantypedata_assoc_msgs, lru_array, name)
+  for i in range(75):
+    addr = i << 2 
+    num_inst = read_request_assoc (addr, refcache, refmem, reftag, num_inst, random_rantypedata_assoc_msgs, lru_array, name)
+  return random_rantypedata_assoc_msgs
+
+def random_ranaddrtypedata_assoc (base_addr):
+  random_ranaddrtypedata_assoc_msgs = []
+  refmem = {} 
+  reftag = set()  
+  refcache_0 = [[-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1]]
+  refcache_1 =[[-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1]]
+  lru_array = [0, 0, 0, 0, 0, 0, 0, 0]
+  refcache = [refcache_0, refcache_1]
+  num_inst = 0 
+  now = datetime.now()
+  current_time = now.strftime("%H:%M:%S")
+  name = "random_ranaddrtypedata_assoc.txt"
+  addr_array = [] 
+  if os.path.exists(name):
+    os.remove(name)
+  with open(name, "w") as f:
+    f.write("Data for random address patterns, random request type, random data " + current_time + "\n") 
+  for i in range(100):
+    addr = random.randint(0, 0x0000FFFF) << 2
+    addr_array.append(addr) 
+    req_type = random.randint(0, 1)
+    if (req_type == 0):
+        num_inst = read_request_assoc (addr, refcache, refmem, reftag, num_inst, random_ranaddrtypedata_assoc_msgs, lru_array, name)
+    else:
+        num_inst = write_request_assoc (addr, refcache, refmem, reftag, num_inst, random_ranaddrtypedata_assoc_msgs, lru_array, name)
+  for i in range(100):
+    addr = addr_array[i]
+    num_inst = read_request_assoc (addr, refcache, refmem, reftag, num_inst, random_ranaddrtypedata_assoc_msgs, lru_array, name)
+  return random_ranaddrtypedata_assoc_msgs
+
+def random_ranaddrtypedata_assoc_1 (base_addr):
+  random_ranaddrtypedata_assoc_1_msgs = []
+  refmem = {} 
+  reftag = set()  
+  refcache_0 = [[-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1]]
+  refcache_1 =[[-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1],
+            [-1,-1,-1,-1,-1]]
+  lru_array = [0, 0, 0, 0, 0, 0, 0, 0]
+  refcache = [refcache_0, refcache_1]
+  num_inst = 0 
+  now = datetime.now()
+  current_time = now.strftime("%H:%M:%S")
+  name = "random_ranaddrtypedata_assoc_1.txt"
+  addr_array = [] 
+  if os.path.exists(name):
+    os.remove(name)
+  with open(name, "w") as f:
+    f.write("Data for random address patterns, random request type, random data " + current_time + "\n") 
+  for i in range(100):
+    addr = random.randint(0, 0x0000007F) << 2
+    addr_array.append(addr) 
+    req_type = random.randint(0, 1)
+    if (req_type == 0):
+        num_inst = read_request_assoc (addr, refcache, refmem, reftag, num_inst, random_ranaddrtypedata_assoc_1_msgs, lru_array, name)
+    else:
+        num_inst = write_request_assoc (addr, refcache, refmem, reftag, num_inst, random_ranaddrtypedata_assoc_1_msgs, lru_array, name)
+  for i in range(100):
+    addr = addr_array[i]
+    num_inst = read_request_assoc (addr, refcache, refmem, reftag, num_inst, random_ranaddrtypedata_assoc_1_msgs, lru_array, name)
+  return random_ranaddrtypedata_assoc_1_msgs
+
 
 #----------------------------------------------------------------------
 # Banked cache test
@@ -1045,20 +1366,24 @@ def test_generic( test_params, dump_vcd ):
 #-------------------------------------------------------------------------
 
 test_case_table_set_assoc = mk_test_case_table([
-  (                           "msg_func               mem_data_func               nbank stall lat src sink"),
-  [ "read_hit_asso",          read_hit_asso,          None,                       0,    0.0,  0,  0,  0    ],
-  [ "read_hit_clean",         read_hit_clean,         None,                       0,    0.0,  0,  0,  0    ],
-  [ "write_hit_clean",        write_hit_clean,        None,                       0,    0.0,  0,  0,  0    ],
-  [ "read_hit_dirty",         read_hit_dirty,         read_hit_dirty_mem,         0,    0.0,  0,  0,  0    ],
-  [ "write_hit_dirty",        write_hit_dirty,        write_hit_dirty_mem,        0,    0.0,  0,  0,  0    ],
-  [ "read_miss_wr_woe",       read_miss_wr_woe,       read_miss_wr_woe_mem,       0,    0.0,  0,  0,  0    ],
-  [ "write_miss_wr_woe",      write_miss_wr_woe,      write_miss_wr_woe_mem,      0,    0.0,  0,  0,  0    ],
-  [ "read_miss_wr_we_assoc",  read_miss_wr_we_assoc,  read_miss_wr_we_assoc_mem,  0,    0.0,  0,  0,  0    ],
-  [ "write_miss_wr_we_assoc", write_miss_wr_we_assoc, write_miss_wr_we_assoc_mem, 0,    0.0,  0,  0,  0    ],
-  [ "conflict_miss_assoc",    conflict_miss_assoc,    conflict_miss_assoc_mem,    0,    0.0,  0,  0,  0    ], 
-  [ "conflict_miss_assoc_1",  conflict_miss_assoc_1,  conflict_miss_assoc_mem_1,  0,    0.0,  0,  0,  0    ], 
-  [ "stress_assoc",           stress_assoc,           stress_assoc_mem,           0,    0.0,  0,  0,  0    ],
-  [ "lru_replacement",        lru_replacement,        lru_replacement_mem,        0,    0.0,  0,  0,  0    ],
+  (                                   "msg_func                       mem_data_func               nbank stall lat src sink"),
+  [ "read_hit_asso",                  read_hit_asso,                  None,                       0,    0.0,  0,  0,  0    ],
+  [ "read_hit_clean",                 read_hit_clean,                 None,                       0,    0.0,  0,  0,  0    ],
+  [ "write_hit_clean",                write_hit_clean,                None,                       0,    0.0,  0,  0,  0    ],
+  [ "read_hit_dirty",                 read_hit_dirty,                 read_hit_dirty_mem,         0,    0.0,  0,  0,  0    ],
+  [ "write_hit_dirty",                write_hit_dirty,                write_hit_dirty_mem,        0,    0.0,  0,  0,  0    ],
+  [ "read_miss_wr_woe",               read_miss_wr_woe,               read_miss_wr_woe_mem,       0,    0.0,  0,  0,  0    ],
+  [ "write_miss_wr_woe",              write_miss_wr_woe,              write_miss_wr_woe_mem,      0,    0.0,  0,  0,  0    ],
+  [ "read_miss_wr_we_assoc",          read_miss_wr_we_assoc,          read_miss_wr_we_assoc_mem,  0,    0.0,  0,  0,  0    ],
+  [ "write_miss_wr_we_assoc",         write_miss_wr_we_assoc,         write_miss_wr_we_assoc_mem, 0,    0.0,  0,  0,  0    ],
+  [ "conflict_miss_assoc",            conflict_miss_assoc,            conflict_miss_assoc_mem,    0,    0.0,  0,  0,  0    ], 
+  [ "conflict_miss_assoc_1",          conflict_miss_assoc_1,          conflict_miss_assoc_mem_1,  0,    0.0,  0,  0,  0    ], 
+  [ "stress_assoc",                   stress_assoc,                   stress_assoc_mem,           0,    0.0,  0,  0,  0    ],
+  [ "lru_replacement",                lru_replacement,                lru_replacement_mem,        0,    0.0,  0,  0,  0    ],
+  [ "random_randata_assoc",           random_randata_assoc,           None,                       0,    0.0,  0,  0,  0    ],
+  [ "random_rantypedata_assoc",       random_rantypedata_assoc,       None,                       0,    0.0,  0,  0,  0    ],
+  [ "random_ranaddrtypedata_assoc",   random_ranaddrtypedata_assoc,   None,                       0,    0.0,  0,  0,  0    ],
+  [ "random_ranaddrtypedata_assoc_1", random_ranaddrtypedata_assoc_1, None,                       0,    0.0,  0,  0,  0,   ],
 
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # LAB TASK: Add test cases to this table
@@ -1089,24 +1414,25 @@ def test_set_assoc( test_params, dump_vcd ):
 #-------------------------------------------------------------------------
 
 test_case_table_dir_mapped = mk_test_case_table([
-  (                               "msg_func                   mem_data_func                   nbank stall lat src sink"),
-  [ "read_hit_dmap",              read_hit_dmap,              None,                           0,    0.0,  0,  0,  0    ],
-  [ "read_hit_clean",             read_hit_clean,             None,                           0,    0.0,  0,  0,  0    ],
-  [ "write_hit_clean",            write_hit_clean,            None,                           0,    0.0,  0,  0,  0    ],
-  [ "read_hit_dirty",             read_hit_dirty,             read_hit_dirty_mem,             0,    0.0,  0,  0,  0    ],
-  [ "write_hit_dirty",            write_hit_dirty,            write_hit_dirty_mem,            0,    0.0,  0,  0,  0    ],
-  [ "read_miss_wr_woe",           read_miss_wr_woe,           read_miss_wr_woe_mem,           0,    0.0,  0,  0,  0    ],
-  [ "write_miss_wr_woe",          write_miss_wr_woe,          write_miss_wr_woe_mem,          0,    0.0,  0,  0,  0    ],
-  [ "read_miss_wr_we_dt",         read_miss_wr_we_dt,         read_miss_wr_we_dt_mem,         0,    0.0,  0,  0,  0    ],
-  [ "write_miss_wr_we_dt",        write_miss_wr_we_dt,        write_miss_wr_we_dt_mem,        0,    0.0,  0,  0,  0    ],
-  [ "conflict_miss_dt",           conflict_miss_dt,           conflict_miss_dt_mem,           0,    0.0,  0,  0,  0    ], 
-  [ "conflict_miss_dt_1",         conflict_miss_dt_1,         conflict_miss_dt_mem_1,         0,    0.0,  0,  0,  0    ], 
-  [ "stress_dt",                  stress_dt,                  stress_dt_mem,                  0,    0.0,  0,  0,  0    ],
-  [ "capacity_dt",                capacity_dt,                capacity_dt_mem,                0,    0.0,  0,  0,  0    ],
-  [ "random_randata_dt",          random_randata_dt,          None,                           0,    0.0,  0,  0,  0    ],
-  [ "random_rantypedata_dt",      random_rantypedata_dt,      None,                           0,    0.0,  0,  0,  0    ],
-  [ "random_ranaddrtypedata_dt",  random_ranaddrtypedata_dt,  None,                           0,    0.0,  0,  0,  0    ],
-  [ "check_random_test_dt",       check_random_test_dt,       None,                           0,    0.0,  0,  0,  0    ],
+  (                                 "msg_func                     mem_data_func                   nbank stall lat src sink"),
+  [ "read_hit_dmap",                read_hit_dmap,                None,                           0,    0.0,  0,  0,  0    ],
+  [ "read_hit_clean",               read_hit_clean,               None,                           0,    0.0,  0,  0,  0    ],
+  [ "write_hit_clean",              write_hit_clean,              None,                           0,    0.0,  0,  0,  0    ],
+  [ "read_hit_dirty",               read_hit_dirty,               read_hit_dirty_mem,             0,    0.0,  0,  0,  0    ],
+  [ "write_hit_dirty",              write_hit_dirty,              write_hit_dirty_mem,            0,    0.0,  0,  0,  0    ],
+  [ "read_miss_wr_woe",             read_miss_wr_woe,             read_miss_wr_woe_mem,           0,    0.0,  0,  0,  0    ],
+  [ "write_miss_wr_woe",            write_miss_wr_woe,            write_miss_wr_woe_mem,          0,    0.0,  0,  0,  0    ],
+  [ "read_miss_wr_we_dt",           read_miss_wr_we_dt,           read_miss_wr_we_dt_mem,         0,    0.0,  0,  0,  0    ],
+  [ "write_miss_wr_we_dt",          write_miss_wr_we_dt,          write_miss_wr_we_dt_mem,        0,    0.0,  0,  0,  0    ],
+  [ "conflict_miss_dt",             conflict_miss_dt,             conflict_miss_dt_mem,           0,    0.0,  0,  0,  0    ], 
+  [ "conflict_miss_dt_1",           conflict_miss_dt_1,           conflict_miss_dt_mem_1,         0,    0.0,  0,  0,  0    ], 
+  [ "stress_dt",                    stress_dt,                    stress_dt_mem,                  0,    0.0,  0,  0,  0    ],
+  [ "capacity_dt",                  capacity_dt,                  capacity_dt_mem,                0,    0.0,  0,  0,  0    ],
+  [ "random_randata_dt",            random_randata_dt,            None,                           0,    0.0,  0,  0,  0    ],
+  [ "random_rantypedata_dt",        random_rantypedata_dt,        None,                           0,    0.0,  0,  0,  0    ],
+  [ "random_ranaddrtypedata_dt",    random_ranaddrtypedata_dt,    None,                           0,    0.0,  0,  0,  0    ],
+  [ "check_random_test_dt",         check_random_test_dt,         None,                           0,    0.0,  0,  0,  0    ],
+  [ "random_ranaddrtypedata_dt_1",  random_ranaddrtypedata_dt_1,  None,                           0,    0.0,  0,  0,  0    ],
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # LAB TASK: Add test cases to this table
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
