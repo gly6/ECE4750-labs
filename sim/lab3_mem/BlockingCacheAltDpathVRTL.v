@@ -280,7 +280,7 @@ assign mk_addr_tag_array_read_data_1 = {tag_array_read_data_1, 4'b0000};
  
 //mk_addr cachereq_addr_reg
 logic [31:0] mk_addr_cachereq_addr_reg_out;
-assign mk_addr_cachereq_addr_reg_out = {mk_addr_cachereq_addr_reg_out[31:4], 4'b0000};
+assign mk_addr_cachereq_addr_reg_out = {cachereq_addr_reg_out[31:4], 4'b0000};
 
 //Fifth column of datapath
 
@@ -309,7 +309,7 @@ vc_Mux3#(abw) memreq_addr_mux
 (
   .in0  (evict_addr_reg_out_0),
   .in1  (evict_addr_reg_out_1),
-  .in2  (cachereq_addr_reg_out), 
+  .in2  (mk_addr_cachereq_addr_reg_out), 
   .sel  (memreq_addr_mux_sel),
   .out  (memreq_addr_mux_out)
 );
