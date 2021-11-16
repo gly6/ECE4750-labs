@@ -271,7 +271,8 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
 
 
 
-  logic [1:0] hit_in = {1'b0, (tag_match_0 || tag_match_1) && (read_data_val_0 || read_data_val_1)};
+  //logic [1:0] hit_in = {1'b0, (tag_match_0 || tag_match_1) && (read_data_val_0 || read_data_val_1)};
+  logic [1:0] hit_in = {1'b0, (tag_match_0 && read_data_val_0) || (tag_match_1 && read_data_val_1)};
   vc_EnReg#(2) hit_reg 
   (
     .clk    (clk),
