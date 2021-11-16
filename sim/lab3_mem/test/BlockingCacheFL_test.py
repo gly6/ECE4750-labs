@@ -1029,14 +1029,14 @@ def shorter_conflict_miss_assoc_1 (base_addr):
    return [
     #    type  opq   addr      len  data               type  opq test len  data
     req( 'rd', 0x00, 0x00000000, 0, 0          ), resp('rd', 0x00, 0, 0, 0xdeadbeef ), #replace index 0 lru 1
-    req( 'rd', 0x04, 0x00000010, 0, 0          ), resp('rd', 0x04, 0, 0, 0xdededede ), #replace index 1 lru 1 
-    req( 'wr', 0x05, 0x00001000, 0, 0x00000010 ), resp('wr', 0x05, 0, 0, 0          ), #replace index 0 lru 0
-    req( 'rd', 0x05, 0x00001000, 0, 0          ), resp('rd', 0x05, 1, 0, 0x00000010 ), 
-    req( 'rd', 0x09, 0x00000000, 0, 0          ), resp('rd', 0x09, 1, 0, 0xdeadbeef ), #lru 1
-    req( 'wr', 0x09, 0x00002000, 0, 0x00000020 ), resp('rd', 0x09, 0, 0, 0          ), #evict and replace index 0 lru 0
-    req( 'rd', 0x10, 0x00002000, 0, 0          ), resp('rd', 0x10, 1, 0, 0x00000020 ), 
-    req( 'rd', 0x14, 0x00000000, 0, 0          ), resp('rd', 0x14, 1, 0, 0xdeadbeef ), #lru 1
-    req( 'rd', 0x15, 0x00001000, 0, 0          ), resp('rd', 0x15, 0, 0, 0x00000010 ), #evict and replace index 0 lru 0
+    req( 'rd', 0x01, 0x00000010, 0, 0          ), resp('rd', 0x01, 0, 0, 0xdededede ), #replace index 1 lru 1 
+    req( 'wr', 0x02, 0x00001000, 0, 0x00000010 ), resp('wr', 0x02, 0, 0, 0          ), #replace index 0 lru 0
+    req( 'rd', 0x03, 0x00001000, 0, 0          ), resp('rd', 0x03, 1, 0, 0x00000010 ), 
+    req( 'rd', 0x04, 0x00000000, 0, 0          ), resp('rd', 0x04, 1, 0, 0xdeadbeef ), #lru 1
+    req( 'wr', 0x05, 0x00002000, 0, 0x00000020 ), resp('rd', 0x05, 0, 0, 0          ), #evict and replace index 0 lru 0
+    req( 'rd', 0x06, 0x00002000, 0, 0          ), resp('rd', 0x06, 1, 0, 0x00000020 ), 
+    req( 'rd', 0x07, 0x00000000, 0, 0          ), resp('rd', 0x07, 1, 0, 0xdeadbeef ), #lru 1
+    req( 'rd', 0x08, 0x00001000, 0, 0          ), resp('rd', 0x08, 0, 0, 0x00000010 ), #evict and replace index 0 lru 0
  
   ]
 def shorter_conflict_miss_assoc_mem_1( base_addr ):
