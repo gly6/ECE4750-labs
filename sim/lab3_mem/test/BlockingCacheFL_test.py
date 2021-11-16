@@ -1100,6 +1100,15 @@ def lru_replacement_mem(base_addr):
     0x00000180, 0x00000004,
   ]
 
+def lru_replacement_1 (base_addr): 
+   return [
+    #    type  opq   addr      len  data               type  opq test len  data
+    req( 'rd', 0x00, 0x00000180, 0, 0          ), resp('rd', 0x00, 0, 0, 0x00000004 ), 
+    req( 'rd', 0x01, 0x00000000, 0, 0          ), resp('rd', 0x01, 0, 0, 0x00000001 ), 
+    req( 'rd', 0x02, 0x00000000, 0, 0          ), resp('rd', 0x02, 1, 0, 0x00000001 ), 
+    req( 'rd', 0x03, 0x00000180, 0, 0          ), resp('rd', 0x03, 1, 0, 0x00000004 ), 
+   ] 
+
 def cacheline_int_assoc (tag, index, cache, tag_mem, msgs, num, lru, name): 
   tag_mem.add(tag)
   offset = ['0', '4', '8', 'c']
@@ -1468,6 +1477,7 @@ test_case_table_set_assoc = mk_test_case_table([
   [ "shorter_conflict_miss_assoc_1",  shorter_conflict_miss_assoc_1,  shorter_conflict_miss_assoc_mem_1,  0,    0.0,  0,  0,  0    ],
   [ "conflict_miss_assoc_1",          conflict_miss_assoc_1,          conflict_miss_assoc_mem_1,          0,    0.0,  0,  0,  0    ], 
   [ "stress_assoc",                   stress_assoc,                   stress_assoc_mem,                   0,    0.0,  0,  0,  0    ],
+  [ "lru_replacement_1",              lru_replacement_1,              lru_replacement_mem,                0,    0.0,  0,  0,  0    ],
   [ "lru_replacement",                lru_replacement,                lru_replacement_mem,                0,    0.0,  0,  0,  0    ],
   [ "random_randata_assoc",           random_randata_assoc,           None,                               0,    0.0,  0,  0,  0    ],
   [ "random_rantypedata_assoc",       random_rantypedata_assoc,       None,                               0,    0.0,  0,  0,  0    ],
