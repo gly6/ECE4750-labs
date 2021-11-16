@@ -81,6 +81,8 @@ module lab3_mem_BlockingCacheAltVRTL
    logic data_array_ren;
    logic data_array_wen;
    logic [15:0] data_array_wben;
+   logic [15:0] data_array_wben_0;
+   logic [15:0] data_array_wben_1;
    logic read_data_reg_en;
    logic tag_match_0;
    logic tag_match_1;
@@ -98,7 +100,13 @@ module lab3_mem_BlockingCacheAltVRTL
    logic  valid_in;
    logic  dirty_in;
    logic  wen_dirty;
-
+   logic data_array_ren_0;
+   logic data_array_ren_1;
+   logic data_array_wen_0;
+   logic data_array_wen_1;
+   logic read_data_reg_en_0;
+   logic read_data_reg_en_1;
+   logic read_data_mux_sel; 
 
 
   //----------------------------------------------------------------------

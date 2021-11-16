@@ -83,10 +83,16 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
   output logic                        tag_array_wen_0,
   output logic                        tag_array_ren_1,
   output logic                        tag_array_wen_1,
-  output logic                        data_array_ren,
-  output logic                        data_array_wen,
-  output logic  [15:0]                data_array_wben,
+  output logic                        data_array_ren_0,
+  output logic                        data_array_wen_0,
+  output logic                        data_array_ren_1,
+  output logic                        data_array_wen_1,
+  output logic  [15:0]                data_array_wben_0,
+  output logic  [15:0]                data_array_wben_1,
   output logic                        read_data_reg_en,
+  output logic                        read_data_reg_en_0,
+  output logic                        read_data_reg_en_1,
+  output logic                        read_data_mux_sel,
   input  logic                        tag_match_0,
   input  logic                        tag_match_1,
   output logic                        evict_addr_reg_en_0,
@@ -98,6 +104,9 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
   output logic  [2:0]                 memreq_type,
   output logic                        tag_array_ren,
   output logic                        tag_array_wen,
+  output logic                        data_array_ren,
+  output logic                        data_array_wen,
+  output logic [15:0]                 data_array_wben,
   output logic                        wen_val,
   output logic                        evict_addr_reg_en,
   output logic                        valid_in,
@@ -170,8 +179,8 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
   //----------------------------------------------------------------------
 
 // Valid,dirty wires for set0
-  logic valid_in_0;
-  logic dirty_in_0;
+  logic valid_in;
+  logic dirty_in;
 
   logic read_data_dirty_0;
   logic wen_dirty_0 = 0;
@@ -180,8 +189,8 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
   logic wen_val_0;
 
 // Valid,dirty wires for set1
-  logic valid_in_1;
-  logic dirty_in_1;
+//  logic valid_in_1;
+//  logic dirty_in_1;
 
   logic read_data_dirty_1;
   logic wen_dirty_1 = 0;
@@ -205,7 +214,7 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
     .read_data(read_data_dirty_0),
     .write_en(wen_dirty_0),
     .write_addr(cachereq_addr[(idw + ofw - 1 + p_idx_shamt):(ofw + p_idx_shamt)]),
-    .write_data(dirty_in_0)
+    .write_data(dirty_in)
 
   );
 
@@ -217,7 +226,7 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
     .read_data(read_data_val_0),
     .write_en(wen_val_0),
     .write_addr(cachereq_addr[(idw + ofw - 1 + p_idx_shamt):(ofw + p_idx_shamt)]),
-    .write_data(valid_in_0)
+    .write_data(valid_in)
   );
 
 // Dirty and Valid Set 1
@@ -230,7 +239,7 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
     .read_data(read_data_dirty_1),
     .write_en(wen_dirty_1),
     .write_addr(cachereq_addr[(idw + ofw - 1 + p_idx_shamt):(ofw + p_idx_shamt)]),
-    .write_data(dirty_in_1)
+    .write_data(dirty_in)
 
   );
 
@@ -242,7 +251,7 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
     .read_data(read_data_val_1),
     .write_en(wen_val_1),
     .write_addr(cachereq_addr[(idw + ofw - 1 + p_idx_shamt):(ofw + p_idx_shamt)]),
-    .write_data(valid_in_1)
+    .write_data(valid_in)
   );
 
 // Used Bit
@@ -305,12 +314,13 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
          if (cachereq_type == 3'b010) state_next = IN;
          //else if ((tag_match_0||tag_match_1) && ( cachereq_type == 0) && (read_data_val_0 || read_data_val_1))  state_next = RD;
          //else if ((tag_match_0||tag_match_1) && ( cachereq_type == 1) && (read_data_val_0 || read_data_val_1))  state_next = WD;
-         //else if ((!(read_data_val_0 || read_data_val_1) || !(tag_match_0 || tag_match_1))  && (read_data_dirty == 0)) state_next = RR; 
          //else if ((!(read_data_val_0 || read_data_val_1) || !(tag_match_0 || tag_match_1)) && (read_data_dirty == 1)) state_next = EP; 
          else if (((tag_match_0 && read_data_val_0) || (tag_match_1 && read_data_val_1)) && (cachereq_type == 0)) state_next = RD; 
          else if (((tag_match_0 && read_data_val_0) || (tag_match_1 && read_data_val_1)) && (cachereq_type == 1)) state_next = WD;
          else if ((read_data_val_0 && read_data_dirty_0 && !read_data_lru) || (read_data_val_1 && read_data_dirty_1 && read_data_lru)) state_next = EP; 
-         else state_next = RR;
+         else if ((!(read_data_val_0 || read_data_val_1) || !(tag_match_0 || tag_match_1))  && (!read_data_dirty_1)) state_next = RR; 
+
+//         else state_next = RR;
        end
 
        IN: begin
@@ -460,11 +470,22 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
 assign wen_dirty_0 = wen_dirty && tag_match_0;
 assign wen_dirty_1 = wen_dirty && tag_match_1;
 assign tag_array_wen_0 = tag_array_wen && !read_data_lru;
+assign tag_array_ren_0 = tag_array_ren;
+assign tag_array_ren_1 = tag_array_ren;
 assign tag_array_wen_1 = tag_array_wen && read_data_lru;
 assign wen_val_0 = wen_val && tag_match_0;
 assign wen_val_1 = wen_val && tag_match_1;
 assign evict_addr_reg_en_0 = evict_addr_reg_en && tag_match_0;
 assign evict_addr_reg_en_1 = evict_addr_reg_en && tag_match_1;
+assign data_array_ren_0 = data_array_ren && tag_match_0;
+assign data_array_ren_1 = data_array_ren && tag_match_1;
+assign data_array_wen_0 = data_array_wen && !read_data_lru;
+assign data_array_wen_1 = data_array_wen && read_data_lru;
+assign read_data_reg_en_0 = read_data_reg_en && tag_match_0;
+assign read_data_reg_en_1 = read_data_reg_en && tag_match_1;
+assign read_data_mux_sel = !(tag_match_0 && read_data_val_0); 
+assign data_array_wben_0 = data_array_wben;// & tag_match_0;
+assign data_array_wben_1 = data_array_wben;// & tag_match_1;
 
 
 always_comb begin

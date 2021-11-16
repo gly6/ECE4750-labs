@@ -47,12 +47,16 @@ module lab3_mem_BlockingCacheAltDpathVRTL
   input logic tag_array_wen_0,
   input logic tag_array_ren_1,
   input logic tag_array_wen_1,
+  input logic data_array_ren,
   input logic data_array_ren_0,
   input logic data_array_wen_0,
+  input logic data_array_wen,
   input logic data_array_ren_1,
   input logic data_array_wen_1,
-  input logic [7:0] data_array_wben_0,
-  input logic [7:0] data_array_wben_1,
+  input logic [15:0] data_array_wben,
+  input logic [15:0] data_array_wben_0,
+  input logic [15:0] data_array_wben_1,
+  input logic read_data_reg_en,
   input logic read_data_reg_en_0,
   input logic read_data_reg_en_1,
   input logic read_data_mux_sel,
@@ -91,7 +95,7 @@ module lab3_mem_BlockingCacheAltDpathVRTL
   localparam tgw  = abw - ofw;       // Short name for the tag bitwidth
 
   //''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // LAB TASK: Implement Dpath
+  // LAB TASK: Implement Dpathdata_array_ren_0
   //'''''''
 
 //First column of datapath
@@ -140,6 +144,7 @@ vc_EnReg#(3) cachereq_type_reg
 );
 
 logic [o-1:0] cachereq_opaque_reg_out; 
+
 vc_EnReg#(o) cachereq_opaque_reg
 (
   .clk    (clk),
@@ -344,7 +349,7 @@ assign cacheresp_msg.data = read_word_mux_out;
 assign memreq_msg.type_ = memreq_type;
 assign memreq_msg.len = 4'b0000;
 assign memreq_msg.addr = memreq_addr_mux_out;
-assign memreq_msg.data = read_data_reg_out;
+assign memreq_msg.data = read_data_mux_out;
 assign memreq_msg.opaque = 8'b00000000;
 //end memreq_msg'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
