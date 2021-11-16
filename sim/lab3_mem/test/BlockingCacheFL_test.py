@@ -1321,6 +1321,20 @@ def random_ranaddrtypedata_assoc_1 (base_addr):
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # LAB TASK:
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+def banking_zero( base_addr ):
+  return [
+    #    type  opq  addr      len data                type  opq  test len data
+    req( 'in', 0x0, 0x00000000, 0, 0xdeadbeef ), resp( 'in', 0x0, 0,   0,  0          ),
+    req( 'rd', 0x1, 0x00000000, 0, 0          ), resp( 'rd', 0x1, 1,   0,  0xdeadbeef ),
+    req( 'wr', 0x2, 0x00000010, 0, 0x00000001 ), resp( 'wr', 0x2, 0,   0,  0          ), 
+  ]
+
+def banking_four( base_addr ):
+  return [
+    #    type  opq  addr      len data                type  opq  test len data
+    req( 'in', 0x0, 0x00000000, 0, 0xdeadbeef ), resp( 'in', 0x0, 0,   0,  0          ),
+    req( 'rd', 0x1, 0x00000000, 0, 0          ), resp( 'rd', 0x1, 1,   0,  0xdeadbeef ),
+  ]
 
 #-------------------------------------------------------------------------
 # Test table for generic test

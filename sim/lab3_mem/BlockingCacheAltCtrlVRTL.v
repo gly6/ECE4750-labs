@@ -466,27 +466,30 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
     .en(read_word_mux_sel_en),
     .out(read_word_mux_sel)
   );
+logic tag_match_eq; 
+assign tag_match_eq = tag_match_1 && tag_match_0;
 
-assign wen_dirty_0 = wen_dirty && tag_match_0;
-assign wen_dirty_1 = wen_dirty && tag_match_1;
+assign wen_val_0 = wen_val && (tag_match_0 || (state_reg == RU && !read_data_lru));
+assign wen_val_1 = wen_val && ((tag_match_1 && !tag_match_eq) || (state_reg == RU && read_data_lru));
+assign wen_dirty_0 = tag_match_0 && wen_dirty;
+assign wen_dirty_1 = tag_match_0 && !tag_match_eq && wen_dirty;
 assign tag_array_wen_0 = tag_array_wen && !read_data_lru;
+assign tag_array_wen_1 = tag_array_wen && read_data_lru;
+assign evict_addr_reg_en_0 = evict_addr_reg_en && tag_match_0;
+assign evict_addr_reg_en_1 = evict_addr_reg_en && tag_match_1 && !tag_match_eq;
+assign data_array_ren_0 = data_array_ren && tag_match_0;
+assign data_array_ren_1 = data_array_ren && tag_match_1 && !tag_match_eq;
+assign data_array_wen_0 = data_array_wen && (tag_match_0 || tag_array_wen_0);
+assign data_array_wen_1 = data_array_wen && ((tag_match_1 && !tag_match_eq) || tag_array_wen_1);
+assign read_data_reg_en_0 = read_data_reg_en && tag_match_0;
+assign read_data_reg_en_1 = read_data_reg_en && tag_match_1 && !tag_match_eq;
+
+assign read_data_mux_sel = !(tag_match_0 && read_data_val_0); 
+
 assign tag_array_ren_0 = tag_array_ren;
 assign tag_array_ren_1 = tag_array_ren;
-assign tag_array_wen_1 = tag_array_wen && read_data_lru;
-assign wen_val_0 = wen_val && tag_match_0;
-assign wen_val_1 = wen_val && tag_match_1;
-assign evict_addr_reg_en_0 = evict_addr_reg_en && tag_match_0;
-assign evict_addr_reg_en_1 = evict_addr_reg_en && tag_match_1;
-assign data_array_ren_0 = data_array_ren && tag_match_0;
-assign data_array_ren_1 = data_array_ren && tag_match_1;
-assign data_array_wen_0 = data_array_wen && !read_data_lru;
-assign data_array_wen_1 = data_array_wen && read_data_lru;
-assign read_data_reg_en_0 = read_data_reg_en && tag_match_0;
-assign read_data_reg_en_1 = read_data_reg_en && tag_match_1;
-assign read_data_mux_sel = !(tag_match_0 && read_data_val_0); 
 assign data_array_wben_0 = data_array_wben;// & tag_match_0;
 assign data_array_wben_1 = data_array_wben;// & tag_match_1;
-
 
 always_comb begin
  case(state_reg)
@@ -499,7 +502,7 @@ always_comb begin
   RD:cs(0,       0,         0,     0,       0,       0,      1'b0,       0,       0,      1,         0,       0,    	    1,         0,          0,           2'd0,     0,        0,      3'd0,   1'bx,   1'bx,   0,    0,     1    );
   RR:cs(0,       0,         1,     0,       0,       0,      1'b0,       0,       0,      0,         0,       0,    	    0,         0,          0,           2,        0,        0,      3'd0,   1'bx,   1'bx,   0,    0,     0    );
   RW:cs(0,       0,         0,     1,       0,       1,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           0,        0,        0,      3'd0,   1'bx,   1'bx,   0,    0,     0    );
-  RU:cs(0,       0,         0,     0,       0,       0,      1'b1,       0,       1,      0,         1,       write_all,  0,         0,          0,           2'd0,     0,        0,      3'd1,   0,      1,      1,    0,     0    );
+  RU:cs(0,       0,         0,     0,       0,       0,      1'b1,       0,       1,      0,         1,       write_all,  0,         0,          0,           2'd0,     0,        0,      3'd1,   0,      1,      1,    1,     0    );
   EP:cs(0,       0,         0,     0,       0,       0,      1'bx,       1,       0,      1,         0,       0,    	    1,         1,          0,           0,        0,        0,      3'bx,   1'bx,   1'bx,   0,    0,     0    );
   ER:cs(0,       0,         1,     0,       0,       0,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           0,        0,        0,      3'bx,   1'bx,   1'bx,   0,    0,     0    );    
   EW:cs(0,       0,         0,     1,       0,       0,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           2'bx,     0,        1,      3'bx,   1'bx,   1'bx,   0,    0,     0    );
