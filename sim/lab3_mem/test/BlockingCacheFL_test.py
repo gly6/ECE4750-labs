@@ -1033,7 +1033,7 @@ def shorter_conflict_miss_assoc_1 (base_addr):
     req( 'wr', 0x05, 0x00001000, 0, 0x00000010 ), resp('wr', 0x05, 0, 0, 0          ), #replace index 0 lru 0
     req( 'rd', 0x05, 0x00001000, 0, 0          ), resp('rd', 0x05, 1, 0, 0x00000010 ), 
     req( 'rd', 0x09, 0x00000000, 0, 0          ), resp('rd', 0x09, 1, 0, 0xdeadbeef ), #lru 1
-    req( 'wr', 0x09, 0x00002000, 0, 0x00000020 ), resp('rd', 0x09, 0, 0, 0          ), #replace index 0 lru 0
+    req( 'wr', 0x09, 0x00002000, 0, 0x00000020 ), resp('rd', 0x09, 0, 0, 0          ), #evict and replace index 0 lru 0
     req( 'rd', 0x10, 0x00002000, 0, 0          ), resp('rd', 0x10, 1, 0, 0x00000020 ), 
     req( 'rd', 0x14, 0x00000000, 0, 0          ), resp('rd', 0x14, 1, 0, 0xdeadbeef ), #lru 1
     req( 'rd', 0x15, 0x00001000, 0, 0          ), resp('rd', 0x15, 0, 0, 0x00000010 ), #evict and replace index 0 lru 0
