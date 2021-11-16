@@ -484,8 +484,8 @@ assign evict_addr_reg_en_0 = evict_addr_reg_en && !read_data_lru;
 assign evict_addr_reg_en_1 = evict_addr_reg_en && read_data_lru;
 assign data_array_ren_0 = data_array_ren && tag_match_0;
 assign data_array_ren_1 = data_array_ren && tag_match_1 && !tag_match_eq;
-assign data_array_wen_0 = data_array_wen && (tag_match_0 || tag_array_wen_0);
 assign data_array_wen_1 = data_array_wen && ((tag_match_1 && !tag_match_eq) || tag_array_wen_1);
+assign data_array_wen_0 = data_array_wen && !data_array_wen_1;
 assign read_data_reg_en_0 = read_data_reg_en && tag_match_0;
 assign read_data_reg_en_1 = read_data_reg_en && tag_match_1 && !tag_match_eq;
 
