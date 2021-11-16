@@ -47,12 +47,15 @@ module lab3_mem_BlockingCacheAltDpathVRTL
   input logic tag_array_wen_0,
   input logic tag_array_ren_1,
   input logic tag_array_wen_1,
-  input logic tag_array_ren,
-  input logic tag_array_wen,
-  input logic data_array_ren,
-  input logic data_array_wen,
-  input logic [15:0] data_array_wben,
-  input logic read_data_reg_en,
+  input logic data_array_ren_0,
+  input logic data_array_wen_0,
+  input logic data_array_ren_1,
+  input logic data_array_wen_1,
+  input logic [7:0] data_array_wben_0,
+  input logic [7:0] data_array_wben_1,
+  input logic read_data_reg_en_0,
+  input logic read_data_reg_en_1,
+  input logic read_data_mux_sel,
   input logic evict_addr_reg_en_0,
   input logic evict_addr_reg_en_1,
   input logic [1:0] memreq_addr_mux_sel,
@@ -168,7 +171,7 @@ vc_Mux2#(clw) write_data_mux
 
 //Tag and data arrays
 logic [(tgw-1):0] tag_array_read_data_0;
-vc_CombinationalBitSRAM_1rw#(tgw, nbl) tag_array_0
+vc_CombinationalBitSRAM_1rw#(tgw, nby) tag_array_0
 (
   .clk          (clk),
   .reset        (reset),
@@ -181,7 +184,7 @@ vc_CombinationalBitSRAM_1rw#(tgw, nbl) tag_array_0
 );
 
 logic [(tgw-1):0] tag_array_read_data_1;
-vc_CombinationalBitSRAM_1rw#(tgw, nbl) tag_array_1
+vc_CombinationalBitSRAM_1rw#(tgw, nby) tag_array_1
 (
   .clk          (clk),
   .reset        (reset),
@@ -193,30 +196,54 @@ vc_CombinationalBitSRAM_1rw#(tgw, nbl) tag_array_1
   .read_data    (tag_array_read_data_1)
 );
 
-logic [clw - 1:0] data_array_read_data;
-vc_CombinationalSRAM_1rw#(clw , nbl) data_array
+logic [clw - 1:0] data_array_read_data_0;
+vc_CombinationalSRAM_1rw#(clw , nby) data_array_0
 (
   .clk            (clk),
   .reset          (reset),
-  .read_en        (data_array_ren),
+  .read_en        (data_array_ren_0),
   .read_addr      (cachereq_addr_reg_out[(idw + ofw - 1 + p_idx_shamt):(ofw + p_idx_shamt)]),
-  .write_en       (data_array_wen),
+  .write_en       (data_array_wen_0),
   .write_addr     (cachereq_addr_reg_out[(idw + ofw - 1 + p_idx_shamt):(ofw + p_idx_shamt)]),
   .write_data     (write_data_mux_out),
-  .write_byte_en  (data_array_wben),
-  .read_data      (data_array_read_data)
+  .write_byte_en  (data_array_wben_0),
+  .read_data      (data_array_read_data_0)
+);
+
+logic [clw - 1:0] data_array_read_data_1;
+vc_CombinationalSRAM_1rw#(clw , nby) data_array_1
+(
+  .clk            (clk),
+  .reset          (reset),
+  .read_en        (data_array_ren_1),
+  .read_addr      (cachereq_addr_reg_out[(idw + ofw - 1 + p_idx_shamt):(ofw + p_idx_shamt)]),
+  .write_en       (data_array_wen_1),
+  .write_addr     (cachereq_addr_reg_out[(idw + ofw - 1 + p_idx_shamt):(ofw + p_idx_shamt)]),
+  .write_data     (write_data_mux_out),
+  .write_byte_en  (data_array_wben_1),
+  .read_data      (data_array_read_data_1)
 );
 
 //Fourth column of datapath
 
-logic [clw - 1:0] read_data_reg_out;
-vc_EnReg#(clw) read_data_reg
+logic [clw - 1:0] read_data_reg_out_0;
+vc_EnReg#(clw) read_data_reg_0
 (
   .clk    (clk),
   .reset  (reset),
-  .q      (read_data_reg_out),
-  .d      (data_array_read_data),
-  .en     (read_data_reg_en)
+  .q      (read_data_reg_out_0),
+  .d      (data_array_read_data_0),
+  .en     (read_data_reg_en_0)
+);
+
+logic [clw - 1:0] read_data_reg_out_1;
+vc_EnReg#(clw) read_data_reg_1
+(
+  .clk    (clk),
+  .reset  (reset),
+  .q      (read_data_reg_out_1),
+  .d      (data_array_read_data_1),
+  .en     (read_data_reg_en_1)
 );
 
 logic cmp_0_out;
@@ -282,19 +309,23 @@ vc_Mux3#(abw) memreq_addr_mux
   .out  (memreq_addr_mux_out)
 );
 
+logic [clw - 1:0] read_data_mux_out;
+vc_Mux2#(clw) read_data_mux
+(
+  .in0  (read_data_reg_out_0),
+  .in1  (read_data_reg_out_1),
+  .sel  (read_data_mux_sel),
+  .out  (read_data_mux_out)
+);
+
 logic [(clw/4 -1):0] read_word_mux_out;
 vc_Mux5#(clw/4) read_word_mux
 (
-  //.in0    (read_data_reg_out[clw - 1:clw/4 * 3]),
-  //.in1    (read_data_reg_out[(clw/4 * 3 - 1):clw/4 * 2]),
-  //.in2    (read_data_reg_out[(clw/4 * 2 - 1):clw/4]),
-  //.in3    (read_data_reg_out[(clw/4 - 1):0]),
-  //.in4    ('h0),
   .in0    (0), 
-  .in1    (read_data_reg_out[(clw/4 - 1):0]),
-  .in2    (read_data_reg_out[(clw/4 * 2 - 1):clw/4]),
-  .in3    (read_data_reg_out[(clw/4 * 3 - 1):clw/4 * 2]),
-  .in4    (read_data_reg_out[clw - 1:clw/4 * 3]),
+  .in1    (read_data_mux_out[(clw/4 - 1):0]),
+  .in2    (read_data_mux_out[(clw/4 * 2 - 1):clw/4]),
+  .in3    (read_data_mux_out[(clw/4 * 3 - 1):clw/4 * 2]),
+  .in4    (read_data_mux_out[clw - 1:clw/4 * 3]),
   .sel    (read_word_mux_sel),
   .out    (read_word_mux_out)
 );
