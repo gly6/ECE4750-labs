@@ -476,8 +476,8 @@ assign wen_dirty_0 = tag_match_0 && wen_dirty;
 assign wen_dirty_1 = tag_match_0 && !tag_match_eq && wen_dirty;
 assign tag_array_wen_0 = tag_array_wen && !read_data_lru;
 assign tag_array_wen_1 = tag_array_wen && read_data_lru;
-assign evict_addr_reg_en_0 = evict_addr_reg_en && tag_match_0;
-assign evict_addr_reg_en_1 = evict_addr_reg_en && tag_match_1 && !tag_match_eq;
+assign evict_addr_reg_en_0 = evict_addr_reg_en && !read_data_lru;
+assign evict_addr_reg_en_1 = evict_addr_reg_en && read_data_lru;
 assign data_array_ren_0 = data_array_ren && tag_match_0;
 assign data_array_ren_1 = data_array_ren && tag_match_1 && !tag_match_eq;
 assign data_array_wen_0 = data_array_wen && (tag_match_0 || tag_array_wen_0);
@@ -504,9 +504,9 @@ always_comb begin
   RR:cs(0,       0,         1,     0,       0,       0,      1'b0,       0,       0,      0,         0,       0,    	    0,         0,          0,           2,        0,        0,      3'd0,   1'bx,   1'bx,   0,    0,     0    );
   RW:cs(0,       0,         0,     1,       0,       1,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           0,        0,        0,      3'd0,   1'bx,   1'bx,   0,    0,     0    );
   RU:cs(0,       0,         0,     0,       0,       0,      1'b1,       0,       1,      0,         1,       write_all,  0,         0,          0,           2'd0,     0,        0,      3'd1,   0,      1,      1,    1,     0    );
-  EP:cs(0,       0,         0,     0,       0,       0,      1'bx,       1,       0,      1,         0,       0,    	    1,         1,          0,           0,        0,        0,      3'bx,   1'bx,   1'bx,   0,    0,     0    );
-  ER:cs(0,       0,         1,     0,       0,       0,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           0,        0,        0,      3'd1,   1'bx,   1'bx,   0,    0,     0    );    
-  EW:cs(0,       0,         0,     1,       0,       0,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           2'bx,     0,        1,      3'bx,   1'bx,   1'bx,   0,    0,     0    );
+  EP:cs(0,       0,         0,     0,       0,       0,      1'bx,       1,       0,      1,         0,       0,    	    1,         1,          0,           1,        0,        0,      3'bx,   1'bx,   1'bx,   0,    0,     0    );
+  ER:cs(0,       0,         1,     0,       0,       0,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           1,        0,        0,      3'bx,   1'bx,   1'bx,   0,    0,     0    );    
+  EW:cs(0,       0,         0,     1,       0,       0,      1'bx,       0,       0,      0,         0,       0,    	    0,         0,          0,           1,     0,        1,      3'bx,   1'bx,   1'bx,   0,    0,     0    );
   W: cs(0,       1,         0,     0,       0,       0,      1'bx,       1,       0,      0,         0,       0,    	    0,         0,          1,           2'dx,     0,        1,      3'bx,   1'bx,   1'bx,   0,    0,     0    ); 
   default: cs( 0,0,         0,     0,       0,       0,      1'bx,       0,       0,      0,         0,       0,          0,         0,          0,           2'dx,     0,        0,      3'bx,   1'bx,   1'bx,   0,    0,     0    );
   endcase   
