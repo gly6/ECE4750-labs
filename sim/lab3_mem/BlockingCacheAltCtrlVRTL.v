@@ -113,7 +113,7 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
   localparam o    = 8;               // Short name for opaque bitwidth
   localparam clw  = 128;             // Short name for cacheline bitwidth
   localparam nbl  = size*8/clw;      // Number of blocks in the cache
-  localparam nby  = nbl;             // Number of blocks per way
+  localparam nby  = nbl/2;             // Number of blocks per way
   localparam idw  = $clog2(nby);     // Short name for index bitwidth
   localparam ofw  = $clog2(clw/8);   // Short name for the offset bitwidth
   // In this lab, to simplify things, we always use all bits except for the
@@ -307,9 +307,9 @@ module lab3_mem_BlockingCacheAltCtrlVRTL
          //else if ((tag_match_0||tag_match_1) && ( cachereq_type == 1) && (read_data_val_0 || read_data_val_1))  state_next = WD;
          //else if ((!(read_data_val_0 || read_data_val_1) || !(tag_match_0 || tag_match_1))  && (read_data_dirty == 0)) state_next = RR; 
          //else if ((!(read_data_val_0 || read_data_val_1) || !(tag_match_0 || tag_match_1)) && (read_data_dirty == 1)) state_next = EP; 
-         else if (((tag_match_0 && read_data_val_0) || (tag_match_1 && read_data_val_1)) && (cachereq_type = 0)) state_next = RD; 
-         else if (((tag_match_0 && read_data_val_0) || (tag_match_1 && read_data_val_1)) && (cachereq_type = 1)) state_next = WD;
-         else if ((read_data_val_0 && read_data_dirty_0 && !lru) || (read_data_val_1 && read_data_dirty_1 && lru)) state_next = EP; 
+         else if (((tag_match_0 && read_data_val_0) || (tag_match_1 && read_data_val_1)) && (cachereq_type == 0)) state_next = RD; 
+         else if (((tag_match_0 && read_data_val_0) || (tag_match_1 && read_data_val_1)) && (cachereq_type == 1)) state_next = WD;
+         else if ((read_data_val_0 && read_data_dirty_0 && !read_data_lru) || (read_data_val_1 && read_data_dirty_1 && read_data_lru)) state_next = EP; 
          else state_next = RR;
        end
 

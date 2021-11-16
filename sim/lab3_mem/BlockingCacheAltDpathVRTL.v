@@ -168,7 +168,7 @@ vc_Mux2#(clw) write_data_mux
 
 //Tag and data arrays
 logic [(tgw-1):0] tag_array_read_data_0;
-vc_CombinationalBitSRAM_1rw#(tgw, nbl) tag_array_0
+vc_CombinationalBitSRAM_1rw#(tgw, nby) tag_array_0
 (
   .clk          (clk),
   .reset        (reset),
@@ -181,7 +181,7 @@ vc_CombinationalBitSRAM_1rw#(tgw, nbl) tag_array_0
 );
 
 logic [(tgw-1):0] tag_array_read_data_1;
-vc_CombinationalBitSRAM_1rw#(tgw, nbl) tag_array_1
+vc_CombinationalBitSRAM_1rw#(tgw, nby) tag_array_1
 (
   .clk          (clk),
   .reset        (reset),
