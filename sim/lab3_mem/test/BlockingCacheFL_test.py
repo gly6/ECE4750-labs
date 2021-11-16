@@ -862,6 +862,48 @@ def write_miss_wr_we_assoc_mem( base_addr ):
     0x00002008, 0x00000023,
     0x0000200c, 0x00000024,
   ]
+
+def write_miss_wr_we_assoc_1( base_addr ):
+  return [
+    #    type  opq   addr      len  data               type  opq test len  data
+    req( 'wr', 0x00, 0x00000000, 0, 0x00000030 ), resp('rd', 0x00, 0, 0, 0          ), # read word  0x00000000
+    req( 'rd', 0x00, 0x00000000, 0, 0          ), resp('rd', 0x00, 1, 0, 0x00000030 ),
+    req( 'rd', 0x01, 0x00000004, 0, 0          ), resp('rd', 0x01, 1, 0, 0x00c0ffee ), # read word  0x00000004
+    req( 'rd', 0x02, 0x00000008, 0, 0          ), resp('rd', 0x02, 1, 0, 0xabcdefab ), # read word  0x00000008
+    req( 'rd', 0x03, 0x0000000c, 0, 0          ), resp('rd', 0x03, 1, 0, 0x01234567 ), # read word  0x0000000c
+    req( 'rd', 0x04, 0x00000010, 0, 0          ), resp('rd', 0x04, 0, 0, 0xdededede ), # read word  0x00000010
+    req( 'wr', 0x05, 0x00001000, 0, 0x00000010 ), resp('wr', 0x05, 0, 0, 0          ), # read word  0x00001000
+    req( 'rd', 0x05, 0x00001000, 0, 0          ), resp('rd', 0x05, 1, 0, 0x00000010 ), # read word  0x00001000
+    req( 'rd', 0x06, 0x00001004, 0, 0          ), resp('rd', 0x06, 1, 0, 0x00000002 ), # read word  0x00001000
+    req( 'rd', 0x07, 0x00001008, 0, 0          ), resp('rd', 0x07, 1, 0, 0x00000003 ), # read word  0x00001000
+    req( 'rd', 0x08, 0x0000100c, 0, 0          ), resp('rd', 0x08, 1, 0, 0x00000004 ), # read word  0x00001000
+    req( 'wr', 0x09, 0x00002000, 0, 0x00000020 ), resp('rd', 0x09, 0, 0, 0          ), # read word  0x00001000
+    req( 'rd', 0x10, 0x00002000, 0, 0          ), resp('rd', 0x10, 1, 0, 0x00000020 ), # read word  0x00001000
+    req( 'rd', 0x11, 0x00002004, 0, 0          ), resp('rd', 0x11, 1, 0, 0x00000022 ), # read word  0x00001000
+    req( 'rd', 0x12, 0x00002008, 0, 0          ), resp('rd', 0x12, 1, 0, 0x00000023 ), # read word  0x00001000
+    req( 'rd', 0x13, 0x0000200c, 0, 0          ), resp('rd', 0x13, 1, 0, 0x00000024 ), # read word  0x00001000
+ 
+  ]
+
+# Data to be loaded into memory before running the test
+
+def write_miss_wr_we_assoc_1_mem( base_addr ):
+  return [
+    # addr      data (in int)
+    0x00000000, 0xdeadbeef,
+    0x00000004, 0x00c0ffee,
+    0x00000008, 0xabcdefab,
+    0x0000000c, 0x01234567, 
+    0x00000010, 0xdededede,   
+    0x00001000, 0x00000001, 
+    0x00001004, 0x00000002,
+    0x00001008, 0x00000003,
+    0x0000100c, 0x00000004,
+    0x00002000, 0x00000021, 
+    0x00002004, 0x00000022,
+    0x00002008, 0x00000023,
+    0x0000200c, 0x00000024,
+  ]
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # Stress test 
 #''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' 
@@ -943,30 +985,61 @@ def conflict_miss_assoc_mem( base_addr ):
 def conflict_miss_assoc_1( base_addr ):
   return [
     #    type  opq   addr      len  data               type  opq test len  data
-    req( 'rd', 0x00, 0x00000000, 0, 0          ), resp('rd', 0x00, 0, 0, 0xdeadbeef ), # read word  0x00000000
-    req( 'rd', 0x01, 0x00000004, 0, 0          ), resp('rd', 0x01, 1, 0, 0x00c0ffee ), # read word  0x00000004
-    req( 'rd', 0x02, 0x00000008, 0, 0          ), resp('rd', 0x02, 1, 0, 0xabcdefab ), # read word  0x00000008
-    req( 'rd', 0x03, 0x0000000c, 0, 0          ), resp('rd', 0x03, 1, 0, 0x01234567 ), # read word  0x0000000c
-    req( 'rd', 0x04, 0x00000010, 0, 0          ), resp('rd', 0x04, 0, 0, 0xdededede ), # read word  0x00000010
-    req( 'wr', 0x05, 0x00001000, 0, 0x00000010 ), resp('wr', 0x05, 0, 0, 0          ), # read word  0x00001000
-    req( 'rd', 0x05, 0x00001000, 0, 0          ), resp('rd', 0x05, 1, 0, 0x00000010 ), # read word  0x00001000
-    req( 'rd', 0x06, 0x00001004, 0, 0          ), resp('rd', 0x06, 1, 0, 0x00000002 ), # read word  0x00001000
-    req( 'rd', 0x07, 0x00001008, 0, 0          ), resp('rd', 0x07, 1, 0, 0x00000003 ), # read word  0x00001000
-    req( 'rd', 0x08, 0x0000100c, 0, 0          ), resp('rd', 0x08, 1, 0, 0x00000004 ), # read word  0x00001000
-    req( 'rd', 0x09, 0x00000000, 0, 0          ), resp('rd', 0x09, 1, 0, 0xdeadbeef ), # read word  0x00000000
-    req( 'wr', 0x09, 0x00002000, 0, 0x00000020 ), resp('rd', 0x09, 0, 0, 0          ), # read word  0x00001000
-    req( 'rd', 0x10, 0x00002000, 0, 0          ), resp('rd', 0x10, 1, 0, 0x00000020 ), # read word  0x00001000
-    req( 'rd', 0x11, 0x00002004, 0, 0          ), resp('rd', 0x11, 1, 0, 0x00000022 ), # read word  0x00001000
-    req( 'rd', 0x12, 0x00002008, 0, 0          ), resp('rd', 0x12, 1, 0, 0x00000023 ), # read word  0x00001000
-    req( 'rd', 0x13, 0x0000200c, 0, 0          ), resp('rd', 0x13, 1, 0, 0x00000024 ), # read word  0x00001000
-    req( 'rd', 0x14, 0x00000000, 0, 0          ), resp('rd', 0x14, 1, 0, 0xdeadbeef ), # read word  0x00000000
-    req( 'rd', 0x15, 0x00001000, 0, 0          ), resp('rd', 0x15, 0, 0, 0x00000010 ), # read word  0x00001000
+    req( 'rd', 0x00, 0x00000000, 0, 0          ), resp('rd', 0x00, 0, 0, 0xdeadbeef ), #replace index 0
+    req( 'rd', 0x01, 0x00000004, 0, 0          ), resp('rd', 0x01, 1, 0, 0x00c0ffee ), 
+    req( 'rd', 0x02, 0x00000008, 0, 0          ), resp('rd', 0x02, 1, 0, 0xabcdefab ), 
+    req( 'rd', 0x03, 0x0000000c, 0, 0          ), resp('rd', 0x03, 1, 0, 0x01234567 ),
+    req( 'rd', 0x04, 0x00000010, 0, 0          ), resp('rd', 0x04, 0, 0, 0xdededede ), #replace index 1
+    req( 'wr', 0x05, 0x00001000, 0, 0x00000010 ), resp('wr', 0x05, 0, 0, 0          ), #replace index 0
+    req( 'rd', 0x05, 0x00001000, 0, 0          ), resp('rd', 0x05, 1, 0, 0x00000010 ), 
+    req( 'rd', 0x06, 0x00001004, 0, 0          ), resp('rd', 0x06, 1, 0, 0x00000002 ), 
+    req( 'rd', 0x07, 0x00001008, 0, 0          ), resp('rd', 0x07, 1, 0, 0x00000003 ), 
+    req( 'rd', 0x08, 0x0000100c, 0, 0          ), resp('rd', 0x08, 1, 0, 0x00000004 ), 
+    req( 'rd', 0x09, 0x00000000, 0, 0          ), resp('rd', 0x09, 1, 0, 0xdeadbeef ), 
+    req( 'wr', 0x09, 0x00002000, 0, 0x00000020 ), resp('rd', 0x09, 0, 0, 0          ), #replace index 0
+    req( 'rd', 0x10, 0x00002000, 0, 0          ), resp('rd', 0x10, 1, 0, 0x00000020 ), 
+    req( 'rd', 0x11, 0x00002004, 0, 0          ), resp('rd', 0x11, 1, 0, 0x00000022 ), 
+    req( 'rd', 0x12, 0x00002008, 0, 0          ), resp('rd', 0x12, 1, 0, 0x00000023 ), 
+    req( 'rd', 0x13, 0x0000200c, 0, 0          ), resp('rd', 0x13, 1, 0, 0x00000024 ), 
+    req( 'rd', 0x14, 0x00000000, 0, 0          ), resp('rd', 0x14, 1, 0, 0xdeadbeef ), 
+    req( 'rd', 0x15, 0x00001000, 0, 0          ), resp('rd', 0x15, 0, 0, 0x00000010 ), #evict and replace index 0
  
   ]
 
 # Data to be loaded into memory before running the test
 
 def conflict_miss_assoc_mem_1( base_addr ):
+  return [
+    # addr      data (in int)
+    0x00000000, 0xdeadbeef,
+    0x00000004, 0x00c0ffee,
+    0x00000008, 0xabcdefab,
+    0x0000000c, 0x01234567, 
+    0x00000010, 0xdededede,   
+    0x00001000, 0x00000001, 
+    0x00001004, 0x00000002,
+    0x00001008, 0x00000003,
+    0x0000100c, 0x00000004,
+    0x00002000, 0x00000021, 
+    0x00002004, 0x00000022,
+    0x00002008, 0x00000023,
+    0x0000200c, 0x00000024,
+  ]
+def shorter_conflict_miss_assoc_1 (base_addr): 
+   return [
+    #    type  opq   addr      len  data               type  opq test len  data
+    req( 'rd', 0x00, 0x00000000, 0, 0          ), resp('rd', 0x00, 0, 0, 0xdeadbeef ), #replace index 0 lru 1
+    req( 'rd', 0x04, 0x00000010, 0, 0          ), resp('rd', 0x04, 0, 0, 0xdededede ), #replace index 1 lru 1 
+    req( 'wr', 0x05, 0x00001000, 0, 0x00000010 ), resp('wr', 0x05, 0, 0, 0          ), #replace index 0 lru 0
+    req( 'rd', 0x05, 0x00001000, 0, 0          ), resp('rd', 0x05, 1, 0, 0x00000010 ), 
+    req( 'rd', 0x09, 0x00000000, 0, 0          ), resp('rd', 0x09, 1, 0, 0xdeadbeef ), #lru 1
+    req( 'wr', 0x09, 0x00002000, 0, 0x00000020 ), resp('rd', 0x09, 0, 0, 0          ), #replace index 0 lru 0
+    req( 'rd', 0x10, 0x00002000, 0, 0          ), resp('rd', 0x10, 1, 0, 0x00000020 ), 
+    req( 'rd', 0x14, 0x00000000, 0, 0          ), resp('rd', 0x14, 1, 0, 0xdeadbeef ), #lru 1
+    req( 'rd', 0x15, 0x00001000, 0, 0          ), resp('rd', 0x15, 0, 0, 0x00000010 ), #evict and replace index 0 lru 0
+ 
+  ]
+def shorter_conflict_miss_assoc_mem_1( base_addr ):
   return [
     # addr      data (in int)
     0x00000000, 0xdeadbeef,
@@ -1380,24 +1453,26 @@ def test_generic( test_params, dump_vcd ):
 #-------------------------------------------------------------------------
 
 test_case_table_set_assoc = mk_test_case_table([
-  (                                   "msg_func                       mem_data_func               nbank stall lat src sink"),
-  [ "read_hit_asso",                  read_hit_asso,                  None,                       0,    0.0,  0,  0,  0    ],
-  [ "read_hit_clean",                 read_hit_clean,                 None,                       0,    0.0,  0,  0,  0    ],
-  [ "write_hit_clean",                write_hit_clean,                None,                       0,    0.0,  0,  0,  0    ],
-  [ "read_hit_dirty",                 read_hit_dirty,                 read_hit_dirty_mem,         0,    0.0,  0,  0,  0    ],
-  [ "write_hit_dirty",                write_hit_dirty,                write_hit_dirty_mem,        0,    0.0,  0,  0,  0    ],
-  [ "read_miss_wr_woe",               read_miss_wr_woe,               read_miss_wr_woe_mem,       0,    0.0,  0,  0,  0    ],
-  [ "write_miss_wr_woe",              write_miss_wr_woe,              write_miss_wr_woe_mem,      0,    0.0,  0,  0,  0    ],
-  [ "read_miss_wr_we_assoc",          read_miss_wr_we_assoc,          read_miss_wr_we_assoc_mem,  0,    0.0,  0,  0,  0    ],
-  [ "write_miss_wr_we_assoc",         write_miss_wr_we_assoc,         write_miss_wr_we_assoc_mem, 0,    0.0,  0,  0,  0    ],
-  [ "conflict_miss_assoc",            conflict_miss_assoc,            conflict_miss_assoc_mem,    0,    0.0,  0,  0,  0    ], 
-  [ "conflict_miss_assoc_1",          conflict_miss_assoc_1,          conflict_miss_assoc_mem_1,  0,    0.0,  0,  0,  0    ], 
-  [ "stress_assoc",                   stress_assoc,                   stress_assoc_mem,           0,    0.0,  0,  0,  0    ],
-  [ "lru_replacement",                lru_replacement,                lru_replacement_mem,        0,    0.0,  0,  0,  0    ],
-  [ "random_randata_assoc",           random_randata_assoc,           None,                       0,    0.0,  0,  0,  0    ],
-  [ "random_rantypedata_assoc",       random_rantypedata_assoc,       None,                       0,    0.0,  0,  0,  0    ],
-  [ "random_ranaddrtypedata_assoc",   random_ranaddrtypedata_assoc,   None,                       0,    0.0,  0,  0,  0    ],
-  [ "random_ranaddrtypedata_assoc_1", random_ranaddrtypedata_assoc_1, None,                       0,    0.0,  0,  0,  0,   ],
+  (                                   "msg_func                       mem_data_func                 nbank stall lat src sink"),
+  [ "read_hit_asso",                  read_hit_asso,                  None,                               0,    0.0,  0,  0,  0    ],
+  [ "read_hit_clean",                 read_hit_clean,                 None,                               0,    0.0,  0,  0,  0    ],
+  [ "write_hit_clean",                write_hit_clean,                None,                               0,    0.0,  0,  0,  0    ],
+  [ "read_hit_dirty",                 read_hit_dirty,                 read_hit_dirty_mem,                 0,    0.0,  0,  0,  0    ],
+  [ "write_hit_dirty",                write_hit_dirty,                write_hit_dirty_mem,                0,    0.0,  0,  0,  0    ],
+  [ "read_miss_wr_woe",               read_miss_wr_woe,               read_miss_wr_woe_mem,               0,    0.0,  0,  0,  0    ],
+  [ "write_miss_wr_woe",              write_miss_wr_woe,              write_miss_wr_woe_mem,              0,    0.0,  0,  0,  0    ],
+  [ "read_miss_wr_we_assoc",          read_miss_wr_we_assoc,          read_miss_wr_we_assoc_mem,          0,    0.0,  0,  0,  0    ],
+  [ "write_miss_wr_we_assoc",         write_miss_wr_we_assoc,         write_miss_wr_we_assoc_mem,         0,    0.0,  0,  0,  0    ],
+  [ "write_miss_wr_we_assoc_1",       write_miss_wr_we_assoc_1,       write_miss_wr_we_assoc_1_mem,       0,    0.0,  0,  0,  0    ],
+  [ "conflict_miss_assoc",            conflict_miss_assoc,            conflict_miss_assoc_mem,            0,    0.0,  0,  0,  0    ], 
+  [ "shorter_conflict_miss_assoc_1",  shorter_conflict_miss_assoc_1,  shorter_conflict_miss_assoc_mem_1,  0,    0.0,  0,  0,  0    ],
+  [ "conflict_miss_assoc_1",          conflict_miss_assoc_1,          conflict_miss_assoc_mem_1,          0,    0.0,  0,  0,  0    ], 
+  [ "stress_assoc",                   stress_assoc,                   stress_assoc_mem,                   0,    0.0,  0,  0,  0    ],
+  [ "lru_replacement",                lru_replacement,                lru_replacement_mem,                0,    0.0,  0,  0,  0    ],
+  [ "random_randata_assoc",           random_randata_assoc,           None,                               0,    0.0,  0,  0,  0    ],
+  [ "random_rantypedata_assoc",       random_rantypedata_assoc,       None,                               0,    0.0,  0,  0,  0    ],
+  [ "random_ranaddrtypedata_assoc",   random_ranaddrtypedata_assoc,   None,                               0,    0.0,  0,  0,  0    ],
+  [ "random_ranaddrtypedata_assoc_1", random_ranaddrtypedata_assoc_1, None,                               0,    0.0,  0,  0,  0,   ],
 
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # LAB TASK: Add test cases to this table
