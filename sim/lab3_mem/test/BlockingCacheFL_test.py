@@ -400,6 +400,15 @@ def stress_dt (base_addr):
       data = i*4+j 
       opq = i*4+j 
       stress_dt_msgs.extend([req('rd', i*4+j, addr, 0, 0), resp('rd', i*4+j, hit, 0, data)])
+  for i in range(16):
+    for j in range(4): 
+      hit = 1 
+      offset = j << 2  
+      index = i << 4 
+      addr = index | offset 
+      data = i*4+j 
+      opq = i*4+j 
+      stress_dt_msgs.extend([req('rd', i*4+j, addr, 0, 0), resp('rd', i*4+j, hit, 0, data)])
   return stress_dt_msgs
 
 def stress_dt_mem(base_addr):
@@ -483,12 +492,12 @@ def conflict_miss_dt_mem_1( base_addr ):
 def check_random_test_dt (base_addr):
   return [
     #    type  opq   addr      len  data               type  opq test len  data
-    req( 'wr', 0x00, 0x00000000, 0, 0xdeadbeef ), resp('wr', 0x00, 0, 0,   0), 
-    req( 'wr', 0x01, 0x0000000c, 0, 0x00c0ffee ), resp('wr', 0x01, 1, 0,   0),
-    req( 'wr', 0x02, 0x0000100c, 0, 0x00000001 ), resp('wr', 0x02, 0, 0,   0),
-    req( 'rd', 0x03, 0x0000000c, 0, 0          ), resp('rd', 0x03, 0, 0,   0x00c0ffee), 
-    req( 'wr', 0x04, 0x0000200c, 0, 0x00000002 ), resp('wr', 0x04, 0, 0,   0), 
-    req( 'rd', 0x05, 0x0000000c, 0, 0          ), resp('rd', 0x05, 0, 0,   0x00c0ffee), 
+    req( 'wr', 0x00, 0x00000000, 0, 0xdeadbeef ), resp('wr', 0x00, 0, 0,   0          ), 
+    req( 'wr', 0x01, 0x0000000c, 0, 0x00c0ffee ), resp('wr', 0x01, 1, 0,   0          ),
+    req( 'wr', 0x02, 0x0000010c, 0, 0x00000001 ), resp('wr', 0x02, 0, 0,   0          ),
+    req( 'rd', 0x03, 0x0000000c, 0, 0          ), resp('rd', 0x03, 0, 0,   0x00c0ffee ), 
+    req( 'wr', 0x04, 0x0000020c, 0, 0x00000002 ), resp('wr', 0x04, 0, 0,   0          ), 
+    req( 'rd', 0x05, 0x0000000c, 0, 0          ), resp('rd', 0x05, 0, 0,   0x00c0ffee ), 
   ]
 
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -916,6 +925,17 @@ def stress_assoc (base_addr):
           hit = 0
         else: 
           hit = 1 
+        tag = k << 7 
+        offset = j << 2  
+        index = i << 4 
+        addr = tag | index | offset 
+        data = 32*k + i*4 + j 
+        opq = 32*k + i*4 + j 
+        stress_assoc_msgs.extend([req('rd', i*4+j, addr, 0, 0), resp('rd', i*4+j, hit, 0, data)])
+  for k in range(2): 
+    for i in range(8):
+      for j in range(4): 
+        hit = 1 
         tag = k << 7 
         offset = j << 2  
         index = i << 4 
@@ -1437,20 +1457,94 @@ def random_ranaddrtypedata_assoc_1 (base_addr):
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 # LAB TASK:
 #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-def banking_zero( base_addr ):
-  return [
-    #    type  opq  addr      len data                type  opq  test len data
-    req( 'in', 0x0, 0x00000000, 0, 0xdeadbeef ), resp( 'in', 0x0, 0,   0,  0          ),
-    req( 'rd', 0x1, 0x00000000, 0, 0          ), resp( 'rd', 0x1, 1,   0,  0xdeadbeef ),
-    req( 'wr', 0x2, 0x00000010, 0, 0x00000001 ), resp( 'wr', 0x2, 0,   0,  0          ), 
-  ]
 
-def banking_four( base_addr ):
-  return [
-    #    type  opq  addr      len data                type  opq  test len data
-    req( 'in', 0x0, 0x00000000, 0, 0xdeadbeef ), resp( 'in', 0x0, 0,   0,  0          ),
-    req( 'rd', 0x1, 0x00000000, 0, 0          ), resp( 'rd', 0x1, 1,   0,  0xdeadbeef ),
-  ]
+def banking_four_dt (base_addr): 
+  stress_dt_msgs = []
+  for i in range(16):
+    for j in range(4): 
+      if (j == 0):
+        hit = 0
+      else: 
+        hit = 1 
+      offset = j << 2  
+      index = i << 6 
+      addr = index | offset 
+      data = i*4+j 
+      opq = i*4+j 
+      stress_dt_msgs.extend([req('rd', i*4+j, addr, 0, 0), resp('rd', i*4+j, hit, 0, data)])
+  for i in range(16):
+    for j in range(4): 
+      hit = 1 
+      offset = j << 2  
+      index = i << 6 
+      addr = index | offset 
+      data = i*4+j 
+      opq = i*4+j 
+      stress_dt_msgs.extend([req('rd', i*4+j, addr, 0, 0), resp('rd', i*4+j, hit, 0, data)])
+  stress_dt_msgs.extend([req('wr', 0, 0x00001080, 0, 0xdeadbeef), resp('wr', 0, 0, 0, 0)])
+  stress_dt_msgs.extend([req('rd', 1, 0x00001080, 0, 0), resp('rd', 1, 1, 0, 0xdeadbeef)])
+  stress_dt_msgs.extend([req('rd', 2, 0x00000080, 0, 0), resp('rd', 2, 0, 0, 8)])
+  stress_dt_msgs.extend([req('rd', 3, 0x00001080, 0, 0), resp('rd', 3, 0, 0, 0xdeadbeef)])
+  stress_dt_msgs.extend([req('rd', 4, 0x00000040, 0, 0), resp('rd', 4, 1, 0, 4)])
+  return stress_dt_msgs
+
+def banking_four_dt_mem(base_addr):
+  stress_dt_mem_msgs = []
+  for i in range(16):
+    for j in range(4): 
+      offset = j << 2  
+      index = i << 6 
+      addr = index | offset 
+      data = i*4 + j 
+      stress_dt_mem_msgs.extend([addr, data])
+  return stress_dt_mem_msgs 
+
+def banking_four_assoc (base_addr): 
+  stress_assoc_msgs = []
+  for k in range(2): 
+    for i in range(8):
+      for j in range(4): 
+        if (j == 0):
+          hit = 0
+        else: 
+          hit = 1 
+        tag = k << 9 
+        offset = j << 2  
+        index = i << 6 
+        addr = tag | index | offset 
+        data = 32*k + i*4 + j 
+        opq = 32*k + i*4 + j 
+        stress_assoc_msgs.extend([req('rd', i*4+j, addr, 0, 0), resp('rd', i*4+j, hit, 0, data)])
+  for k in range(2): 
+    for i in range(8):
+      for j in range(4): 
+        hit = 1 
+        tag = k << 9 
+        offset = j << 2  
+        index = i << 6 
+        addr = tag | index | offset 
+        data = 32*k + i*4 + j 
+        opq = 32*k + i*4 + j 
+        stress_assoc_msgs.extend([req('rd', i*4+j, addr, 0, 0), resp('rd', i*4+j, hit, 0, data)])
+  stress_assoc_msgs.extend([req('wr', 0, 0x00001080, 0, 0xdeadbeef), resp('wr', 0, 0, 0, 0)])
+  stress_assoc_msgs.extend([req('rd', 1, 0x00001080, 0, 0), resp('rd', 1, 1, 0, 0xdeadbeef)])
+  stress_assoc_msgs.extend([req('rd', 2, 0x00000080, 0, 0), resp('rd', 2, 0, 0, 8)])
+  stress_assoc_msgs.extend([req('rd', 3, 0x00001080, 0, 0), resp('rd', 3, 1, 0, 0xdeadbeef)])
+  stress_assoc_msgs.extend([req('rd', 4, 0x00000040, 0, 0), resp('rd', 4, 1, 0, 4)])
+  return stress_assoc_msgs
+
+def banking_four_assoc_mem(base_addr):
+  stress_assoc_mem_msgs = []
+  for k in range(2):
+    for i in range(8):
+      for j in range(4): 
+        tag = k << 9
+        offset = j << 2  
+        index = i << 6 
+        addr = tag| index | offset 
+        data = 32*k + i*4 + j 
+        stress_assoc_mem_msgs.extend([addr, data])
+  return stress_assoc_mem_msgs 
 
 #-------------------------------------------------------------------------
 # Test table for generic test
@@ -1496,29 +1590,32 @@ def test_generic( test_params, dump_vcd ):
 #-------------------------------------------------------------------------
 
 test_case_table_set_assoc = mk_test_case_table([
-  (                                   "msg_func                       mem_data_func                 nbank stall lat src sink"),
-  [ "read_hit_asso",                  read_hit_asso,                  None,                               0,    0.0,  0,  0,  0    ],
-  [ "read_hit_clean",                 read_hit_clean,                 None,                               0,    0.0,  0,  0,  0    ],
-  [ "write_hit_clean",                write_hit_clean,                None,                               0,    0.0,  0,  0,  0    ],
-  [ "read_hit_dirty",                 read_hit_dirty,                 read_hit_dirty_mem,                 0,    0.0,  0,  0,  0    ],
-  [ "write_hit_dirty",                write_hit_dirty,                write_hit_dirty_mem,                0,    0.0,  0,  0,  0    ],
-  [ "read_miss_wr_woe",               read_miss_wr_woe,               read_miss_wr_woe_mem,               0,    0.0,  0,  0,  0    ],
-  [ "write_miss_wr_woe",              write_miss_wr_woe,              write_miss_wr_woe_mem,              0,    0.0,  0,  0,  0    ],
-  [ "read_miss_wr_we_assoc",          read_miss_wr_we_assoc,          read_miss_wr_we_assoc_mem,          0,    0.0,  0,  0,  0    ],
-  [ "write_miss_wr_we_assoc",         write_miss_wr_we_assoc,         write_miss_wr_we_assoc_mem,         0,    0.0,  0,  0,  0    ],
-  [ "write_miss_wr_we_assoc_1",       write_miss_wr_we_assoc_1,       write_miss_wr_we_assoc_1_mem,       0,    0.0,  0,  0,  0    ],
-  [ "conflict_miss_assoc",            conflict_miss_assoc,            conflict_miss_assoc_mem,            0,    0.0,  0,  0,  0    ], 
-  [ "shorter_conflict_miss_assoc_1",  shorter_conflict_miss_assoc_1,  shorter_conflict_miss_assoc_mem_1,  0,    0.0,  0,  0,  0    ],
-  [ "conflict_miss_assoc_1",          conflict_miss_assoc_1,          conflict_miss_assoc_mem_1,          0,    0.0,  0,  0,  0    ], 
-  [ "stress_assoc",                   stress_assoc,                   stress_assoc_mem,                   0,    0.0,  0,  0,  0    ],
-  [ "lru_replacement_1",              lru_replacement_1,              lru_replacement_mem,                0,    0.0,  0,  0,  0    ],
-  [ "lru_replacement",                lru_replacement,                lru_replacement_mem,                0,    0.0,  0,  0,  0    ],
-  [ "random_randata_assoc_1",         random_randata_assoc_1,         None,                               0,    0.0,  0,  0,  0    ],
-  [ "random_randata_assoc_2",         random_randata_assoc_2,         None,                               0,    0.0,  0,  0,  0    ],
-  [ "random_randata_assoc",           random_randata_assoc,           None,                               0,    0.0,  0,  0,  0    ],
-  [ "random_rantypedata_assoc",       random_rantypedata_assoc,       None,                               0,    0.0,  0,  0,  0    ],
-  [ "random_ranaddrtypedata_assoc",   random_ranaddrtypedata_assoc,   None,                               0,    0.0,  0,  0,  0    ],
-  [ "random_ranaddrtypedata_assoc_1", random_ranaddrtypedata_assoc_1, None,                               0,    0.0,  0,  0,  0,   ],
+  (                                         "msg_func                       mem_data_func                       nbank stall lat src sink"),
+  [ "read_hit_asso",                        read_hit_asso,                  None,                               0,    0.0,  0,  0,  0    ],
+  [ "read_hit_clean",                       read_hit_clean,                 None,                               0,    0.0,  0,  0,  0    ],
+  [ "write_hit_clean",                      write_hit_clean,                None,                               0,    0.0,  0,  0,  0    ],
+  [ "read_hit_dirty",                       read_hit_dirty,                 read_hit_dirty_mem,                 0,    0.0,  0,  0,  0    ],
+  [ "write_hit_dirty",                      write_hit_dirty,                write_hit_dirty_mem,                0,    0.0,  0,  0,  0    ],
+  [ "read_miss_wr_woe",                     read_miss_wr_woe,               read_miss_wr_woe_mem,               0,    0.0,  0,  0,  0    ],
+  [ "write_miss_wr_woe",                    write_miss_wr_woe,              write_miss_wr_woe_mem,              0,    0.0,  0,  0,  0    ],
+  [ "read_miss_wr_we_assoc",                read_miss_wr_we_assoc,          read_miss_wr_we_assoc_mem,          0,    0.0,  0,  0,  0    ],
+  [ "write_miss_wr_we_assoc",               write_miss_wr_we_assoc,         write_miss_wr_we_assoc_mem,         0,    0.0,  0,  0,  0    ],
+  [ "write_miss_wr_we_assoc_1",             write_miss_wr_we_assoc_1,       write_miss_wr_we_assoc_1_mem,       0,    0.0,  0,  0,  0    ],
+  [ "conflict_miss_assoc",                  conflict_miss_assoc,            conflict_miss_assoc_mem,            0,    0.0,  0,  0,  0    ], 
+  [ "shorter_conflict_miss_assoc_1",        shorter_conflict_miss_assoc_1,  shorter_conflict_miss_assoc_mem_1,  0,    0.0,  0,  0,  0    ],
+  [ "conflict_miss_assoc_1",                conflict_miss_assoc_1,          conflict_miss_assoc_mem_1,          0,    0.0,  0,  0,  0    ], 
+  [ "stress_assoc",                         stress_assoc,                   stress_assoc_mem,                   0,    0.0,  0,  0,  0    ],
+  [ "lru_replacement_1",                    lru_replacement_1,              lru_replacement_mem,                0,    0.0,  0,  0,  0    ],
+  [ "lru_replacement",                      lru_replacement,                lru_replacement_mem,                0,    0.0,  0,  0,  0    ],
+  [ "random_randata_assoc_1",               random_randata_assoc_1,         None,                               0,    0.0,  0,  0,  0    ],
+  [ "random_randata_assoc_2",               random_randata_assoc_2,         None,                               0,    0.0,  0,  0,  0    ],
+  [ "random_randata_assoc",                 random_randata_assoc,           None,                               0,    0.0,  0,  0,  0    ],
+  [ "random_rantypedata_assoc",             random_rantypedata_assoc,       None,                               0,    0.0,  0,  0,  0    ],
+  [ "random_ranaddrtypedata_assoc",         random_ranaddrtypedata_assoc,   None,                               0,    0.0,  0,  0,  0    ],
+  [ "random_ranaddrtypedata_assoc_1",       random_ranaddrtypedata_assoc_1, None,                               0,    0.0,  0,  0,  0    ],
+  [ "random_ranaddrtypedata_assoc_delay",   random_ranaddrtypedata_assoc,   None,                               0,    0.5,  1,  1,  1    ],
+  [ "random_ranaddrtypedata_assoc_delay_1", random_ranaddrtypedata_assoc_1, None,                               0,    0.5,  1,  1,  1    ],
+  [ "banking_four_assoc",                   banking_four_assoc,             banking_four_assoc_mem,             4,    0.0,  0,  0,  0    ],
 
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # LAB TASK: Add test cases to this table
@@ -1549,25 +1646,28 @@ def test_set_assoc( test_params, dump_vcd ):
 #-------------------------------------------------------------------------
 
 test_case_table_dir_mapped = mk_test_case_table([
-  (                                 "msg_func                     mem_data_func                   nbank stall lat src sink"),
-  [ "read_hit_dmap",                read_hit_dmap,                None,                           0,    0.0,  0,  0,  0    ],
-  [ "read_hit_clean",               read_hit_clean,               None,                           0,    0.0,  0,  0,  0    ],
-  [ "write_hit_clean",              write_hit_clean,              None,                           0,    0.0,  0,  0,  0    ],
-  [ "read_hit_dirty",               read_hit_dirty,               read_hit_dirty_mem,             0,    0.0,  0,  0,  0    ],
-  [ "write_hit_dirty",              write_hit_dirty,              write_hit_dirty_mem,            0,    0.0,  0,  0,  0    ],
-  [ "read_miss_wr_woe",             read_miss_wr_woe,             read_miss_wr_woe_mem,           0,    0.0,  0,  0,  0    ],
-  [ "write_miss_wr_woe",            write_miss_wr_woe,            write_miss_wr_woe_mem,          0,    0.0,  0,  0,  0    ],
-  [ "read_miss_wr_we_dt",           read_miss_wr_we_dt,           read_miss_wr_we_dt_mem,         0,    0.0,  0,  0,  0    ],
-  [ "write_miss_wr_we_dt",          write_miss_wr_we_dt,          write_miss_wr_we_dt_mem,        0,    0.0,  0,  0,  0    ],
-  [ "conflict_miss_dt",             conflict_miss_dt,             conflict_miss_dt_mem,           0,    0.0,  0,  0,  0    ], 
-  [ "conflict_miss_dt_1",           conflict_miss_dt_1,           conflict_miss_dt_mem_1,         0,    0.0,  0,  0,  0    ], 
-  [ "stress_dt",                    stress_dt,                    stress_dt_mem,                  0,    0.0,  0,  0,  0    ],
-  [ "capacity_dt",                  capacity_dt,                  capacity_dt_mem,                0,    0.0,  0,  0,  0    ],
-  [ "random_randata_dt",            random_randata_dt,            None,                           0,    0.0,  0,  0,  0    ],
-  [ "random_rantypedata_dt",        random_rantypedata_dt,        None,                           0,    0.0,  0,  0,  0    ],
-  [ "random_ranaddrtypedata_dt",    random_ranaddrtypedata_dt,    None,                           0,    0.0,  0,  0,  0    ],
-  [ "check_random_test_dt",         check_random_test_dt,         None,                           0,    0.0,  0,  0,  0    ],
-  [ "random_ranaddrtypedata_dt_1",  random_ranaddrtypedata_dt_1,  None,                           0,    0.0,  0,  0,  0    ],
+  (                                     "msg_func                     mem_data_func                   nbank stall lat src sink"),
+  [ "read_hit_dmap",                      read_hit_dmap,                None,                           0,    0.0,  0,  0,  0    ],
+  [ "read_hit_clean",                     read_hit_clean,               None,                           0,    0.0,  0,  0,  0    ],
+  [ "write_hit_clean",                    write_hit_clean,              None,                           0,    0.0,  0,  0,  0    ],
+  [ "read_hit_dirty",                     read_hit_dirty,               read_hit_dirty_mem,             0,    0.0,  0,  0,  0    ],
+  [ "write_hit_dirty",                    write_hit_dirty,              write_hit_dirty_mem,            0,    0.0,  0,  0,  0    ],
+  [ "read_miss_wr_woe",                   read_miss_wr_woe,             read_miss_wr_woe_mem,           0,    0.0,  0,  0,  0    ],
+  [ "write_miss_wr_woe",                  write_miss_wr_woe,            write_miss_wr_woe_mem,          0,    0.0,  0,  0,  0    ],
+  [ "read_miss_wr_we_dt",                 read_miss_wr_we_dt,           read_miss_wr_we_dt_mem,         0,    0.0,  0,  0,  0    ],
+  [ "write_miss_wr_we_dt",                write_miss_wr_we_dt,          write_miss_wr_we_dt_mem,        0,    0.0,  0,  0,  0    ],
+  [ "conflict_miss_dt",                   conflict_miss_dt,             conflict_miss_dt_mem,           0,    0.0,  0,  0,  0    ], 
+  [ "conflict_miss_dt_1",                 conflict_miss_dt_1,           conflict_miss_dt_mem_1,         0,    0.0,  0,  0,  0    ], 
+  [ "stress_dt",                          stress_dt,                    stress_dt_mem,                  0,    0.0,  0,  0,  0    ],
+  [ "capacity_dt",                        capacity_dt,                  capacity_dt_mem,                0,    0.0,  0,  0,  0    ],
+  [ "random_randata_dt",                  random_randata_dt,            None,                           0,    0.0,  0,  0,  0    ],
+  [ "random_rantypedata_dt",              random_rantypedata_dt,        None,                           0,    0.0,  0,  0,  0    ],
+  [ "random_ranaddrtypedata_dt",          random_ranaddrtypedata_dt,    None,                           0,    0.0,  0,  0,  0    ],
+  [ "check_random_test_dt",               check_random_test_dt,         None,                           0,    0.0,  0,  0,  0    ],
+  [ "random_ranaddrtypedata_dt_1",        random_ranaddrtypedata_dt_1,  None,                           0,    0.0,  0,  0,  0    ],
+  [ "random_ranaddrtypedata_dt_delay",    random_ranaddrtypedata_dt,    None,                           0,    0.5,  1,  1,  1    ],
+  [ "random_ranaddrtypedata_dt_delay_1",  random_ranaddrtypedata_dt_1,  None,                           0,    0.5,  1,  1,  1    ],
+  [ "banking_four_dt",                    banking_four_dt,              banking_four_dt_mem,            4,    0.0,  0,  0,  0    ],
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
   # LAB TASK: Add test cases to this table
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
