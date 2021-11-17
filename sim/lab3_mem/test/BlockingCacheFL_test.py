@@ -1122,7 +1122,7 @@ def cacheline_int_assoc (tag, index, cache, tag_mem, msgs, num, lru, name):
     cache[lru][index][i+1] = data 
     addr = int(addr_hex, 16) 
     with open(name, "a") as f:
-      f.write("wr " + "addr " + addr_hex + " data " + str(data) + " hit " + str(hit) + " index " + str(index) + " lru " + str(lru) + "\n")  
+      f.write('{:02x}'.format(num)  + " wr " + "addr " + addr_hex + " data " + '{:08x}'.format(data) + " hit " + str(hit) + " index " + str(index) + " lru " + str(lru) + "\n")  
     msgs.extend([req('wr', num, addr, 0, data), resp('wr', num, hit, 0, 0)])
     num += 1
     if (num > 255): num = 0
@@ -1175,7 +1175,7 @@ def read_request_assoc (addr, refcache, refmem, reftag, num_inst, msgs, lru_arra
   else:
     data = refcache[1][index][offset_dic[offset_hex]]
   with open(name, "a") as f:
-    f.write("rd " + "addr " + addr_hex + " data " + str(data) + " hit " + str(hit) + " index " + str(index) + " lru " + str(lru) + "\n")
+    f.write('{:02x}'.format(num_inst)  + " rd " + "addr " + addr_hex + " data " + '{:08x}'.format(data) + " hit " + str(hit) + " index " + str(index) + " lru " + str(lru) + "\n")
   msgs.extend([req('rd', num_inst, addr, 0, 0),resp('rd', num_inst, hit, 0, data)])
   num_inst += 1
   if (num_inst > 255): num_inst = 0
@@ -1212,7 +1212,7 @@ def write_request_assoc (addr, refcache, refmem, reftag, num_inst, msgs, lru_arr
   else:
       refcache[1][index][offset_dic[offset_hex]] = data
   with open(name, "a") as f:
-    f.write("wr " + "addr " + addr_hex + " data " + str(data) + " hit " + str(hit) + " index " + str(index) + " lru " + str(lru) + "\n")
+    f.write('{:02x}'.format(num_inst) + " wr " + "addr " + addr_hex + " data " + '{:08x}'.format(data) + " hit " + str(hit) + " index " + str(index) + " lru " + str(lru) + "\n")
   msgs.extend([req('wr', num_inst, addr, 0, data),resp('wr', num_inst, hit, 0, 0)])
   num_inst += 1
   if (num_inst > 255): num_inst = 0
@@ -1256,6 +1256,40 @@ def random_randata_assoc (base_addr):
     addr = i << 2 
     num_inst = read_request_assoc (addr, refcache, refmem, reftag, num_inst, random_randata_assoc_msgs, lru_array, name)
   return random_randata_assoc_msgs
+
+def random_randata_assoc_1(base_addr): 
+  return [
+    #    type  opq   addr      len  data               type  opq test len  data
+    req( 'wr', 0x00, 0x00000000, 0, 0x00000001), resp('rd', 0x00, 0, 0, 0          ), 
+    req( 'rd', 0x01, 0x00000000, 0, 0         ), resp('rd', 0x01, 1, 0, 0x00000001 ),  
+    req( 'wr', 0x02, 0x00000070, 0, 0x00000002), resp('rd', 0x02, 0, 0, 0          ), 
+    req( 'rd', 0x03, 0x00000070, 0, 0         ), resp('rd', 0x03, 1, 0, 0x00000002 ),  
+    req( 'wr', 0x04, 0x00000080, 0, 0x00000003), resp('rd', 0x04, 0, 0, 0          ), 
+    req( 'rd', 0x05, 0x00000080, 0, 0         ), resp('rd', 0x05, 1, 0, 0x00000003 ),  
+    req( 'wr', 0x06, 0x000000f0, 0, 0x00000004), resp('rd', 0x06, 0, 0, 0          ), 
+    req( 'rd', 0x07, 0x000000f0, 0, 0         ), resp('rd', 0x07, 1, 0, 0x00000004 ), 
+    req( 'wr', 0x08, 0x00000100, 0, 0x00000005), resp('rd', 0x08, 0, 0, 0          ), 
+    req( 'rd', 0x09, 0x00000100, 0, 0         ), resp('rd', 0x09, 1, 0, 0x00000005 ), 
+    req( 'rd', 0x10, 0x00000000, 0, 0         ), resp('rd', 0x10, 0, 0, 0x00000001 ),
+   ] 
+
+def random_randata_assoc_2(base_addr): 
+  return [
+    #    type  opq   addr      len  data               type  opq test len  data
+    req( 'wr', 0x00, 0x00000000, 0, 0x00000001), resp('rd', 0x00, 0, 0, 0          ), 
+    req( 'rd', 0x01, 0x00000000, 0, 0         ), resp('rd', 0x01, 1, 0, 0x00000001 ),  
+    req( 'wr', 0x02, 0x00000070, 0, 0x00000002), resp('rd', 0x02, 0, 0, 0          ), 
+    req( 'rd', 0x03, 0x00000070, 0, 0         ), resp('rd', 0x03, 1, 0, 0x00000002 ),  
+    req( 'wr', 0x04, 0x00000080, 0, 0x00000003), resp('rd', 0x04, 0, 0, 0          ), 
+    req( 'rd', 0x05, 0x00000080, 0, 0         ), resp('rd', 0x05, 1, 0, 0x00000003 ),  
+    req( 'wr', 0x06, 0x000000f0, 0, 0x00000004), resp('rd', 0x06, 0, 0, 0          ), 
+    req( 'rd', 0x07, 0x000000f0, 0, 0         ), resp('rd', 0x07, 1, 0, 0x00000004 ), 
+    req( 'wr', 0x08, 0x00000100, 0, 0x00000005), resp('rd', 0x08, 0, 0, 0          ), 
+    req( 'rd', 0x09, 0x00000100, 0, 0         ), resp('rd', 0x09, 1, 0, 0x00000005 ), 
+    req( 'rd', 0x10, 0x00000000, 0, 0         ), resp('rd', 0x10, 0, 0, 0x00000001 ),
+    req( 'rd', 0x11, 0x00000080, 0, 0         ), resp('rd', 0x11, 0, 0, 0x00000003 ),
+    req( 'rd', 0x12, 0x00000100, 0, 0         ), resp('rd', 0x12, 0, 0, 0x00000005 ),
+   ] 
 
 def random_rantypedata_assoc (base_addr):
   random_rantypedata_assoc_msgs = []
@@ -1479,6 +1513,8 @@ test_case_table_set_assoc = mk_test_case_table([
   [ "stress_assoc",                   stress_assoc,                   stress_assoc_mem,                   0,    0.0,  0,  0,  0    ],
   [ "lru_replacement_1",              lru_replacement_1,              lru_replacement_mem,                0,    0.0,  0,  0,  0    ],
   [ "lru_replacement",                lru_replacement,                lru_replacement_mem,                0,    0.0,  0,  0,  0    ],
+  [ "random_randata_assoc_1",         random_randata_assoc_1,         None,                               0,    0.0,  0,  0,  0    ],
+  [ "random_randata_assoc_2",         random_randata_assoc_2,         None,                               0,    0.0,  0,  0,  0    ],
   [ "random_randata_assoc",           random_randata_assoc,           None,                               0,    0.0,  0,  0,  0    ],
   [ "random_rantypedata_assoc",       random_rantypedata_assoc,       None,                               0,    0.0,  0,  0,  0    ],
   [ "random_ranaddrtypedata_assoc",   random_ranaddrtypedata_assoc,   None,                               0,    0.0,  0,  0,  0    ],
