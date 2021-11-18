@@ -86,7 +86,7 @@ def parse_cmdline():
   # LAB TASK: Add choices to --pattern option to use your new patterns
   #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-  p.add_argument(       "--pattern",  choices=["loop-1d", "loop-2d", "loop-3d"], default="loop-1d" )
+  p.add_argument(       "--pattern",  choices=["loop-1d", "loop-2d", "loop-3d", "copy_access","sum"], default="loop-1d" )
   p.add_argument(       "--dump-vcd", action="store_true"                                          )
   p.add_argument(       "--stats",    action="store_true"                                          )
   p.add_argument(       "--trace",    action="store_true"                                          )
@@ -204,13 +204,63 @@ def loop_3d():
 
   return [ src_msgs, sink_msgs, mem_data ]
 
-#'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-# LAB TASK: Add more memory access patterns to evaluate your cache
-#'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+def copy_access( size = 100 ):
 
-#-------------------------------------------------------------------------
-# Main
-#-------------------------------------------------------------------------
+  src_msgs  = []
+  sink_msgs = []
+
+  mem_data  = []
+  mem_word  = Bits( 32 )
+
+  addr = 0
+  # return memory message
+  for i in xrange( size):
+    mem_word.value = i
+    mem_data.append( addr )
+    mem_data.append( mem_word.uint() )
+    addr += 4
+
+  # return src/sink message
+  for k in xrange( 5 ):
+    for i in xrange( size ):
+      addr = i*4 
+      data = i
+      addr_2 =  i * 64 + 400
+      src_msgs.append ( mk_req ( 'rd', addr, 0, 0 ) )
+      sink_msgs.append( mk_resp( 'rd', 0, data    ) )
+      src_msgs.append ( mk_req ( 'wr', addr_2, 0, 0 ) )
+      sink_msgs.append( mk_resp( 'wr', 0, data    ) )
+
+  return [ src_msgs, sink_msgs, mem_data ]
+
+def summ( size = 100 ):
+
+  src_msgs  = []
+  sink_msgs = []
+
+  mem_data  = []
+  mem_word  = Bits( 32 )
+
+  addr = 256
+  # return memory message
+  for i in xrange( size):
+    mem_word.value = i
+    mem_data.append( addr )
+    mem_data.append( mem_word.uint() )
+    addr += 4
+
+  data = 0;
+  # return src/sink message
+  for k in xrange( 5 ):
+    for i in xrange( size ):
+      addr = i*4 +k *64
+      data = i + data
+      src_msgs.append ( mk_req ( 'rd', addr, 0, 0 ) )
+      sink_msgs.append( mk_resp( 'rd', 0, data    ) )
+      src_msgs.append ( mk_req ( 'rd', addr, 0, 0 ) )
+      sink_msgs.append( mk_resp( 'rd', 0, data    ) )
+
+  return [ src_msgs, sink_msgs, mem_data ]
 
 def main():
   opts = parse_cmdline()
@@ -228,11 +278,8 @@ def main():
     'loop-1d' : loop_1d,
     'loop-2d' : loop_2d,
     'loop-3d' : loop_3d,
-
-    #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    # LAB TASK: Add your new patterns to this Python dict
-    #'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
+    'copy_access' : copy_access,
+    'summ' : summ,
   }
 
   [ src_msgs, sink_msgs, mem_data ] = pattern_dict[ opts.pattern ]()
