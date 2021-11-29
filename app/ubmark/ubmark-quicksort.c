@@ -10,19 +10,50 @@
 // quicksort-scalar
 //------------------------------------------------------------------------
 
-// '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-// LAB TASK: Add functions you may need
-// '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+void swap(int* x, int* y) {
+  int temp = *x;
+  *x = *y;
+  *y = temp;
+} 
+
+int partition(int* src, int begin, int end) {
+  int idx = begin; // To iterate through the array for swapping
+  int pivot = src[end-1];
+
+  if ( begin == end) {
+    return idx;
+  }
+
+    for (int i = 0; i <end; i++ ) {
+      if ( src[i] < pivot) {
+        swap(&src[i],&src[idx]);
+        idx++;
+        } 
+     }
+ 
+
+  return idx-1;
+}
+
+void qsort(int* src, int begin, int end) {
+
+  if (begin >= end) {
+    return;
+  }
+
+  int idx = partition(src,begin,end); // index of the partition
+  qsort(src,begin,idx); // recursive case for one half of the array
+  qsort(src,idx+2,end); // recursive case for other half of the array 
+
+}
 
 __attribute__ ((noinline))
 void quicksort_scalar( int* dest, int* src, int size )
 {
 
-  // '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-  // LAB TASK: Implement main function of serial quicksort
-  // '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
     // implement quicksort algorithm here
+    qsort(src,0,size);   
+
     int i;
 
     // dummy copy src into dest
