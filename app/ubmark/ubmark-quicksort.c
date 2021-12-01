@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "ubmark-quicksort.dat"
+#include <stdio.h>
 
 //------------------------------------------------------------------------
 // quicksort-scalar
@@ -20,16 +21,20 @@ int partition(int* src, int begin, int end) {
   int idx = begin; // To iterate through the array for swapping
   int pivot = src[end-1];
 
+  if (end < begin){
+    return end;
+  }
+  
   if ( begin == end) {
     return idx;
   }
 
-    for (int i = 0; i <end; i++ ) {
-      if ( src[i] < pivot) {
-        swap(&src[i],&src[idx]);
-        idx++;
-        } 
-     }
+  for (int i = idx; i <end; i++ ) {
+    if ( src[i] <= pivot) {
+      swap(&src[i],&src[idx]);
+      idx++;
+      } 
+    }
  
 
   return idx-1;
@@ -38,7 +43,7 @@ int partition(int* src, int begin, int end) {
 void qsort(int* src, int begin, int end) {
 
   if (begin >= end) {
-    return;
+    return; 
   }
 
   int idx = partition(src,begin,end); // index of the partition
@@ -55,10 +60,12 @@ void quicksort_scalar( int* dest, int* src, int size )
     qsort(src,0,size);   
 
     int i;
-
     // dummy copy src into dest
-    for ( i = 0; i < size; i++ )
+    for ( i = 0; i < size; i++ ){
       dest[i] = src[i];
+      printf("%d, ", dest[i]);
+    }
+    printf("\n\n");
 }
 
 //------------------------------------------------------------------------
@@ -68,7 +75,9 @@ void quicksort_scalar( int* dest, int* src, int size )
 void verify_results( int dest[], int ref[], int size )
 {
   int i;
+
   for ( i = 0; i < size; i++ ) {
+    
     if ( !( dest[i] == ref[i] ) ) {
       test_fail( i, dest[i], ref[i] );
     }
