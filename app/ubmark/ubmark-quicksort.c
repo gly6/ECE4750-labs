@@ -47,8 +47,8 @@ void qsort(int* src, int begin, int end) {
   }
 
   int idx = partition(src,begin,end); // index of the partition
-  qsort(src,begin,idx); // recursive case for one half of the array
-  qsort(src,idx+2,end); // recursive case for other half of the array 
+  qsort(src,begin,idx-1); // recursive case for one half of the array
+  qsort(src,idx+1,end); // recursive case for other half of the array 
 
 }
 
