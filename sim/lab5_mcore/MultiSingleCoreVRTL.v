@@ -53,7 +53,10 @@ module lab5_mcore_MultiSingleCoreVRTL(
 
   logic                                 proc_commit_inst;
 
-lab2_proc_ProcAltVRTL proc
+lab2_proc_ProcAltVRTL  
+  #(
+    .p_num_cores  (4)
+  ) proc 
   (
     .clk           (clk),
     .reset         (reset),
